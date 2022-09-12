@@ -400,4 +400,43 @@ public:
 		return this->NextEnt;
 	}
 };
-};
+
+
+	__forceinline bool WriteRegistry(UNICODE_STRING RegPath, UNICODE_STRING Key, PVOID Address, ULONG Type, ULONG Size)
+	{
+		bool Success = false;
+		HANDLE hKey;
+		OBJECT_ATTRIBUTES ObjAttr;
+		NTSTATUS Status = STATUS_UNSUCCESSFUL;
+
+		InitializeObjectAttributes(&ObjAttr, &RegPath, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+
+		Status = ZwOpenKey(&hKey, KEY_ALL_ACCESS, &ObjAttr);
+
+		if (NT_SUCCESS(Status))
+		{
+			Status = ZwSetValueKey(hKey, &Key, NULL, Type, Address, Size);
+
+			if (NT_SUCCESS(Status))
+				Success = true;
+
+			ZwClose(hKey);
+		}
+		else {
+			Status = ZwCreateKey(&hKey, KEY_ALL_ACCESS, &ObjAttr, 0, &RegPath, 0, 0);
+
+			if (NT_SUCCESS(Status))
+			{
+				Status = ZwSetValueKey(hKey, &Key, NULL, Type, Address, Size);
+
+				if (NT_SUCCESS(Status))
+					Success = true;
+			}
+			ZwClose(hKey);
+		}
+
+		return Success;
+	}
+}
+
+
