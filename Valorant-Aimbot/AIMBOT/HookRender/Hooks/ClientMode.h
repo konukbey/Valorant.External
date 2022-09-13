@@ -39,7 +39,6 @@ void ProcessEntityCache(UserCmd* Cmd)
 		}
 	}
 
-	//wait update tick
 	static BYTE Tick = 0;
 	if (Visuals::LootESP && !Tick++)
 	{
@@ -95,32 +94,32 @@ __int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
 	//call the original function
 	return SpoofCall<__int64>(ClientModeOrg, a1, a2, a3, a4);
 
-	////save prev angles
-	////CameraAngBackup = CurCmd->viewangles;
-
-	////get usercmd & process entities
-	////ProcessEntityCache(CurCmd);
-	//
-	//Aim(CurCmd);
-	//
-	////bhop (w only)
-	//if (Misc::Bhop && (CurCmd->buttons & 2))
-	//{
-	//	//forward + duck
-	//	CurCmd->buttons |= 4u;
-	//	CurCmd->forwardmove = 1.f;
-
-	//	//auto strafer
-	//	if (Global::MouseDelta.x > 0.f)
-	//		CurCmd->sidemove = 1.f;
-	//	else if (Global::MouseDelta.x < 0.f)
-	//		CurCmd->sidemove = -1.f;
-
-	//	//-jump
-	//	if (!(LP->Flags() & 1)) {
-	//		CurCmd->buttons &= ~2u;
-	//	}
-	//}
-
-	//MUTATE_END
 }
+
+struct Vector2 {
+public:
+	float x;
+	float y;
+
+	inline Vector2() : x(0), y(0) {}
+	inline Vector2(float x, float y) : x(x), y(y) {}
+
+	inline float Distance(Vector2 v) {
+		return sqrtf(((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y)));
+	}
+
+	inline Vector2 operator+(const Vector2& v) const {
+		return Vector2(x + v.x, y + v.y);
+	}
+
+	inline Vector2 operator-(const Vector2& v) const {
+		return Vector2(x - v.x, y - v.y);
+	}
+};
+
+struct FQuat {
+	float x;
+	float y;
+	float z;
+	float w;
+};
