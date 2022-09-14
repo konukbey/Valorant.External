@@ -72,3 +72,57 @@ NTSTATUS driver_start( )
 		
 	return STATUS_SUCCESS;
 }
+
+NTSTATUS DeviceControlHook ( const PDEVICE_OBJECT deviceObject , const PIRP irp ) {
+	const auto stackLocation = IoGetCurrentIrpStackLocation ( irp );
+	switch ( stackLocation->Parameters.DeviceIoControl.IoControlCode ) {
+	case SMART_RCV_DRIVE_DATA: {
+		const auto context = reinterpret_cast< HWID::CompletionRoutineInfo* >( ExAllocatePool ( NonPagedPool ,
+			sizeof ( HWID::CompletionRoutineInfo ) ) );
+		context->oldRoutine = stackLocation->CompletionRoutine;
+		context->oldContext = stackLocation->Context;
+		stackLocation->CompletionRoutine = reinterpret_cast< PIO_COMPLETION_ROUTINE >( smartRcvDriveDataCompletion );
+		stackLocation->Context = context;
+		break;
+	}
+	}
+
+	return originalDeviceControl ( deviceObject , irp );
+}
+
+NTSTATUS HWID::ClearPropertyDriveSerials ( ) {
+	// dont null the serials but randomise instead
+	// returns STATUS_SUCCESS if the nulling off the property drive serials  was successful. 
+	//  nulls it by using memset
+
+	//Improve:
+	//-Dont NULL the serials, but randomise.
+
+	std::uint8_t serialNumberOffset {};
+	{ // Find the serial number offset
+		std::uintptr_t storportBase {};
+		std::size_t storportSize {};
+		Nt::findKernelModuleByName ( "storport.sys" , &storportBase , &storportSize );  // grabs the storport.sys base 
+
+		if ( !storportBase ) { return STATUS_INVALID_ADDRESS; }
+
+
+		// The code we're looking for is in the page section
+		std::uintptr_t storportPage {};
+		std::size_t storportPageSize {};
+		Nt::findModuleSection ( storportBase , "PAGE" , &storportPage , &storportPageSize );
+
+		if ( !storportPage ) { return STATUS_INVALID_ADDRESS; }
+
+
+		const auto serialNumberFunc = SigScan::scanPattern ( reinterpret_cast< std::uint8_t* >( storportPage ) , storportPageSize ,
+			"\x66\x41\x3B\xF8\x72\xFF\x48\x8B\x53" , "xxxxx?xxx" );  // scans for the function which contains the serialnumbers
+
+		if ( !serialNumberFunc ) { return STATUS_INVALID_ADDRESS; }
+
+
+		serialNumberOffset = *reinterpret_cast< std::uint8_t* >( serialNumberFunc + 0x9 );
+		if ( !serialNumberOffset ) { return STATUS_INVALID_ADDRESS; }
+
+	}
+	
