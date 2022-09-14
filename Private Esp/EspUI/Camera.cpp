@@ -40,3 +40,28 @@ struct ents
 	float viewMatrix[16];
 	char entName[16];
 }mainInfo;
+
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine, int nCmdShow)
+{
+	AllocConsole();
+	FILE* f;
+	freopen_s(&f, "conout$", "w", stdout);
+	std::cout << "[*] Loading..." << std::endl;
+	std::cout << "[*] Launch Game..." << std::endl;
+
+	while (!targetHwnd)
+	{
+		targetHwnd = FindWindowA(NULL, "AssaultCube");
+	}
+
+	RECT rect;
+	GetWindowRect(targetHwnd, &rect);
+	windowWidth = rect.right - rect.left;
+	windowHeight = rect.bottom - rect.top;
+	windowX = rect.left;
+	windowY = rect.top;
+	vecScreen.x = windowWidth / 2;
+	vecScreen.y = windowHeight;
+	
+	
