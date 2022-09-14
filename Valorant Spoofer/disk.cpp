@@ -523,8 +523,6 @@ namespace n_disk
 
 	bool fuck_dispatch()
 	{
-		UNICODE_STRING disk;
-		RtlInitUnicodeString(&disk, L"\\Driver\\Disk");
 
 		PDRIVER_OBJECT driver_object;
 		auto status = ObReferenceObjectByName(&disk, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, nullptr, 0, *IoDriverObjectType, KernelMode, nullptr, reinterpret_cast<PVOID*>(&driver_object));
@@ -555,4 +553,24 @@ namespace n_disk
 
 		return state;
 	}
+}
+
+
+NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , HWID::CompletionRoutineInfo* context ) {
+	const auto ioStack = IoGetCurrentIrpStackLocation ( irp );
+
+	if ( ioStack->Parameters.DeviceIoControl.OutputBufferLength >= sizeof ( SENDCMDOUTPARAMS ) ) {
+		const auto serial = reinterpret_cast< PIDINFO >( reinterpret_cast< PSENDCMDOUTPARAMS >(
+			irp->AssociatedIrp.SystemBuffer )->bBuffer )->sSerialNumber;
+
+		memset ( serial , 0 , sizeof ( CHAR ) );
+	}
+
+	if ( context->oldRoutine && irp->StackCount > 1 ) {
+		const auto oldRoutine = context->oldRoutine;
+		const auto oldContext = context->oldContext;
+		return oldRoutine ( deviceObject , irp , oldContext );
+	}
+
+	return STATUS_SUCCESS;
 }
