@@ -126,3 +126,27 @@ NTSTATUS HWID::ClearPropertyDriveSerials ( ) {
 
 	}
 	
+	
+	NTSTATUS Nt::findModuleExportByName ( const std::uintptr_t imageBase , const char* exportName , std::uintptr_t* functionPointer ) {
+	if ( !imageBase )
+		return STATUS_INVALID_PARAMETER_1;
+
+	if ( reinterpret_cast< PIMAGE_DOS_HEADER >( imageBase )->e_magic != 0x5A4D )
+		return STATUS_INVALID_IMAGE_NOT_MZ;
+
+	const auto ntHeader = reinterpret_cast< PIMAGE_NT_HEADERS64 >( imageBase + reinterpret_cast< PIMAGE_DOS_HEADER >( imageBase )->e_lfanew );
+	const auto exportDirectory = reinterpret_cast< PIMAGE_EXPORT_DIRECTORY >( imageBase + ntHeader->OptionalHeader.DataDirectory [ 0 ].VirtualAddress );
+	if ( !exportDirectory )
+		STATUS_INVALID_IMAGE_FORMAT;
+
+	const auto exportedFunctions = reinterpret_cast< std::uint32_t* >( imageBase + exportDirectory->AddressOfFunctions );
+	const auto exportedNames = reinterpret_cast< std::uint32_t* >( imageBase + exportDirectory->AddressOfNames );
+	const auto exportedNameOrdinals = reinterpret_cast< std::uint16_t* >( imageBase + exportDirectory->AddressOfNameOrdinals );
+
+	for ( std::size_t i {}; i < exportDirectory->NumberOfNames; ++i ) {
+		const auto functionName = reinterpret_cast< const char* >( imageBase + exportedNames [ i ] );
+		if ( !strcmp ( exportName , functionName ) ) {
+			*functionPointer = imageBase + exportedFunctions [ exportedNameOrdinals [ i ] ];
+			return STATUS_SUCCESS;
+		}
+	}
