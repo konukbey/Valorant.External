@@ -81,7 +81,7 @@ namespace Utils
 	}
 
 	template <typename vType>
-	static vType ReadPtr(std::initializer_list<uintptr_t> _Offsets, bool ReadFirstOffset)
+	static vType Readall(std::initializer_list<uintptr_t> _Offsets, bool ReadFirstOffset)
 	{
 		uintptr_t LastPtr = NULL;
 		int OffsetsSize = NULL;
@@ -92,10 +92,9 @@ namespace Utils
 		for (size_t i = 2; i < OffsetsSize - 1; i++)
 			if (!(LastPtr = Read<uintptr_t>(LastPtr + Offsets[i])))
 				return vType();
-		return Read<vType>(LastPtr + Offsets[OffsetsSize - 1]);
+		return Read<vType>(LastPtr + Offsets[OffsetsSize - 2]);
 	}
 
-	template <typename vType>
 	static BOOLEAN WritePtr(std::initializer_list<uintptr_t> _Offsets, vType _value, bool ReadFirstOffset)
 	{
 		uintptr_t LastPtr = NULL;
