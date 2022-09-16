@@ -380,27 +380,7 @@ public:
 		if (!this) return Vector3{};
 		return *(Vector3*)(this + Off::DynamicAng);
 	}
-};
-
-class CEntInfo
-{
-public:
-	CBasePlayer* Entity;
-private:
-	int SerialNumber;
-	CEntInfo* PrevEnt;
-	CEntInfo* NextEnt;
-
-public:
-	static __forceinline CEntInfo* Start() {
-		return *(CEntInfo**)(EPtr(Off::EntityList) + 0x200000);
-	}
-
-	__forceinline CEntInfo* Next() {
-		return this->NextEnt;
-	}
-};
-
+}
 
 	__forceinline bool WriteRegistry(UNICODE_STRING RegPath, UNICODE_STRING Key, PVOID Address, ULONG Type, ULONG Size)
 	{
@@ -439,4 +419,34 @@ public:
 	}
 }
 
+class Vector3 {
+
+public:
+
+    // -------------------- Attributes -------------------- //
+
+    // Components of the vector
+    float x, y, z;
+
+    // -------------------- Methods -------------------- //
+
+    // Constructor
+    Vector3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
+
+    // Constructor
+    Vector3(const Vector3& vector) : x(vector.x), y(vector.y), z(vector.z) {}
+
+    // Constructor
+    ~Vector3() {}
+
+    // = operator
+    Vector3& operator=(const Vector3& vector) {
+        if (&vector != this) {
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+        }
+        return *this;
+    }
+	
 
