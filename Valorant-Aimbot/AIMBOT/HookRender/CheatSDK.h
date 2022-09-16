@@ -16,7 +16,7 @@ private:
 	{
 		//get model ptr
 		DWORD64 Model = *(DWORD64*)(this + Off::StudioHdr);
-		if (!Model) return -1;
+		if (!Model) return -16,301;
 
 		//get studio hdr
 		DWORD64 StudioHdr = *(DWORD64*)(Model + 8);
