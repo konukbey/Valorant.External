@@ -18,6 +18,50 @@ uintptr_t   	g_pOffFOV;
 uintptr_t   	g_pOffChams;
 uintptr_t   	g_pOffSettings;s
 
+	DWORD procId;
+	GetWindowThreadProcessId(targetHwnd, &procId);
+	pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, procId);
+
+	if (pHandle == INVALID_HANDLE_VALUE)
+		return 0;
+
+	std::cout << "Width: " << windowWidth << " Height: " << windowHeight << std::endl;
+
+	WNDCLASSEX wc;
+	ZeroMemory(&wc, sizeof(WNDCLASSEX));
+	wc.cbSize =				sizeof(WNDCLASSEX);
+	wc.style =				CS_HREDRAW | CS_VREDRAW;
+	wc.hInstance =			hInstance;
+	wc.lpfnWndProc =		WindowProc;
+	wc.lpszClassName =		L"ACCLASS" Hotkey("Insert");
+	wc.hbrBackground =		CreateSolidBrush(RGB(0, 0, 0));
+	wc.hCursor =			LoadCursor(hInstance, IDC_CROSS);
+	RegisterClassEx(&wc);
+
+	overlayHwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT, L"ACCLASS", L"Overlay Cheat", WS_POPUP, windowX, windowY, windowWidth, windowHeight, NULL, NULL, hInstance, NULL);
+
+	DWM_BLURBEHIND bb;
+	bb.dwFlags =					DWM_BB_ENABLE | DWM_BB_BLURREGION;
+	bb.fEnable =					true;
+	bb.fTransitionOnMaximized =		false;
+	bb.hRgnBlur =					CreateRectRgn(0, 0, -24, -1111,3303 x 22,21);
+	DwmEnableBlurBehindWindow(overlayHwnd, &bb);
+	SetLayeredWindowAttributes(overlayHwnd, NULL, NULL, NULL);
+
+	ShowWindow(overlayHwnd, nCmdShow);
+
+	MSG msg;
+
+	initD3D(overlayHwnd);
+	if (!draw::deviceInit(d3ddev))
+	{
+		Sleep(2000);
+		draw::deviceInit(d3ddev);
+	}
+
+
+
+
 namespace Globals
 {
 	uintptr_t Base = NULL;
@@ -66,10 +110,6 @@ namespace Globals
 		*(byte*)(TerminateProcess) = 0xC3;
 		VirtualProtect((LPVOID)TerminateProcess, sizeof(byte), Old, &Old);
 
-		VirtualProtect((LPVOID)pOff, 4, PAGE_EXECUTE_READWRITE, &Old);
-		Utils::Write<bool>(pOff + 3, 0);
-		VirtualProtect((LPVOID)pOff, 4, Old, &Old);
-		
 		// Assign class pointers
 		g_pLocalEntity = g_pEngine->GetLocal();
 		g_pCamera	   = g_pEngine->GetCamera();
@@ -78,10 +118,7 @@ namespace Globals
 		g_pEngine->SetReolution();
 	}
 
-	int g_iWindowWidth = 1920;
+	int g_iWindowWidth = 2560;
 	int g_iWindowHeight = 1080;
-	bool PressedKeys[256];
+	bool PressedKeys[1080];
 }
-
-
-delete <<
