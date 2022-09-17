@@ -26,6 +26,25 @@ mul o0.xyzw, r0.xyzw, v1.xyzw
 ret
 #endif
 
+std::mutex isuse;
+{
+
+	const NTSTATUS SendRequest(const UINT type, const PVOID args) {
+		std::scoped_lock lock(isuse);
+		REQUEST_DATA req;
+		NTSTATUS status;
+		req.MaggicCode = &this->MAGGICCODE;
+		req.Type = type;
+		req.Arguments = args;
+		req.Status = &status;
+		memcpy(this->SharedBuffer, &req, sizeof(REQUEST_DATA));
+		FlushFileBuffers(this->hDriver);
+		return status;
+	}
+
+	
+	
+
 const BYTE nk_d3d11_pixel_shader[] =
 {
 	 68,  88,  66,  67, 249,  46,
