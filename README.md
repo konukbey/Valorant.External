@@ -1,4 +1,4 @@
-## Valorant External
+## Valorant External Bypass
 ```sh-session
 FREE PROJECT YOU DONT HAVE TO PAY ANY FEES , JUST FOLLOW OUT POLICIES
 ```
