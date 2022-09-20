@@ -428,18 +428,33 @@ __int64 __fastcall Present(PVOID a1, GUID* a2, PVOID a3, PVOID a4)
 	MUTATE_END
 }
 
-//HRESULT __fastcall Resize(IDXGISwapChain* Swap, UINT a2, UINT a3, UINT a4, DXGI_FORMAT a5, UINT a6) {
-//
-//	auto state = oResize(Swap, a2, a3, a4, a5, a6);
-//	GUI::Render.Release(); 
-//	return state;
-//}
 
-//void HookD3D()
-//{
-//	/*DX11PresentFn* pOBS_Present = (DX11PresentFn*)RVA(FindPattern(E("FF 15 ? ? ? ? 48 8B 16 48 8B CE FF 52 10 48"), E(L"graphics-hook64.dll")), 6);
-//	oPresent = *pOBS_Present; *pOBS_Present = Present;*/
-//
-//	DX11PresentFn* pOBS_Present = (DX11PresentFn*)(GetModuleBase(E(L"IGO64")) + 0x163CE8); 
-//	oPresent = *pOBS_Present; *pOBS_Present = Present;
-//}
+bool verify_game() {
+
+	wchar_t name[] = { 'V', 'A', 'L', 'O', 'R', 'A', 'N', 'T', '-', 'W', 'i' , 'n' , '6', '4', '-' , 'S' , 'h', 'i', 'p', 'p', 'i', 'n', 'g', '.','e', 'x', 'e' , 0 };
+	
+	Unprotect(GetProcessIdByName);
+	pid = GetProcessIdByName(name);
+	Protect(GetProcessIdByName);
+	memset(name, 0, sizeof(name));
+
+	Unprotect(Driver::GetBaseAddress);
+	BaseAddr = Driver::GetBaseAddress(pid);
+	Protect(Driver::GetBaseAddress);
+
+	printf("-> m_pid: %d base: %llx\n", pid, BaseAddr);
+
+	if (BaseAddr != 0) {
+
+		GamePid = pid;
+		GameBaseAddress = BaseAddr;
+
+
+		GamePid = 0;
+		GameBaseAddress = 0;
+
+	}
+	//ProtectedSleep(2000);
+
+	return true;
+}
