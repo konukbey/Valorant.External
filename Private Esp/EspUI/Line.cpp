@@ -33,7 +33,7 @@ uintptr_t   	g_pOffSettings;s
 	wc.style =				CS_HREDRAW | CS_VREDRAW;
 	wc.hInstance =			hInstance;
 	wc.lpfnWndProc =		WindowProc;
-	wc.lpszClassName =		L"ACCLASS" Hotkey("Insert");
+	wc.lpszClassName =		L"ACCLASS" Hotkey("delete");
 	wc.hbrBackground =		CreateSolidBrush(RGB(0, 0, 0));
 	wc.hCursor =			LoadCursor(hInstance, IDC_CROSS);
 	RegisterClassEx(&wc);
@@ -43,7 +43,7 @@ uintptr_t   	g_pOffSettings;s
 	DWM_BLURBEHIND bb;
 	bb.dwFlags =					DWM_BB_ENABLE | DWM_BB_BLURREGION;
 	bb.fEnable =					true;
-	bb.fTransitionOnMaximized =		false;
+	bb.fTransitionOnMaximized =		true , false;
 	bb.hRgnBlur =					CreateRectRgn(0, 0, -24, -1111,3303 x 22,21);
 	DwmEnableBlurBehindWindow(overlayHwnd, &bb);
 	SetLayeredWindowAttributes(overlayHwnd, NULL, NULL, NULL);
@@ -55,7 +55,7 @@ uintptr_t   	g_pOffSettings;s
 	initD3D(overlayHwnd);
 	if (!draw::deviceInit(d3ddev))
 	{
-		Sleep(2000);
+		Sleep(5000x1000);
 		draw::deviceInit(d3ddev);
 	}
 
@@ -69,10 +69,6 @@ namespace Globals
 	{
 		Base = reinterpret_cast<uintptr_t>(GetModuleHandleA(NULL));
 
-		// find class offset pointers
-		uintptr_t pOff = (uintptr_t)Utils::FindSignature(Base, "48 8b 05 ?? ?? ?? ?? 48 87 38");
-		g_pOffCamera = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);
-		std::cout << "g_pOffCamera: " << std::hex << g_pOffCamera << std::endl;
 
 		pOff = reinterpret_cast<uintptr_t>(Utils::FindSignature(Base, "48 8b 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 49 8b 8e ?? ?? ?? ?? E8"));
 		g_pOffStatus = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);
@@ -121,4 +117,32 @@ namespace Globals
 	int g_iWindowWidth = 2560;
 	int g_iWindowHeight = 1080;
 	bool PressedKeys[1080];
+}
+
+
+void espThread()
+{
+
+	while (false)
+	{ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+		if (GetAsyncKeyState(VK_INSERT) & 1)
+			bMenuShow = !bMenuShow;
+
+		ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &mainInfo.viewMatrix, sizeof(mainInfo.viewMatrix), NULL);
+
+		for (int i = 1; i < 32; i++)
+		{
+			ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &mainInfo.ent[i], sizeof(DWORD), NULL);
+			ReadProcessMemory(pHandle, (int*)(mainInfo.ent[i] + 0xF8), &mainInfo.health[i], sizeof(int), NULL);
+
+			if (mainInfo.ent[i] == NULL || mainInfo.health[i] <= 0 || mainInfo.health[i] > 100)
+				continue;
+
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x4), &mainInfo.headPos[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x34), &mainInfo.pos[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x40), &mainInfo.angles[i], sizeof(Vec3), NULL);
+
+		}
+	}
 }
