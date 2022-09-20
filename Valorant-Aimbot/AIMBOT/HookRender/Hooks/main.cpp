@@ -128,3 +128,50 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	return 0;
 };
+
+bool IsKeyDown(int vk)
+{
+	return (GetAsyncKeyState(vk) & 0x8000) != 0;
+}
+
+int aim_key = VK_RBUTTON;
+
+int main()
+{
+
+	std::cout << _xor_("Key: Insert");
+	std::string i2;
+	std::cin >> i2;
+
+	program::login(i2, userid, ProgramID);
+
+}
+
+void choices()
+{
+
+    Print::text(_xor_("[1] Load Cheat\n").c_str(), White);
+    std::string choice;
+    std::getline(std::cin, choice);
+
+
+    if (choice == _xor_("1").c_str())
+    {
+        system(_xor_("cls").c_str());
+        WaitingForGame();
+
+    }
+
+
+    else if (choice != _xor_("1").c_str())
+    {
+        system(_xor_("cls").c_str());
+        choices();
+
+    }
+
+}
+
+
+
+
