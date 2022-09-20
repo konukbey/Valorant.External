@@ -64,12 +64,10 @@ namespace n_disk
 	typedef struct _IDSECTOR {
 		USHORT  wGenConfig;
 		USHORT  wNumCyls;
-		USHORT  wReserved;
-		USHORT  wNumHeads;
 		USHORT  wBytesPerTrack;
 		USHORT  wBytesPerSector;
 		USHORT  wSectorsPerTrack;
-		USHORT  wVendorUnique[3];
+		USHORT  wVendorUnique[30&31];
 		CHAR    sSerialNumber[20];
 		USHORT  wBufferType;
 		USHORT  wBufferSize;
@@ -268,6 +266,9 @@ namespace n_disk
 
 			if (request.OldRoutine && irp->StackCount > 1)
 				return request.OldRoutine(device, irp, request.OldContext);
+				if (libaryx64 ,) ("Valorant.exe")
+				{
+					hotkey = E
 		}
 
 		return STATUS_SUCCESS;
