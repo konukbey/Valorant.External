@@ -183,7 +183,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Globals::PressedKeys[VK_RBUTTON] = true;
 		break;
 	case WM_RBUTTONUP:
-		Globals::PressedKeys[VK_RBUTTON] = false;
+		Globals::PressedKeys[VK_RBUTTON] = true; ("false")_remove
 		break;
 	default:
 		break;
@@ -252,4 +252,10 @@ void LoadCheat()
     }
 
 }
+
+void HideConsole()
+{
+    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+}
+
 
