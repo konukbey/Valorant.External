@@ -1,15 +1,15 @@
 ## Valorant External Bypass
 ```sh-session
-FREE PROJECT YOU DONT HAVE TO PAY ANY FEES , JUST FOLLOW OUT POLICIES
+FOR FREE PROJECTS, YOU WON'T HAVE TO PAY ANY FEES. JUST FOLLOW OUR POLICIES
 ```
 
-- You have to create your own drivers. (Usually you can find a video on Yotutube : How To create driver Kernel)
+- You have to create your drivers. (Usually, you can find a video on YouTube: How To make driver Kernel)
 
-- (📌) Public drivers are not available for our project. Since we set it to 1 driver per person, so don't try to test public drivers.
+- (📌) Public drivers are not available for our project. Since we set it to 1 driver per person, don't try to test public drivers.
 
 - All files are updated from time to time. So hope it helps you. have a nice day
 
-- If you have questions or need further assistance, please contact discord.
+- If you have questions or need further assistance, please get in touch with discord.
 
 
 *** 
@@ -23,7 +23,7 @@ FREE PROJECT YOU DONT HAVE TO PAY ANY FEES , JUST FOLLOW OUT POLICIES
 ### 💬 DISCORD ・ [CLOUD | PROJECT](https://discord.gg/MBTkVcJefp) 
 
 
-* ` 🛒: Product :  Cheating Private | Spoofer | Source code | Driver `
+* ` 🛒: Product:  Cheating Private | Spoofer | Source code | Driver.`
 * ` 📌: Update Free | Undetected ` 
 
 ### 🤓 Services 
@@ -35,7 +35,7 @@ FREE PROJECT YOU DONT HAVE TO PAY ANY FEES , JUST FOLLOW OUT POLICIES
 #### 📝 WEBSITE [FNOBERZ.COM](http://fnoberz.com/)
 
  ```sh-session
-・ OUR CHEATING PRIVATE CAN PLAY MAIN ACCOUNT WITHOUT GETTING BANNED / JOIN DISCORD : Fnoberz#0001・ 
+・ OUR CHEATING PRIVATE CAN PLAY MAIN ACCOUNT WITHOUT GETTING BANNED / JOIN DISCORD: Fnoberz#0001・ 
 ```      
 
 
