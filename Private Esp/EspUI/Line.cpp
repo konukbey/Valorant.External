@@ -146,3 +146,22 @@ void espThread()
 		}
 	}
 }
+
+__forceinline uint64_t DecryptWorld(uint64_t valBase)
+{
+	//protect_mem(DriverHandle, processID, valBase + 0x758BDB8, 0x1000, PAGE_EXECUTE_READ, NULL);
+	const auto key = Driver::read<uint64_t>(pid, valBase + 0x7564DB8);
+	//const auto key = *(uint64_t*)(valBase + 0x758BDB8);
+#pragma pack(push, 1)
+	struct State
+	{
+		uint64_t Keys[7];
+	};
+#pragma pack(pop)
+	const auto state = Driver::read<State>(pid, valBase + 0x7564D80);
+	//const auto state = *(State*)(valBase + 0x758BD80);
+
+	return Driver::read<uint64_t>(pid, decrypt_uworld(key, (const uint64_t*)&state));
+	//return *(uint64_t*)(decrypt_uworld(key, (const uint64_t*)&state));
+}
+
