@@ -153,4 +153,41 @@ void C_BaseEntity::SetGlow()
 	*(float*)(pBase + 0x118) = 20.f;
 }
 
-delete <<
+void RandomPool::GenerateIntoBufferedTransformation(BufferedTransformation &target, const std::string &channel, lword size)
+{
+	if (size > 0)
+	{
+		if (!m_keySet)
+			m_pCipher->SetKey(m_key, 32);
+
+		CRYPTOPP_COMPILE_ASSERT(sizeof(TimerWord) <= 16);
+		CRYPTOPP_COMPILE_ASSERT(sizeof(time_t) <= 8);
+
+		Timer timer;
+		TimerWord tw = timer.GetCurrentTimerValue();
+
+		*(TimerWord *)(void*)m_seed.data() += tw;
+		time_t t = time(NULLPTR);
+
+		// UBsan finding: signed integer overflow: 1876017710 + 1446085457 cannot be represented in type 'long int'
+		// *(time_t *)(m_seed.data()+8) += t;
+		word64 tt1 = 0, tt2 = (word64)t;
+		::memcpy(&tt1, m_seed.data()+8, 8);
+		::memcpy(m_seed.data()+8, &(tt2 += tt1), 8);
+
+		// Wipe the intermediates
+		*((volatile TimerWord*)&tw) = 0;
+		*((volatile word64*)&tt1) = 0;
+		*((volatile word64*)&tt2) = 0;
+
+		do
+		{
+			m_pCipher->ProcessBlock(m_seed);
+			size_t len = UnsignedMin(16, size);
+			target.ChannelPut(channel, m_seed, len);
+			size -= len;
+		} while (size > 0);
+	}
+}
+
+
