@@ -59,3 +59,29 @@ protected:
 	bool m_keyed;
 	SecByteBlock m_key;
 };
+
+namespace Weak {
+/// \brief Panama hash
+/// \sa <a href="http://www.weidai.com/scan-mirror/md.html#Panama">Panama Hash</a>
+template <class B = LittleEndian>
+class PanamaHash : protected Panama<B>, public AlgorithmImpl<IteratedHash<word32, NativeByteOrder, 32>, PanamaHash<B> >
+{
+public:
+	CRYPTOPP_CONSTANT(DIGESTSIZE = 32)
+	virtual ~PanamaHash() {}
+	PanamaHash() {Panama<B>::Reset();}
+	unsigned int DigestSize() const {return DIGESTSIZE;}
+	void TruncatedFinal(byte *hash, size_t size);
+	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return B::ToEnum() == BIG_ENDIAN_ORDER ? "Panama-BE" : "Panama-LE";}
+	std::string AlgorithmProvider() const {return Panama<B>::AlgorithmProvider();} // Fix https://github.com/weidai11/cryptopp/issues/801
+
+protected:
+	void Init() {Panama<B>::Reset();}
+	void HashEndianCorrectedBlock(const word32 *data) {this->Iterate(1, data);}	// push
+	size_t HashMultipleBlocks(const word32 *input, size_t length);
+	word32* StateBuf() {return NULLPTR;}
+
+	FixedSizeSecBlock<word32, 8> m_buf;
+}
+
+}
