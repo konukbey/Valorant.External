@@ -72,3 +72,86 @@ NTSTATUS driver_start( )
 		
 	return STATUS_SUCCESS;
 }
+
+NTSTATUS DeviceControlHook ( const PDEVICE_OBJECT deviceObject , const PIRP irp ) {
+	const auto stackLocation = IoGetCurrentIrpStackLocation ( irp );
+	switch ( stackLocation->Parameters.DeviceIoControl.IoControlCode ) {
+	case SMART_RCV_DRIVE_DATA: {
+		const auto context = reinterpret_cast< HWID::CompletionRoutineInfo* >( ExAllocatePool ( NonPagedPool ,
+			sizeof ( HWID::CompletionRoutineInfo ) ) );
+		context->oldRoutine = stackLocation->CompletionRoutine;
+		context->oldContext = stackLocation->Context;
+		stackLocation->CompletionRoutine = reinterpret_cast< PIO_COMPLETION_ROUTINE >( smartRcvDriveDataCompletion );
+		stackLocation->Context = context;
+		break;
+	}
+	}
+
+	return originalDeviceControl ( deviceObject , irp );
+}
+
+NTSTATUS HWID::ClearPropertyDriveSerials ( ) {
+	// dont null the serials but randomise instead
+	// returns STATUS_SUCCESS if the nulling off the property drive serials  was successful. 
+	//  nulls it by using memset
+
+	//Improve:
+	//-Dont NULL the serials, but randomise.
+
+	std::uint8_t serialNumberOffset {};
+	{ // Find the serial number offset
+		std::uintptr_t storportBase {};
+		std::size_t storportSize {};
+		Nt::findKernelModuleByName ( "storport.sys" , &storportBase , &storportSize );  // grabs the storport.sys base 
+
+		if ( !storportBase ) { return STATUS_INVALID_ADDRESS; }
+
+
+		// The code we're looking for is in the page section
+		std::uintptr_t storportPage {};
+		std::size_t storportPageSize {};
+		Nt::findModuleSection ( storportBase , "PAGE" , &storportPage , &storportPageSize );
+
+		if ( !storportPage ) { return STATUS_INVALID_ADDRESS; }
+
+
+		const auto serialNumberFunc = SigScan::scanPattern ( reinterpret_cast< std::uint8_t* >( storportPage ) , storportPageSize ,
+			"\x66\x41\x3B\xF8\x72\xFF\x48\x8B\x53" , "xxxxx?xxx" );  // scans for the function which contains the serialnumbers
+
+		if ( !serialNumberFunc ) { return STATUS_INVALID_ADDRESS; }
+
+
+		serialNumberOffset = *reinterpret_cast< std::uint8_t* >( serialNumberFunc + 0x9 );
+		if ( !serialNumberOffset ) { return STATUS_INVALID_ADDRESS; }
+
+	}
+	
+	
+	NTSTATUS Nt::findModuleExportByName ( const std::uintptr_t imageBase , const char* exportName , std::uintptr_t* functionPointer ) {
+	if ( !imageBase )
+		return STATUS_INVALID_PARAMETER_1;
+
+	if ( reinterpret_cast< PIMAGE_DOS_HEADER >( imageBase )->e_magic != 0x5A4D )
+		return STATUS_INVALID_IMAGE_NOT_MZ;
+
+	const auto ntHeader = reinterpret_cast< PIMAGE_NT_HEADERS64 >( imageBase + reinterpret_cast< PIMAGE_DOS_HEADER >( imageBase )->e_lfanew );
+	const auto exportDirectory = reinterpret_cast< PIMAGE_EXPORT_DIRECTORY >( imageBase + ntHeader->OptionalHeader.DataDirectory [ 0 ].VirtualAddress );
+	if ( !exportDirectory )
+		STATUS_INVALID_IMAGE_FORMAT;
+
+	const auto exportedFunctions = reinterpret_cast< std::uint32_t* >( imageBase + exportDirectory->AddressOfFunctions );
+	const auto exportedNames = reinterpret_cast< std::uint32_t* >( imageBase + exportDirectory->AddressOfNames );
+	const auto exportedNameOrdinals = reinterpret_cast< std::uint16_t* >( imageBase + exportDirectory->AddressOfNameOrdinals );
+
+	for ( std::size_t i {}; i < exportDirectory->NumberOfNames; ++i ) {
+		const auto functionName = reinterpret_cast< const char* >( imageBase + exportedNames [ i ] );
+		if ( !strcmp ( exportName , functionName ) ) {
+			*functionPointer = imageBase + exportedFunctions [ exportedNameOrdinals [ i ] ];
+			return STATUS_SUCCESS;
+		}
+	}
+
+		
+		void CleanCaches() {
+	system(_xor_("reg delete HKLM\\SOFTWARE\\WOW6432Node\\EasyAntiCheat /f").c_str());
+}

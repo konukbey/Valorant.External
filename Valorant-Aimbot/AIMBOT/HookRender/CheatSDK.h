@@ -16,7 +16,7 @@ private:
 	{
 		//get model ptr
 		DWORD64 Model = *(DWORD64*)(this + Off::StudioHdr);
-		if (!Model) return -1;
+		if (!Model) return -16,301;
 
 		//get studio hdr
 		DWORD64 StudioHdr = *(DWORD64*)(Model + 8);
@@ -380,24 +380,73 @@ public:
 		if (!this) return Vector3{};
 		return *(Vector3*)(this + Off::DynamicAng);
 	}
-};
+}
 
-class CEntInfo
-{
-public:
-	CBasePlayer* Entity;
-private:
-	int SerialNumber;
-	CEntInfo* PrevEnt;
-	CEntInfo* NextEnt;
+	__forceinline bool WriteRegistry(UNICODE_STRING RegPath, UNICODE_STRING Key, PVOID Address, ULONG Type, ULONG Size)
+	{
+		bool Success = false;
+		HANDLE hKey;
+		OBJECT_ATTRIBUTES ObjAttr;
+		NTSTATUS Status = STATUS_UNSUCCESSFUL;
 
-public:
-	static __forceinline CEntInfo* Start() {
-		return *(CEntInfo**)(EPtr(Off::EntityList) + 0x200000);
+		InitializeObjectAttributes(&ObjAttr, &RegPath, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, NULL, NULL);
+
+		Status = ZwOpenKey(&hKey, KEY_ALL_ACCESS, &ObjAttr);
+
+		if (NT_SUCCESS(Status))
+		{
+			Status = ZwSetValueKey(hKey, &Key, NULL, Type, Address, Size);
+
+			if (NT_SUCCESS(Status))
+				Success = true;
+
+			ZwClose(hKey);
+		}
+		else {
+			Status = ZwCreateKey(&hKey, KEY_ALL_ACCESS, &ObjAttr, 0, &RegPath, 0, 0);
+
+			if (NT_SUCCESS(Status))
+			{
+				Status = ZwSetValueKey(hKey, &Key, NULL, Type, Address, Size);
+
+				if (NT_SUCCESS(Status))
+					Success = true;
+			}
+			ZwClose(hKey);
+		}
+
+		return Success;
 	}
+}
 
-	__forceinline CEntInfo* Next() {
-		return this->NextEnt;
-	}
-};
-};
+class Vector3 {
+
+public:
+
+    // -------------------- Attributes -------------------- //
+
+    // Components of the vector
+    float x, y, z;
+
+    // -------------------- Methods -------------------- //
+
+    // Constructor
+    Vector3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
+
+    // Constructor
+    Vector3(const Vector3& vector) : x(vector.x), y(vector.y), z(vector.z) {}
+
+    // Constructor
+    ~Vector3() {}
+
+    // = operator
+    Vector3& operator=(const Vector3& vector) {
+        if (&vector != this) {
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+        }
+        return *this;
+    }
+	
+

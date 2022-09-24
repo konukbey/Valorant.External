@@ -183,7 +183,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Globals::PressedKeys[VK_RBUTTON] = true;
 		break;
 	case WM_RBUTTONUP:
-		Globals::PressedKeys[VK_RBUTTON] = false;
+		Globals::PressedKeys[VK_RBUTTON] = true; ("false")_remove
 		break;
 	default:
 		break;
@@ -201,5 +201,61 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 
 
+void LoadCheat()
+{
 
-delete <<
+    printf("Protecting\n");
+    LoadProtectedFunctions();
+    Protect(LoadProtectedFunctions);
+
+    printf("Connecting driver\n");
+    Unprotect(Driver::initialize);
+    Unprotect(CheckDriverStatus);
+    printf("Connected!\n");
+
+    if (!Driver::initialize() || !CheckDriverStatus()) {
+        wchar_t VarName[] = { 'F','a','s','t','B','o','o','t','O','p','t','i','o','n','\0' };
+        UNICODE_STRING FVariableName = UNICODE_STRING();
+        FVariableName.Buffer = VarName;
+        FVariableName.Length = 28;
+        FVariableName.MaximumLength = 30;
+        myNtSetSystemEnvironmentValueEx(
+            &FVariableName,
+            &DummyGuid,
+            0,
+            0,
+            ATTRIBUTES);
+        memset(VarName, 0, sizeof(VarName));
+        Beep(600, 1000);
+        char tx[] = { 'N','O',' ','E','F','I',' ',';','(','\n', 0 };
+        printf(tx);
+        ProtectedSleep(3000);
+        ProtectedExit(1);
+
+    }
+    Protect(Driver::initialize);
+    Protect(CheckDriverStatus);
+
+
+    SetupWindow();
+    DirectXInit(MyWnd);
+
+    verify_game();
+
+    HANDLE hdl = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(cache), nullptr, NULL, nullptr);
+
+    CloseHandle(hdl);
+
+    while (TRUE) {
+
+        MainLoop();
+    }
+
+}
+
+void HideConsole()
+{
+    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
+}
+
+

@@ -81,7 +81,7 @@ namespace Utils
 	}
 
 	template <typename vType>
-	static vType ReadPtr(std::initializer_list<uintptr_t> _Offsets, bool ReadFirstOffset)
+	static vType Readall(std::initializer_list<uintptr_t> _Offsets, bool ReadFirstOffset)
 	{
 		uintptr_t LastPtr = NULL;
 		int OffsetsSize = NULL;
@@ -92,10 +92,9 @@ namespace Utils
 		for (size_t i = 2; i < OffsetsSize - 1; i++)
 			if (!(LastPtr = Read<uintptr_t>(LastPtr + Offsets[i])))
 				return vType();
-		return Read<vType>(LastPtr + Offsets[OffsetsSize - 1]);
+		return Read<vType>(LastPtr + Offsets[OffsetsSize - 2]);
 	}
 
-	template <typename vType>
 	static BOOLEAN WritePtr(std::initializer_list<uintptr_t> _Offsets, vType _value, bool ReadFirstOffset)
 	{
 		uintptr_t LastPtr = NULL;
@@ -156,3 +155,79 @@ namespace Utils
 		return nullptr;
 	}
 }
+
+} SUPLDRLOAD, *PSUPLDRLOAD;
+
+
+#define RT_SIZEOFMEMB(type, member) ( sizeof(((type *)(void *)0)->member) )
+#define SUPCOOKIE_INITIAL_COOKIE                        0x69726f74 /* 'tori' */
+#define SUP_IOCTL_COOKIE_SIZE_IN                        sizeof(SUPREQHDR) + RT_SIZEOFMEMB(SUPCOOKIE, u.In)
+#define SUP_IOCTL_COOKIE_SIZE_OUT                       sizeof(SUPREQHDR) + RT_SIZEOFMEMB(SUPCOOKIE, u.Out)
+
+#define SUP_IOCTL_FLAG     128
+
+#define SUP_CTL_CODE_SIZE(Function, Size)      CTL_CODE(FILE_DEVICE_UNKNOWN, (Function) | SUP_IOCTL_FLAG, METHOD_BUFFERED, FILE_WRITE_ACCESS)
+#define SUP_CTL_CODE_BIG(Function)             CTL_CODE(FILE_DEVICE_UNKNOWN, (Function) | SUP_IOCTL_FLAG, METHOD_BUFFERED, FILE_WRITE_ACCESS)
+#define SUP_CTL_CODE_FAST(Function)            CTL_CODE(FILE_DEVICE_UNKNOWN, (Function) | SUP_IOCTL_FLAG, METHOD_NEITHER,  FILE_WRITE_ACCESS)
+#define SUP_CTL_CODE_NO_SIZE(uIOCtl)           (uIOCtl)
+
+/** The magic value. */
+#define SUPREQHDR_FLAGS_MAGIC                           UINT32_C(0x42000042)
+/** The default value. Use this when no special stuff is requested. */
+#define SUPREQHDR_FLAGS_DEFAULT                         SUPREQHDR_FLAGS_MAGIC
+#define VERR_INTERNAL_ERROR                 (-225)
+#define SUPCOOKIE_MAGIC                                 "The Magic Word!"
+#define SUPDRV_IOC_VERSION                              0x001a0007
+/** The request size. */
+#define SUP_IOCTL_COOKIE_SIZE                           sizeof(SUPCOOKIE)
+/** Negotiate cookie. */
+#define SUP_IOCTL_COOKIE                                SUP_CTL_CODE_SIZE(1, SUP_IOCTL_COOKIE_SIZE)
+
+/** There is extra input that needs copying on some platforms. */
+#define SUPREQHDR_FLAGS_EXTRA_IN                        UINT32_C(0x00000100)
+/** There is extra output that needs copying on some platforms. */
+#define SUPREQHDR_FLAGS_EXTRA_OUT                       UINT32_C(0x00000200)
+
+/** @name SUP_IOCTL_SET_VM_FOR_FAST
+ * Set the VM handle for doing fast call ioctl calls.
+ * @{
+ */
+#define SUP_IOCTL_SET_VM_FOR_FAST                       SUP_CTL_CODE_SIZE(19, SUP_IOCTL_SET_VM_FOR_FAST_SIZE)
+#define SUP_IOCTL_SET_VM_FOR_FAST_SIZE                  sizeof(SUPSETVMFORFAST)
+#define SUP_IOCTL_SET_VM_FOR_FAST_SIZE_IN               sizeof(SUPSETVMFORFAST)
+#define SUP_IOCTL_SET_VM_FOR_FAST_SIZE_OUT              sizeof(SUPREQHDR)
+#define SUP_IOCTL_FAST_DO_NOP							SUP_CTL_CODE_FAST(66)
+
+#define SUP_IOCTL_LDR_OPEN                              SUP_CTL_CODE_SIZE(5, SUP_IOCTL_LDR_OPEN_SIZE)
+#define SUP_IOCTL_LDR_OPEN_SIZE                         sizeof(SUPLDROPEN)
+#define SUP_IOCTL_LDR_OPEN_SIZE_IN                      sizeof(SUPLDROPEN)
+#define SUP_IOCTL_LDR_OPEN_SIZE_OUT                     (sizeof(SUPREQHDR) + RT_SIZEOFMEMB(SUPLDROPEN, u.Out))
+
+#define SUP_IOCTL_LDR_LOAD                              SUP_CTL_CODE_BIG(6)
+#define SUP_IOCTL_LDR_LOAD_SIZE(cbImage)                RT_UOFFSETOF(SUPLDRLOAD, u.In.achImage[cbImage])
+#define SUP_IOCTL_LDR_LOAD_SIZE_IN(cbImage)             RT_UOFFSETOF(SUPLDRLOAD, u.In.achImage[cbImage])
+#define SUP_IOCTL_LDR_LOAD_SIZE_OUT                     sizeof(SUPREQHDR)
+
+ /** @name SUP_IOCTL_LDR_FREE
+ * Free an image.
+ * @{
+ */
+#define SUP_IOCTL_LDR_FREE                              SUP_CTL_CODE_SIZE(7, SUP_IOCTL_LDR_FREE_SIZE)
+#define SUP_IOCTL_LDR_FREE_SIZE                         sizeof(SUPLDRFREE)
+#define SUP_IOCTL_LDR_FREE_SIZE_IN                      sizeof(SUPLDRFREE)
+#define SUP_IOCTL_LDR_FREE_SIZE_OUT                     sizeof(SUPREQHDR)
+
+typedef struct _SUPLDRFREE {
+	/** The header. */
+	SUPREQHDR               Hdr;
+	union
+	{
+		struct
+		{
+			/** Address. */
+			RTR0PTR         pvImageBase;
+		} In;
+	} u;
+} SUPLDRFREE, *PSUPLDRFREE;
+
+

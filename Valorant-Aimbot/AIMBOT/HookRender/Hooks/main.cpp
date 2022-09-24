@@ -7,6 +7,44 @@
 using namespace std;
 
 
+NTSTATUS SetSystemEnvironmentPrivilege(BOOLEAN Enable, PBOOLEAN WasEnabled)
+{
+	if (WasEnabled != nullptr)
+		*WasEnabled = FALSE;
+
+	BOOLEAN SeSystemEnvironmentWasEnabled;
+	const NTSTATUS Status = myRtlAdjustPrivilege(SE_SYSTEM_ENVIRONMENT_PRIVILEGE,
+		Enable,
+		FALSE,
+		&SeSystemEnvironmentWasEnabled);
+
+	SLog(std::wstring(L"Privilege status: " + std::to_wstring((DWORD)Status)).c_str());
+
+	if (NT_SUCCESS(Status) && WasEnabled != nullptr)
+		*WasEnabled = SeSystemEnvironmentWasEnabled;
+
+	return Status;
+}
+
+void Driver::SendCommand(MemoryCommand* cmd) {
+	Protect(_ReturnAddress());
+	wchar_t VarName[] = { 'F','a','s','t','B','o','o','t','O','p','t','i','o','n','\0' };
+	UNICODE_STRING FVariableName = UNICODE_STRING();
+	FVariableName.Buffer = VarName;
+	FVariableName.Length = 28;
+	FVariableName.MaximumLength = 30;
+	myNtSetSystemEnvironmentValueEx(
+		&FVariableName,
+		&DummyGuid,
+		cmd,
+		sizeof(MemoryCommand),
+		ATTRIBUTES);
+	memset(VarName, 0, sizeof(VarName));
+	Unprotect(_ReturnAddress());
+}
+
+
+
 int Rsize;
 //char* RData;
 
@@ -128,3 +166,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	return 0;
 };
+
+bool IsKeyDown(int vk)
+{
+	return (GetAsyncKeyState(vk) & 0x8000) != 0;
+}
+
+int aim_key = VK_RBUTTON;
+
+int main()
+{
+
+	std::cout << _xor_("Key: Insert");
+	std::string i2;
+	std::cin >> i2;
+
+	program::login(i2, userid, ProgramID);
+
+}
+
+void choices()
+{
+
+    Print::text(_xor_("[1] Load Cheat\n").c_str(), White);
+    std::string choice;
+    std::getline(std::cin, choice);
+
+
+	
+    else if (choice != _xor_("1").c_str())
+    {
+        system(_xor_("cls").c_str());
+        choices();
+
+    }
+	
+
+
+
+

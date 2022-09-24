@@ -18,6 +18,50 @@ uintptr_t   	g_pOffFOV;
 uintptr_t   	g_pOffChams;
 uintptr_t   	g_pOffSettings;s
 
+	DWORD procId;
+	GetWindowThreadProcessId(targetHwnd, &procId);
+	pHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, procId);
+
+	if (pHandle == INVALID_HANDLE_VALUE)
+		return 0;
+
+	std::cout << "Width: " << windowWidth << " Height: " << windowHeight << std::endl;
+
+	WNDCLASSEX wc;
+	ZeroMemory(&wc, sizeof(WNDCLASSEX));
+	wc.cbSize =				sizeof(WNDCLASSEX);
+	wc.style =				CS_HREDRAW | CS_VREDRAW;
+	wc.hInstance =			hInstance;
+	wc.lpfnWndProc =		WindowProc;
+	wc.lpszClassName =		L"ACCLASS" Hotkey("delete");
+	wc.hbrBackground =		CreateSolidBrush(RGB(0, 0, 0));
+	wc.hCursor =			LoadCursor(hInstance, IDC_CROSS);
+	RegisterClassEx(&wc);
+
+	overlayHwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT, L"ACCLASS", L"Overlay Cheat", WS_POPUP, windowX, windowY, windowWidth, windowHeight, NULL, NULL, hInstance, NULL);
+
+	DWM_BLURBEHIND bb;
+	bb.dwFlags =					DWM_BB_ENABLE | DWM_BB_BLURREGION;
+	bb.fEnable =					true;
+	bb.fTransitionOnMaximized =		true , false;
+	bb.hRgnBlur =					CreateRectRgn(0, 0, -24, -1111,3303 x 22,21);
+	DwmEnableBlurBehindWindow(overlayHwnd, &bb);
+	SetLayeredWindowAttributes(overlayHwnd, NULL, NULL, NULL);
+
+	ShowWindow(overlayHwnd, nCmdShow);
+
+	MSG msg;
+
+	initD3D(overlayHwnd);
+	if (!draw::deviceInit(d3ddev))
+	{
+		Sleep(5000x1000);
+		draw::deviceInit(d3ddev);
+	}
+
+
+
+
 namespace Globals
 {
 	uintptr_t Base = NULL;
@@ -25,10 +69,6 @@ namespace Globals
 	{
 		Base = reinterpret_cast<uintptr_t>(GetModuleHandleA(NULL));
 
-		// find class offset pointers
-		uintptr_t pOff = (uintptr_t)Utils::FindSignature(Base, "48 8b 05 ?? ?? ?? ?? 48 87 38");
-		g_pOffCamera = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);
-		std::cout << "g_pOffCamera: " << std::hex << g_pOffCamera << std::endl;
 
 		pOff = reinterpret_cast<uintptr_t>(Utils::FindSignature(Base, "48 8b 0d ?? ?? ?? ?? e8 ?? ?? ?? ?? 49 8b 8e ?? ?? ?? ?? E8"));
 		g_pOffStatus = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);
@@ -66,10 +106,6 @@ namespace Globals
 		*(byte*)(TerminateProcess) = 0xC3;
 		VirtualProtect((LPVOID)TerminateProcess, sizeof(byte), Old, &Old);
 
-		VirtualProtect((LPVOID)pOff, 4, PAGE_EXECUTE_READWRITE, &Old);
-		Utils::Write<bool>(pOff + 3, 0);
-		VirtualProtect((LPVOID)pOff, 4, Old, &Old);
-		
 		// Assign class pointers
 		g_pLocalEntity = g_pEngine->GetLocal();
 		g_pCamera	   = g_pEngine->GetCamera();
@@ -78,10 +114,54 @@ namespace Globals
 		g_pEngine->SetReolution();
 	}
 
-	int g_iWindowWidth = 1920;
+	int g_iWindowWidth = 2560;
 	int g_iWindowHeight = 1080;
-	bool PressedKeys[256];
+	bool PressedKeys[1080];
 }
 
 
-delete <<
+void espThread()
+{
+
+	while (false)
+	{ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+
+		if (GetAsyncKeyState(VK_INSERT) & 1)
+			bMenuShow = !bMenuShow;
+
+		ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &mainInfo.viewMatrix, sizeof(mainInfo.viewMatrix), NULL);
+
+		for (int i = 1; i < 32; i++)
+		{
+			ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &mainInfo.ent[i], sizeof(DWORD), NULL);
+			ReadProcessMemory(pHandle, (int*)(mainInfo.ent[i] + 0xF8), &mainInfo.health[i], sizeof(int), NULL);
+
+			if (mainInfo.ent[i] == NULL || mainInfo.health[i] <= 0 || mainInfo.health[i] > 100)
+				continue;
+
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x4), &mainInfo.headPos[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x34), &mainInfo.pos[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x40), &mainInfo.angles[i], sizeof(Vec3), NULL);
+
+		}
+	}
+}
+
+__forceinline uint64_t DecryptWorld(uint64_t valBase)
+{
+	//protect_mem(DriverHandle, processID, valBase + 0x758BDB8, 0x1000, PAGE_EXECUTE_READ, NULL);
+	const auto key = Driver::read<uint64_t>(pid, valBase + 0x7564DB8);
+	//const auto key = *(uint64_t*)(valBase + 0x758BDB8);
+#pragma pack(push, 1)
+	struct State
+	{
+		uint64_t Keys[7];
+	};
+#pragma pack(pop)
+	const auto state = Driver::read<State>(pid, valBase + 0x7564D80);
+	//const auto state = *(State*)(valBase + 0x758BD80);
+
+	return Driver::read<uint64_t>(pid, decrypt_uworld(key, (const uint64_t*)&state));
+	//return *(uint64_t*)(decrypt_uworld(key, (const uint64_t*)&state));
+}
+

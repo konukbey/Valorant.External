@@ -34,3 +34,24 @@ void SilentEnd(PVOID a1, PVOID a2)
 
 	MUTATE_END
 }
+
+bool BulletPredict(PredictCtx& Ctx)
+{
+	float MAX_TIME = 1.f, TIME_STEP = (1.f / 256.f);
+	for (float CurrentTime = 0.f; CurrentTime <= MAX_TIME; CurrentTime += TIME_STEP)
+	{
+		float TravelTime;
+		Vector ExtrPos = ExtrapolatePos(Ctx, CurrentTime);
+		if (!SolveTrajectory(Ctx, ExtrPos, &TravelTime))
+		{
+			return false;
+		}
+
+		if (TravelTime < CurrentTime)
+		{
+			Ctx.AimAngles = { -RAD2DEG(Ctx.AimAngles.x), RAD2DEG(Ctx.AimAngles.y) };
+			return true;
+		}
+	}
+	return false;
+}
