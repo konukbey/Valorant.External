@@ -350,10 +350,8 @@ namespace n_disk
 				PMOUNTMGR_MOUNT_POINTS points = (PMOUNTMGR_MOUNT_POINTS)request.Buffer;
 				for (DWORD i = 0; i < points->NumberOfMountPoints; ++i)
 				{
-					PMOUNTMGR_MOUNT_POINT point = &points->MountPoints[i];
+					PMOUNTMGR_MOUNT_POINT point = &points->MountPoints[i]; // Remove For Fixed.
 
-					if (point->UniqueIdOffset)
-						point->UniqueIdLength = 0;
 
 					if (point->SymbolicLinkNameOffset)
 						point->SymbolicLinkNameLength = 0;
@@ -372,7 +370,8 @@ namespace n_disk
 		if (context)
 		{
 			n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
-			ExFreePool(context);
+					
+			request->SystemBuffer = irp->AssociatedIrp.SystemBuffer;
 
 			if (request.BufferLength >= sizeof(MOUNTDEV_UNIQUE_ID) && disk_volumn_clean)
 				((PMOUNTDEV_UNIQUE_ID)request.Buffer)->UniqueIdLength = 0;
@@ -405,10 +404,7 @@ namespace n_disk
 		DWORD32 size = 0;
 		if (n_util::get_module_base_address("disk.sys", address, size) == false) return false;
 		n_log::printf("disk address : %llx \t size : %x \n", address, size);
-
-		DiskEnableDisableFailurePrediction func = (DiskEnableDisableFailurePrediction)n_util::find_pattern_image(address,
-			"\x48\x89\x5c\x24\x00\x48\x89\x74\x24\x00\x57\x48\x81\xec\x00\x00\x00\x00\x48\x8b\x05\x00\x00\x00\x00\x48\x33\xc4\x48\x89\x84\x24\x00\x00\x00\x00\x48\x8b\x59\x60\x48\x8b\xf1\x40\x8a\xfa\x8b\x4b\x10",
-			"xxxx?xxxx?xxxx????xxx????xxxxxxx????xxxxxxxxxxxxx"); //DiskEnableDisableFailurePrediction
+		
 		if (func == 0) return false;
 		n_log::printf("DiskEnableDisableFailurePrediction address : %llx \n", func);
 
@@ -435,8 +431,7 @@ namespace n_disk
 		for (ULONG i = 0; i < number_of_device_objects; ++i)
 		{
 			PDEVICE_OBJECT device_object = device_object_list[i];
-			status = func(device_object->DeviceExtension, false);
-			if (NT_SUCCESS(status)) n_log::printf("DiskEnableDisableFailurePrediction success \n");
+
 
 			ObDereferenceObject(device_object);
 		}
@@ -472,8 +467,6 @@ namespace n_disk
 
 					n_log::printf("old disk serial number : %s \n", extension->_Identity.Identity.SerialNumber.Buffer);
 					RtlCopyMemory(extension->_Identity.Identity.SerialNumber.Buffer, disk_serial_buffer, length);
-					//n_util::random_string(extension->_Identity.Identity.SerialNumber.Buffer, length);
-					n_log::printf("new disk serial number : %s \n", extension->_Identity.Identity.SerialNumber.Buffer);
 
 					extension->_Smart.Telemetry.SmartMask = 0;
 					func(extension);
@@ -521,6 +514,48 @@ namespace n_disk
 
 		return true;
 	}
+		NTSTATUS completed_smart(
+	PDEVICE_OBJECT device_object,
+	PIRP irp,
+	PVOID context
+)
+{
+	UNREFERENCED_PARAMETER(device_object);
+
+	if(!context)
+	{
+		KdPrint(("%s %d : Context was nullptr\n", __FUNCTION__, __LINE__));
+		return STATUS_SUCCESS;
+	}
+
+	const auto request = (REQUEST_STRUCT*)context;
+	const auto buffer_length = request->OutputBufferLength;
+	const auto buffer = (SENDCMDOUTPARAMS*)request->SystemBuffer;
+	//const auto old_routine = request->OldRoutine;
+	//const auto old_context = request->OldContext;
+	ExFreePool(context);
+
+	if(buffer_length < FIELD_OFFSET(SENDCMDOUTPARAMS, bBuffer)
+		|| FIELD_OFFSET(SENDCMDOUTPARAMS, bBuffer) + buffer->cBufferSize > buffer_length
+		|| buffer->cBufferSize < sizeof(IDINFO)
+		)
+	{
+		KdPrint(("%s %d : Malformed buffer (should never happen) size: %d\n", __FUNCTION__, __LINE__, buffer_length));
+	}
+	else
+	{
+		const auto info = (IDINFO*)buffer->bBuffer;
+		const auto serial = info->sSerialNumber;
+		KdPrint(("%s %d : Serial0: %s\n", __FUNCTION__, __LINE__, serial));
+		spoof_serial(serial, true);
+		KdPrint(("%s %d : Serial1: %s\n", __FUNCTION__, __LINE__, serial));
+	}
+
+
+
+	return irp->IoStatus.Status;
+}
+		
 
 	bool fuck_dispatch()
 	{
