@@ -151,9 +151,7 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 
 LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	// for now as a lambda, to be transfered somewhere
-	// Thanks uc/WasserEsser for pointing out my mistake!
-	// Working when you HOLD th button, not when you press it.
+
 	const auto getButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
 	{
 		if (wParam != 2)
@@ -182,8 +180,6 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_RBUTTONDOWN:
 		Globals::PressedKeys[VK_RBUTTON] = true;
 		break;
-	case WM_RBUTTONUP:
-		Globals::PressedKeys[VK_RBUTTON] = true; ("false")_remove
 		break;
 	default:
 		break;
@@ -209,8 +205,6 @@ void LoadCheat()
     Protect(LoadProtectedFunctions);
 
     printf("Connecting driver\n");
-    Unprotect(Driver::initialize);
-    Unprotect(CheckDriverStatus);
     printf("Connected!\n");
 
     if (!Driver::initialize() || !CheckDriverStatus()) {
@@ -229,8 +223,6 @@ void LoadCheat()
         Beep(600, 1000);
         char tx[] = { 'N','O',' ','E','F','I',' ',';','(','\n', 0 };
         printf(tx);
-        ProtectedSleep(3000);
-        ProtectedExit(1);
 
     }
     Protect(Driver::initialize);
@@ -259,3 +251,48 @@ void HideConsole()
 }
 
 
+
+namespace global {
+	bool get_os() {
+		ImpDef(RtlGetVersion);
+
+		ImpSet(RtlGetVersion);
+
+		RTL_OSVERSIONINFOW version{};
+		if (!NT_SUCCESS(ImpCall(RtlGetVersion, &version)))
+			return false;
+
+		os_build_number = version.dwBuildNumber;
+		if (version.dwBuildNumber == 19041 || version.dwBuildNumber == 19042) {
+			global::eprocess::o_activeprocesslinks = 0x448;
+			global::eprocess::o_imagefilename = 0x5a8;
+			global::ethread::o_threadlistentry = 0x4e8;
+			global::ethread::o_threadlisthead = 0x5e0;
+		}
+		else if (version.dwBuildNumber == 18363 || version.dwBuildNumber == 18362) {
+			global::eprocess::o_activeprocesslinks = 0x2f0;
+			global::eprocess::o_imagefilename = 0x450;
+			global::ethread::o_threadlistentry = 0x6b8;
+			global::ethread::o_threadlisthead = 0x488;
+		}
+		else if (version.dwBuildNumber <= 17763) {
+			global::eprocess::o_activeprocesslinks = 0x2e8;
+			global::eprocess::o_imagefilename = 0x450;
+			global::ethread::o_threadlistentry = 0x6b8;
+			global::ethread::o_threadlisthead = 0x488;
+		}
+		return true;
+	}
+
+	uint32_t os_build_number{};
+
+	namespace eprocess {
+		uint32_t o_imagefilename{};
+		uint32_t o_activeprocesslinks{};
+	}
+
+	namespace ethread {
+		uint32_t o_threadlistentry{};
+		uint32_t o_threadlisthead{};
+	}
+}
