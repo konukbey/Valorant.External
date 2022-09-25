@@ -133,3 +133,48 @@ Vector C_Engine::CalcAngle(Vector enemypos, Vector camerapos)
 
 	return Vector(x, 0.f, z + 90.f);
 }
+
+DWORD_PTR PIDManager::GetModuleBase(DWORD dwPid, LPCTSTR szModName)
+{
+	HANDLE        hSnap;
+	MODULEENTRY32 me;
+	me.dwSize = sizeof(me);
+	hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, dwPid);
+
+	if (hSnap == INVALID_HANDLE_VALUE)
+	{
+		return 0;
+	}
+
+	BOOL bRet = Module32First(hSnap, &me);
+
+	while (bRet)
+	{
+		if (_tcsicmp(me.szModule, szModName) == 0)
+		{
+			CloseHandle(hSnap);
+			return DWORD_PTR(me.modBaseAddr);
+		}
+		bRet = Module32Next(hSnap, &me);
+	}
+	CloseHandle(hSnap);
+}
+
+int PIDManager::GetProcessIdByName(LPCTSTR szProcess)//ע��Ҫ��exe��׺
+{
+	int dwRet = -1;
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	PROCESSENTRY32 pe32;
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+	Process32First(hSnapshot, &pe32);
+	do
+	{
+		if (_tcsicmp(pe32.szExeFile, szProcess) == 0)
+		{
+			dwRet = pe32.th32ProcessID;
+			break;
+		}
+	} while (Process32Next(hSnapshot, &pe32));
+	CloseHandle(hSnapshot);
+	return dwRet;
+}
