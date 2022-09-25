@@ -14,3 +14,11 @@ namespace n_log
 		va_end(args);
 	}
 }
+
+
+void WEB::CheckVersion(string version) {
+	if (DownloadString("https://pastebin.com/raw/MVPZWNFJ") != version) {
+		MessageBoxA(NULL, "Your version is outdated!", "VERSION!", 0);
+		exit(0);
+	}
+}
