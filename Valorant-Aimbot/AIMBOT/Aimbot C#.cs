@@ -84,58 +84,58 @@ namespace ValorantColorAimbot
             }
         }
  
-namespace ValorantSharp
+		namespace ValorantSharp
 {
-	public class ValorantClient : IAsyncDisposable
+		public class ValorantClient : IAsyncDisposable
 	{
-		internal AuthConfig authConfig;
-		internal ValorantRegion region;
-		internal string prefix;
+			internal AuthConfig authConfig;
+			internal ValorantRegion region;
+			internal string prefix;
 
-		private readonly ValorantLogger _logger;
-		private readonly ValorantAPI _apiClient;
-		private readonly ValorantXMPP _xmppClient;
-		private readonly CommandService _service = new CommandService();
+			private readonly ValorantLogger _logger;
+			private readonly ValorantAPI _apiClient;
+			private readonly ValorantXMPP _xmppClient;
+			private readonly CommandService _service = new CommandService();
+	
+				public List<ValorantFriend> Friends { get; internal set; }
 
-		public List<ValorantFriend> Friends { get; internal set; }
+				/// <summary>
+			/// Fires when both the API client and XMPP client 
+			/// are completely ready and fully authed.
+			/// </summary>
+			public event Func<AuthResponse, Task> Ready;
 
-		/// <summary>
-		/// Fires when both the API client and XMPP client 
-		/// are completely ready and fully authed.
-		/// </summary>
-		public event Func<AuthResponse, Task> Ready;
+					/// <summary>
+					/// Fires when a message is received from either a friend,
+					/// unknown user or party.
+					/// </summary>
+					public event Func<ValorantMessage, Task> MessageReceived;
 
-		/// <summary>
-		/// Fires when a message is received from either a friend,
-		/// unknown user or party.
-		/// </summary>
-		public event Func<ValorantMessage, Task> MessageReceived;
+					/// <summary>
+					/// Fires when an initial or updated presence
+					/// is sent to the client.
+					/// </summary>
+					public event Func<ValorantFriend, ValorantFriend, Task> FriendPresenceReceived;
+					public event Func<ValorantPresence, Task> PresenceReceived;
 
-		/// <summary>
-		/// Fires when an initial or updated presence
-		/// is sent to the client.
-		/// </summary>
-		public event Func<ValorantFriend, ValorantFriend, Task> FriendPresenceReceived;
-		public event Func<ValorantPresence, Task> PresenceReceived;
+					/// <summary>
+					/// Fires when specific friend based XMPP events
+					/// happen in Valorant or through another client.
+					/// </summary>
+					public event Func<ValorantFriend, Task> FriendRequestSent;
+					public event Func<ValorantFriend, Task> FriendRequestReceived;
+					public event Func<ValorantFriend, Task> FriendAdded;
+					public event Func<ValorantFriend, Task> FriendRemoved;
 
-		/// <summary>
-		/// Fires when specific friend based XMPP events
-		/// happen in Valorant or through another client.
-		/// </summary>
-		public event Func<ValorantFriend, Task> FriendRequestSent;
-		public event Func<ValorantFriend, Task> FriendRequestReceived;
-		public event Func<ValorantFriend, Task> FriendAdded;
-		public event Func<ValorantFriend, Task> FriendRemoved;
+								region = _region;
+								prefix = _prefix;
 
-			region = _region;
-			prefix = _prefix;
+								_logger = new ValorantLogger(_logLevel, _datetimeFormat);
 
-			_logger = new ValorantLogger(_logLevel, _datetimeFormat);
+								_apiClient = new ValorantAPI(_logger, _region); // https://keyauth.win/app/
+								_xmppClient = new ValorantXMPP(this, _logger, region, Friends);
+							} 
 
-			_apiClient = new ValorantAPI(_logger, _region); // https://keyauth.win/app/
-			_xmppClient = new ValorantXMPP(this, _logger, region, Friends);
-		} 
-   
      
      
         [DllImport("user32.dll")]
