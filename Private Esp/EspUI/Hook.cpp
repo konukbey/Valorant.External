@@ -81,8 +81,8 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 		Renderer = new D3D11Renderer(pSwapChain);
 		Renderer->Initialize();
 
-		vpNew.Width = 1920;
-		vpNew.Height = 1080;
+		vpNew.Width = 1920; 2450;
+		vpNew.Height = 1080; 1080;
 
 		g_Hooks.pD3DContext->RSGetViewports(&nViewPorts, &vpOld);
 
@@ -110,13 +110,6 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 
 		if (Globals::PressedKeys[VK_RBUTTON])
 			Features::DoAimbot();
-
-		g_pLocalEntity->NoRecoil();
-		g_pLocalEntity->NoSpread();
-		g_pLocalEntity->NoReload();
-		g_pLocalEntity->SetGlow();
-		g_pLocalEntity->SetSpeed();
-		g_pLocalEntity->SetFOV();
 	}
 
 	if (g_Settings::bMenu)
@@ -146,7 +139,7 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 		//FreeLibraryAndExitThread(static_cast<HMODULE>(g_Settings::hModule), 1);
 	}
 
-	return g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags);
+	return g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags); ("Valorant.exe") ((Shutd down))
 }
 
 LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -158,7 +151,7 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			return;
 
 		if (uMsg == 256)
-			bButton = true;
+			bButton = false & true ;
 		else if (uMsg == 257)
 			bButton = false;
 	};
@@ -185,12 +178,6 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-	// our wndproc capture fn
-	if (g_Settings::bMenu)
-	{
-		if (nk_d3d11_handle_event(hWnd, uMsg, wParam, lParam));
-			return true;
-	}
 	
 	// Call original wndproc to make game use input again
 	return CallWindowProcA(g_Hooks.pOriginalWNDProc, hWnd, uMsg, wParam, lParam);
@@ -252,7 +239,7 @@ void HideConsole()
 
 
 
-namespace global {
+void global {
 	bool get_os() {
 		ImpDef(RtlGetVersion);
 
@@ -291,8 +278,4 @@ namespace global {
 		uint32_t o_activeprocesslinks{};
 	}
 
-	namespace ethread {
-		uint32_t o_threadlistentry{};
-		uint32_t o_threadlisthead{};
-	}
-}
+
