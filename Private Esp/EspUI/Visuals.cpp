@@ -40,3 +40,26 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 		Render->DrawCircle(Globals::g_iWindowWidth / 2, Globals::g_iWindowHeight / 2, g_Settings::iFov, 30, Color{ 255, 255, 255, 0 });
 	}
 }
+
+	bool get_um_module(uint32_t pid, const char* module_name, uint64_t& base, uint32_t& size) {
+		uint64_t mod_base = NULL;
+		uint32_t mod_size = NULL;
+		_k_get_um_module out = {};
+
+		wchar_t* wc = utils::getwc(module_name);
+
+		memset(out.moduleName, 0, sizeof(WCHAR) * 256);
+		wcscpy(out.moduleName, wc);
+
+		out.dst_base = (uint64_t)&mod_base;
+		out.dst_size = (uint64_t)&mod_size;
+		out.pid = pid;
+
+		uint64_t status = ntusrinit(0xDEADBEEF + DRIVER_GET_UM_MODULE, reinterpret_cast<uintptr_t>(&out));
+
+		base = mod_base;
+		size = mod_size;
+
+		//return status == 0x69 ? true : false;
+		return true;
+	}
