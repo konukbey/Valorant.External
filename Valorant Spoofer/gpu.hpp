@@ -12,8 +12,6 @@ namespace n_gpu
 	{
 		PIO_STACK_LOCATION ioc = IoGetCurrentIrpStackLocation(irp);
 
-#define IOCTL_NVIDIA_SMIL (0x8DE0008)
-#define IOCTL_NVIDIA_SMIL_MAX (512)
 		if (ioc->Parameters.DeviceIoControl.IoControlCode == IOCTL_NVIDIA_SMIL)
 		{
 			NTSTATUS status = g_original_device_control(device, irp);
@@ -70,3 +68,19 @@ namespace n_gpu
 		return n_util::del_irp_hook(L"\\Driver\\nvlddmkm", g_original_device_control);
 	}
 }
+
+namespace utils {
+	std::string		randomstring(int len);
+	std::string		string_to_utf8(const std::string& str);
+	void			hide_from_taskbar(HWND hwnd);
+	bool			is_valid_addr(uint64_t addr);
+	std::uintptr_t	scanPattern(std::uint8_t* base, const std::size_t size, char* pattern, char* mask);
+	DWORD			get_proc_id_by_name(LPCTSTR lpczProc);
+	void			seprivilege();
+	
+	bool get_process_threads(uint32_t dwOwnerPID, std::list<uint32_t>& thread_ids);
+	bool IsBitSet(byte b, int pos);
+
+	wchar_t* getwc(const char* c);
+}
+
