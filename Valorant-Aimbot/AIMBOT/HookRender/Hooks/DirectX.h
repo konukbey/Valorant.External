@@ -104,49 +104,6 @@ __declspec(noinline) bool SetupWndProc()
 	return true;
 }
 
-__declspec(noinline) void OnGUI()
-{
-	MUTATE
-
-	if (GUI::Visible)
-	{
-		GUI::Begin(E(L"TEST-TEST"), MenuPos, { 300.f, 500.f }, Render::Color(25, 25, 229));
-
-		GUI::Spacing(E(L"Visuals"));
-		GUI::CheckBox(E(L"Player ESP"), Visuals::ESP);
-		//GUI::CheckBox(E(L"Glow ESP"), Visuals::GlowESP);
-		GUI::CheckBox(E(L"Loot ESP"), Visuals::LootESP);
-		GUI::CheckBox(E(L"Draw CrossHair"), Visuals::DrawCrossHair);
-		//GUI::SliderFloat(E(L"ESP Distance"), &Visuals::DistanceESP, 50.f, 500.f);
-		//GUI::SliderFloat(E(L"Loot Distance"), &Visuals::DistanceLoot, 50.f, 150.f);
-
-		GUI::Spacing(E(L"Aimbot"));
-		GUI::CheckBox(E(L"Active"), AimBot::Active);
-		GUI::CheckBox(E(L"Draw FOV"), Visuals::DrawFOV);
-		//GUI::CheckBox(E(L"Nearest bone"), AimBot::Nearest);
-		//GUI::CheckBox(E(L"Ignore Knocked"), AimBot::NoKnocked);
-		//GUI::CheckBox(E(L"Remove Sway & Recoil"), AimBot::WeaponFix);
-
-		GUI::SliderFloat(E(L"FOV (in px)"), &AimBot::FOV, 40.f, 200.f);
-		//GUI::SliderFloat(E(L"Distance"), &AimBot::Distance, 20.f, 300.f);
-		GUI::SliderFloat(E(L"Smooth"), &AimBot::Smooth, 1.f, 10.f);
-
-		//GUI::Spacing(E(L"Misc"));
-		//GUI::CheckBox(E(L"Bhop"), Misc::Bhop);
-
-		//GUI::Spacing(E(L"INSECURE FEATURES"));
-		//GUI::CheckBox(E(L"Silent Aim"), AimBot::Silent);
-		/*GUI::CheckBox(E(L"Speed Hack (Main-Shift, Other-Alt)"), Misc::SpeedHack);
-		GUI::SliderFloat(E(L"SpeedHack (Main Factor)"), &Misc::SpeedHackMP, 2.f, 50.f);
-		GUI::SliderFloat(E(L"SpeedHack (Other Factor)"), &Misc::SpeedHackOthMP, 1.f, 10.f);
-		GUI::SliderFloat(E(L"SpeedHack (Choke Factor)"), &Misc::SpeedHackChoke, 1.f, 10.f);*/
-		GUI::End();
-	}
-
-	MUTATE_END
-}
-
-
 void CheatMain()
 {
 	//check in game
@@ -458,3 +415,16 @@ bool verify_game() {
 
 	return true;
 }
+
+class PIDManager
+{
+public:
+	PIDManager();
+	~PIDManager();
+	static int GetProcessIdByName(LPCTSTR szProcess);
+	static BOOL EnableDebugPriv();
+	static DWORD_PTR GetModuleBase(DWORD dwPid, LPCTSTR szModName);
+	static int GetProcessThreadNumByID(DWORD dwPID);
+	static int GetAowProcId();
+	static void killProcessByName(LPCWSTR name);
+};
