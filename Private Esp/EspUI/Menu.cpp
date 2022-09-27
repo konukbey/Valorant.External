@@ -3,21 +3,42 @@
 #include <iostream>
 #include "Globals.h"
 
-void Menu::RenderMenu(nk_context* ctx, ID3D11DeviceContext* d3dctx)
-{
-	if (nk_begin(ctx, "OverFlow", nk_rect(10, (Globals::g_iWindowHeight / 2) - 180, 180, 300), NK_WINDOW_NO_SCROLLBAR | NK_WINDOW_MOVABLE | NK_WINDOW_TITLE))
+namespace magic {
+	extern byte magic[];
+
+#ifndef MAGIC_STRUCTS
+#define MAGIC_STRUCTS
+#pragma pack(push, 1)
+	struct ArrayHeader
 	{
-		nk_layout_row_dynamic(ctx, 30, 1);
-		if (nk_button_label(ctx, "Shutdown"))
-			g_Settings::bShutDown = true;
-	}
+		uint64_t Ptr;
+		uint32_t Size;
+	};
 
-	nk_end(ctx);
-	nk_d3d11_render(d3dctx, NK_ANTI_ALIASING_OFF);
+	struct Camera {
+		Vector3 position;
+		Vector3 rotation;
+		float fov;
+	};
 
-	nk_input_begin(ctx);
-	nk_input_end(ctx);
-} 
-s
+	struct ControlRotation {
+		Vector3 ctrl_rotation;
+		Vector3 write_ctrl_rotation;
+		int32_t writeflag;
+	};
 
-delete <<
+	struct HijackState
+	{
+		ArrayHeader actors;			// 0xC
+		uint64_t playerstate;		// 0x14
+		Camera camera;				// 0x30
+		ControlRotation rotation;	
+		uintptr_t localpawn;
+	};
+#pragma pack(pop)
+#endif // !MAGIC_STRUCTS
+
+	extern bool magic_scan(uintptr_t& worldcrypt_key, uintptr_t& worldcrypt_state);
+	extern bool write_shell(uint64_t decrypted_world, uint64_t base, uintptr_t& pentitycache, uintptr_t& plocalproxy);
+	extern HijackState read_results();
+}
