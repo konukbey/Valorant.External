@@ -20,11 +20,6 @@ FOR FREE PROJECTS, YOU WON'T HAVE TO PAY ANY FEES. JUST FOLLOW OUR POLICIES
 #### - Save & Load Config
 
 
-SCROLL DOWN
-
-
-
-
 *** 
   <p align="center">
     <a href="https://discord.com/users/943374631644045363">
