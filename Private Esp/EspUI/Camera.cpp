@@ -65,3 +65,64 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 	vecScreen.y = windowHeight;
 	
 	
+
+	void cache()
+{
+	while (true)
+	{
+		vector<TslEntity> tmpList;
+
+		world = read<std::uint64_t>(m_base + 0x5DD8EF8);
+		persistent_level = read<std::uint64_t>(world + 0x38);
+		game_instance = read<std::uint64_t>(world + 0x180);
+
+		local_player_array = read<std::uint64_t>(game_instance + 0x40);
+		local_player = read<std::uint64_t>(local_player_array);
+		local_player_controller = read<std::uint64_t>(local_player + 0x38);
+		local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
+
+		camera_manager = read<std::uint64_t>(local_player_controller + 0x530);
+
+		actors = read<std::uint64_t>(persistent_level + 0xB0);
+		actor_count = read<int>(persistent_level + 0xB8);
+
+		LocalRoot = read<std::uint64_t>(local_player_pawn + 0x238);
+		LocalPos = read<Vector3>(LocalRoot + 0x1E0);
+
+		damage_controller = read<std::uint64_t>(local_player_pawn + 0xAF8);
+
+		for (unsigned long i = 0; i < actor_count; ++i)
+		{
+			std::uint64_t actor = read<std::uint64_t>(actors + i * 0x8);
+
+			if (actor == 0x00)
+			{
+				continue;
+			}
+
+			
+
+			int ID = read<int>(actor + 0x18);
+
+			TslEntity tslEntity{ };
+			tslEntity.pObjPointer = actor;
+			tslEntity.ID = ID;
+			tslEntity.PlayerController = local_player_controller;
+
+			uint64_t mesh = read<uint64_t>(actor + 0x4F0);
+
+			int UniqueID = read<int>(actor + 0x3C);
+			if (UniqueID != 16777502)
+				continue;
+
+			if (mesh != 0x00 && UniqueID != 0x00)
+			{
+				tslEntity.mesh = mesh;
+
+				tmpList.push_back(tslEntity);
+			}
+		}
+		entityList = tmpList;
+		Sleep(1);
+	}
+}
