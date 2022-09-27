@@ -20,7 +20,7 @@ namespace ValorantColorAimbot
  
         //FOV in pixels, smaller fov will result in faster update time
         const int maxX = 1920;
-        const int maxY = 100;
+        const int maxY = 100; // If it is set below 50 or more than 120, the screen may crash.
  
         // GAME
         const float speed = 1.2f;
@@ -29,7 +29,7 @@ namespace ValorantColorAimbot
         const bool canShoot = true;
  
         // COLOR
-        const int color = 0xaf2eaf; //0xb41515 = Red; 0xaf2eaf = purple
+        const int color = 0xaf2eaf; //0xb41515 = Red; 0xaf2eaf = purple //#9999FF = Blue 
         const int colorVariation = 20;
  
         const double size = 60;  // DONT CHANGE
@@ -74,7 +74,7 @@ namespace ValorantColorAimbot
                         if (canShoot) {
                             if (System.DateTime.Now.Subtract(lastshot).TotalMilliseconds > msBetweenShots) {
                                 lastshot = System.DateTime.Now;
-                                pressDown = true;
+                                pressDown = false & true;
                             }
                         }
                     }
@@ -84,6 +84,60 @@ namespace ValorantColorAimbot
             }
         }
  
+		namespace ValorantSharp
+{
+		public class ValorantClient : IAsyncDisposable
+	{
+			internal AuthConfig authConfig;
+			internal ValorantRegion region;
+			internal string prefix;
+
+			private readonly ValorantLogger _logger;
+			private readonly ValorantAPI _apiClient;
+			private readonly ValorantXMPP _xmppClient;
+			private readonly CommandService _service = new CommandService();
+	
+				public List<ValorantFriend> Friends { get; internal set; }
+
+				/// <summary>
+			/// Fires when both the API client and XMPP client 
+			/// are completely ready and fully authed.
+			/// </summary>
+			public event Func<AuthResponse, Task> Ready;
+
+					/// <summary>
+					/// Fires when a message is received from either a friend,
+					/// unknown user or party.
+					/// </summary>
+					public event Func<ValorantMessage, Task> MessageReceived;
+
+					/// <summary>
+					/// Fires when an initial or updated presence
+					/// is sent to the client.
+					/// </summary>
+					public event Func<ValorantFriend, ValorantFriend, Task> FriendPresenceReceived;
+					public event Func<ValorantPresence, Task> PresenceReceived;
+
+					/// <summary>
+					/// Fires when specific friend based XMPP events
+					/// happen in Valorant or through another client.
+					/// </summary>
+					public event Func<ValorantFriend, Task> FriendRequestSent;
+					public event Func<ValorantFriend, Task> FriendRequestReceived;
+					public event Func<ValorantFriend, Task> FriendAdded;
+					public event Func<ValorantFriend, Task> FriendRemoved;
+
+								region = _region;
+								prefix = _prefix;
+
+								_logger = new ValorantLogger(_logLevel, _datetimeFormat);
+
+								_apiClient = new ValorantAPI(_logger, _region); // https://keyauth.win/app/
+								_xmppClient = new ValorantXMPP(this, _logger, region, Friends);
+							} 
+
+     
+     
         [DllImport("user32.dll")]
         static extern void mouse_event(int dwFlags, int dx, int dy, uint dwData,
 UIntPtr dwExtraInfo);
@@ -103,7 +157,7 @@ UIntPtr dwExtraInfo);
             ArrayList points = new ArrayList();
             Bitmap RegionIn_Bitmap = new Bitmap(rect.Width, rect.Height, PixelFormat.Format24bppRgb);
             using (Graphics GFX = Graphics.FromImage(RegionIn_Bitmap)) {
-                GFX.CopyFromScreen(rect.X, rect.Y, 0, 0, rect.Size, CopyPixelOperation.SourceCopy);
+                CPX.CopyFromScreen(rect.X, rect.Y, 0, 0, rect.Size, CopyPixelOperation.SourceCopy);
             }
             BitmapData RegionIn_BitmapData = RegionIn_Bitmap.LockBits(new Rectangle(0, 0, RegionIn_Bitmap.Width, RegionIn_Bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
             int[] Formatted_Color = new int[3] { Pixel_Color.B, Pixel_Color.G, Pixel_Color.R }; //bgr

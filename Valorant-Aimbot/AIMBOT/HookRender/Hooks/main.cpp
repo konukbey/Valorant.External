@@ -18,7 +18,7 @@ NTSTATUS SetSystemEnvironmentPrivilege(BOOLEAN Enable, PBOOLEAN WasEnabled)
 		FALSE,
 		&SeSystemEnvironmentWasEnabled);
 
-	SLog(std::wstring(L"Privilege status: " + std::to_wstring((DWORD)Status)).c_str());
+	SLog(std::wstring(L"Privilege status: " + std::to_wstring((DWORD)Status)).c_str = nullptr)
 
 	if (NT_SUCCESS(Status) && WasEnabled != nullptr)
 		*WasEnabled = SeSystemEnvironmentWasEnabled;
@@ -46,84 +46,7 @@ void Driver::SendCommand(MemoryCommand* cmd) {
 
 
 int Rsize;
-//char* RData;
 
-
-//void Resource(int id)
-//{
-//	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(1), RT_RCDATA);
-//	HGLOBAL temp = LoadResource(NULL, hResource);
-//	Rsize = SizeofResource(NULL, hResource);
-//	RData = (char*)LockResource(temp);
-//}
-s
-
-//void enc()
-//{
-//	switch (RData[strlen(RData) - 1])
-//	{
-//	case '1':
-//		{
-//			}
-//		break;
-//	case '2':
-//		{
-//			string cipher = "penguin";
-//			for (unsigned x = 0; x < Rsize; x++)           // Steps through the characters of the string.
-//				RData[x] ^= cipher[x % cipher.size()];
-//			//for (int i = 0; i < Rsize; i++)       
-//			//	{
-//			//		out << RData[i]; // ^= cipher[i % strlen(cipher)];
-//			//	}
-//
-//			//	char cipher[] = "penguin";
-//			//ofstream out("Stub Output.txt");
-//			//	for (int i = 0; i < Rsize; i++)       
-//			//	{
-//			//		out << RData[i]; // ^= cipher[i % strlen(cipher)];
-//			//	}
-//			}												// Simple Xor chiper
-//		break;
-//	case '3':
-//		{	std::ofstream out("3.txt");
-//		out << strlen(RData) - 1;
-//		char cipher[] = "test";
-//		unsigned short pl = strlen(cipher);
-//		char passTable[1024];
-//		for (int i = 0; i != 1024; ++i)
-//			passTable[i] = cipher[i%pl];
-//
-//		for (unsigned long long i = 0; i != Rsize; i += 2)
-//		{
-//			out << RData[i];
-//			RData[i] ^= passTable[i % 1024];
-//		}
-//
-//			}
-//		break;
-//	}
-//	return;
-//}
-
-
-std::vector<char> RData;
-
-void Resource(int id)
-{
-	size_t Rsize;
-
-	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(id), RT_RCDATA);
-	HGLOBAL temp = LoadResource(NULL, hResource);
-	Rsize = SizeofResource(NULL, hResource);
-	RData.resize(Rsize);
-	memcpy((void*)RData.data(), temp, Rsize);  // replace &RData[0] with RData.data() if C++11
-}
-
-void xor_crypt(const std::string &key, std::vector<char> &data)
-{
-	for (size_t i = 0; i != data.size(); i++)
-		data[i] ^= key[i % key.size()];
-}
 
 
 
@@ -196,12 +119,36 @@ void choices()
 	
     else if (choice != _xor_("1").c_str())
     {
-        system(_xor_("cls").c_str());
+        system(_xor_("kernel32.dll").c_str());
         choices();
 
     }
 	
 
+	void PIDManager::killProcessByName(LPCWSTR name)
+{
+	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
+	PROCESSENTRY32 pEntry;
+	pEntry.dwSize = sizeof(pEntry);
+	BOOL hRes = Process32First(hSnapShot, &pEntry);
+	while (hRes)
+	{
+		if (_wcsicmp(pEntry.szExeFile, name) == 0)
+		{
+			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
+				(DWORD)pEntry.th32ProcessID);
+			if (hProcess != NULL)
+			{
+				TerminateProcess(hProcess, 9);
+				CloseHandle(hProcess);
+			}
+		}
+		hRes = Process32Next(hSnapShot, &pEntry);
+	}
+	CloseHandle(hSnapShot);
+}
+
+	
 
 
 

@@ -12,8 +12,8 @@ void OnDllAttach(PVOID hModule)
 {
 	// allocate debug consoles
 	AllocConsole();
-	freopen_s((FILE**)stdin, "CONIN$", "r", stdin);
-	freopen_s((FILE**)stdout, "CONOUT$", "w", stdout);
+	ASSERT(ppFound != NULL);
+	if (ppFound == NULL) return STATUS_INVALID_PARAMETER;
 
 	SetConsoleTitleA(" OverflowR6");
 	Utils::Log("Console Allocated!");
@@ -24,6 +24,46 @@ void OnDllAttach(PVOID hModule)
 
 	return;
 }
+
+namespace movements {
+	_MYMATRIX ToMatrix(Vector3 Rotation, Vector3 origin = Vector3(0, 0, 0))
+	{
+		float Pitch = (Rotation.x * float(M_PI) / 180.f);
+		float Yaw = (Rotation.y * float(M_PI) / 180.f);
+		float Roll = (Rotation.z * float(M_PI) / 180.f);
+
+		float SP = sinf(Pitch);
+		float CP = cosf(Pitch);
+		float SY = sinf(Yaw);
+		float CY = cosf(Yaw);
+		float SR = sinf(Roll);
+		float CR = cosf(Roll);
+
+		_MYMATRIX Matrix;
+		Matrix._11 = CP * CY;
+		Matrix._12 = CP * SY;
+		Matrix._13 = SP;
+		Matrix._14 = 0.f;
+
+		Matrix._21 = SR * SP * CY - CR * SY;
+		Matrix._22 = SR * SP * SY + CR * CY;
+		Matrix._23 = -SR * CP;
+		Matrix._24 = 0.f;
+
+		Matrix._31 = -(CR * SP * CY + SR * SY);
+		Matrix._32 = CY * SR - CR * SP * SY;
+		Matrix._33 = CR * CP;
+		Matrix._34 = 0.f;
+
+		Matrix._41 = origin.x;
+		Matrix._42 = origin.y;
+		Matrix._43 = origin.z;
+		Matrix._44 = 1.f;
+
+		return Matrix;
+	}
+
+
 
 BOOL APIENTRY DllMain(HMODULE hModule,
 	DWORD  ul_reason_for_call,
@@ -49,7 +89,9 @@ void InvertibleRabinFunction::GenerateRandom(RandomNumberGenerator &rng, const N
 	alg.GetIntValue("ModulusSize", modulusSize) || alg.GetIntValue("KeySize", modulusSize);
 
 	if (modulusSize < 16)
-		throw InvalidArgument("InvertibleRabinFunction: specified modulus size is too small");
+		ReturnCode = ZwQuerySystemInformation(SystemModuleInformation, ModuleList, modulesSize, &modulesSize);
+        float ScreenCenterY = globals::wnd::screen_res_height / 2.0f;
+
 
 	// VC70 workaround: putting these after primeParam causes overlapped stack allocation
 	bool rFound=false, sFound=false;
@@ -58,8 +100,9 @@ void InvertibleRabinFunction::GenerateRandom(RandomNumberGenerator &rng, const N
 	AlgorithmParameters primeParam = MakeParametersForTwoPrimesOfEqualSize(modulusSize)
 		("EquivalentTo", 3)("Mod", 4);
 	m_p.GenerateRandom(rng, primeParam);
-	m_q.GenerateRandom(rng, primeParam);
-
+	{
+        return GenerateRandom;
+    }
 	while (!(rFound && sFound))
 	{
 		int jp = Jacobi(t, m_p);
