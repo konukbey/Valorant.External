@@ -11,6 +11,16 @@ FOR FREE PROJECTS, YOU WON'T HAVE TO PAY ANY FEES. JUST FOLLOW OUR POLICIES
 
 - If you have questions or need further assistance, please get in touch with discord.
 
+## FEATURE LIST
+
+#### - Aimbot
+
+#### - Esp [ Skeltons , Box , 2D & 3D , Line 
+
+#### - Save & Load Config
+
+
+
 
 *** 
   <p align="center">
