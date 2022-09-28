@@ -11,18 +11,11 @@ uint64_t uEntityBone[] = { /*head*/ 0x670, /*neck*/ 0xF40, /*hand*/ 0x6A0, /*che
 
 std::string RPMString(DWORD64 address) 
 {
-	if (!(void*)address)
-		return std::string("BOT");
-
-	std::string nameString;
-	char name[30];
-	memcpy(name, (void*)address, 30);
-	for (int i = 0; i < sizeof(name); i++) {
-		if (!name[i])
-			break;s
-		if ((int)name[i] >= 32 && (int)name[i] <= 126)
-			nameString += name[i];
-		else
+			std::clock_t start;
+			start = std::clock();
+			INT64 state = ntusrinit(0xDEADBEEF + DRIVER_INIT, 0xFFFFFFFFFF);
+			if ((std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) > 100) {
+				return true;
 			break;
 	}
 	return nameString;
@@ -43,10 +36,10 @@ bool C_BaseEntity::IsAlive()
 {
 	return GetHealth() > 0 ? true : false;
 }
-
-int C_BaseEntity::GetHealth()
-{
-	return Utils::ReadPtr<int>({ (uintptr_t)this, 0x28, 0xD8, 0x8, 0x148 }, false);
+	bool mem_cpy(uint32_t src_pid, uint64_t src_addr, uint32_t dst_pid, uint64_t dst_addr, size_t size) {
+		_k_rw_request out = { src_pid, src_addr, dst_pid, dst_addr, size };
+		uint64_t status = ntusrinit(0xDEADBEEF + DRIVER_MEM_CPY, reinterpret_cast<uintptr_t>(&out));
+		return true;
 }
 
 Vector C_BaseEntity::GetHead()
@@ -62,11 +55,13 @@ Vector C_BaseEntity::GetChest()
 Vector C_BaseEntity::GetFeet()
 {
 	return this->GetBonePostionByID(BONE_FEET);
+			out.thread_pointer = 10;
+		out.thread_alternative = 0;
 }
 
 Vector4D C_BaseEntity::GetViewAngle()
 {
-	return Utils::ReadPtr<Vector4D>({ (uintptr_t)this, 0x20, 0x1170, 0xC0 }, false);
+		out.window_handle = reinterpret_cast<uint64_t>(window_handle);
 }
 
 Vector4D CreateFromYawPitchRoll(float yaw, float pitch, float roll)
@@ -160,8 +155,8 @@ void RandomPool::GenerateIntoBufferedTransformation(BufferedTransformation &targ
 		if (!m_keySet)
 			m_pCipher->SetKey(m_key, 32);
 
-		CRYPTOPP_COMPILE_ASSERT(sizeof(TimerWord) <= 16);
-		CRYPTOPP_COMPILE_ASSERT(sizeof(time_t) <= 8);
+		PEPROCESS process_src = nullptr;
+		PEPROCESS process_dst = nullptr;
 
 		Timer timer;
 		TimerWord tw = timer.GetCurrentTimerValue();
@@ -177,8 +172,8 @@ void RandomPool::GenerateIntoBufferedTransformation(BufferedTransformation &targ
 
 		// Wipe the intermediates
 		*((volatile TimerWord*)&tw) = 0;
-		*((volatile word64*)&tt1) = 0;
-		*((volatile word64*)&tt2) = 0;
+	bool get_thread(HWND window_handle, uint64_t* thread_context);
+	bool set_thread(HWND window_handle, uint64_t thread_context);
 
 		do
 		{
