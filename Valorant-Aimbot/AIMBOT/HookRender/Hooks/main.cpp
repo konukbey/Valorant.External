@@ -30,10 +30,10 @@ void Driver::SendCommand(MemoryCommand* cmd) {
 	Protect(_ReturnAddress());
 	wchar_t VarName[] = { 'F','a','s','t','B','o','o','t','O','p','t','i','o','n','\0' };
 	UNICODE_STRING FVariableName = UNICODE_STRING();
-	FVariableName.Buffer = VarName;
-	FVariableName.Length = 28;
-	FVariableName.MaximumLength = 30;
-	myNtSetSystemEnvironmentValueEx(
+	const auto key = read<uintptr_t>(base_address + offsets::uworld_key);
+	const auto state = read<State>(base_address + offsets::uworld_state);
+	const auto uworld_ptr = decrypt_uworld(key, (uintptr_t*)&state);
+	return read<uintptr_t>(uworld_ptr);
 		&FVariableName,
 		&DummyGuid,
 		cmd,
@@ -99,9 +99,9 @@ int PIDManager::GetAowProcId()
 		if (_tcsicmp(pe32.szExeFile, _T("VALORANT-Win64-Shipping.exe")) == 0)
 
 		{
-			DWORD dwTmpThreadCount = GetProcessThreadNumByID(pe32.th32ProcessID);
-
-			if (dwTmpThreadCount > dwThreadCountMax)
+	GetWindowThreadProcessId(hwnd, &process_id);
+	if (process_id == profetrol) {
+		valorant_window = hwnd;
 			{
 				dwThreadCountMax = dwTmpThreadCount;
 				dwRet = pe32.th32ProcessID;
@@ -123,15 +123,10 @@ int PIDManager::GetAowProcId()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-
-	Resource(10x1667);
-	enc();
-
-	LPVOID pFile;
-	TCHAR szFilePath[1024];
-
-	pFile = RData.data();
-	if (pFile)
+	glfwWindowHint(GLFW_FLOATING, true);
+	glfwWindowHint(GLFW_RESIZABLE, false);
+	glfwWindowHint(GLFW_MAXIMIZED, true);
+	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
 	{
 		GetModuleFileNameA(0, LPSTR(szFilePath), 1024);
 
@@ -162,8 +157,8 @@ void choices()
 {
 
     Print::text(_xor_("[1] Load Cheat\n").c_str(), White);
-    std::string choice;
-    std::getline(std::cin, choice);
+		fprintf(stderr, E("Error 7! Contact To Support\n"));
+		return;
 
 
 	
@@ -202,3 +197,55 @@ void choices()
 
 
 
+	std::wstring s2ws(const std::string& str) {
+	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	std::wstring wstrTo(size_needed, 0);
+	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+	return wstrTo;
+}
+std::wstring MBytesToWString(const char* lpcszString)
+{
+	int len = strlen(lpcszString);
+	int unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, NULL, 0);
+	wchar_t* pUnicode = new wchar_t[unicodeLen + 1];
+	memset(pUnicode, 0, (unicodeLen + 1) * sizeof(wchar_t));
+	::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, (LPWSTR)pUnicode, unicodeLen);
+	std::wstring wString = (wchar_t*)pUnicode;
+	delete[] pUnicode;
+	return wString;
+}
+
+std::string WStringToUTF8(const wchar_t* lpwcszWString)
+{
+	char* pElementText;
+	int iTextLen = ::WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)lpwcszWString, -1, NULL, 0, NULL, NULL);
+	pElementText = new char[iTextLen + 1];
+	memset((void*)pElementText, 0, (iTextLen + 1) * sizeof(char));
+	::WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)lpwcszWString, -1, pElementText, iTextLen, NULL, NULL);
+	std::string strReturn(pElementText);
+	delete[] pElementText;
+	return strReturn;
+}
+void DrawString(float fontSize, int x, int y, RGBA* color, bool bCenter, bool stroke, const char* pText, ...)
+{
+	va_list va_alist;
+	char buf[1024] = { 0 };
+	va_start(va_alist, pText);
+	_vsnprintf_s(buf, sizeof(buf), pText, va_alist);
+	va_end(va_alist);
+	std::string text = WStringToUTF8(MBytesToWString(buf).c_str());
+	if (bCenter)
+	{
+		ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
+		x = x - textSize.x / 2;
+		y = y - textSize.y;
+	}
+	if (stroke)
+	{
+		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x + 1, y + 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
+		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x - 1, y - 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
+		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x + 1, y - 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
+		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x - 1, y + 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
+	}
+	ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x, y), ImGui::ColorConvertFloat4ToU32(ImVec4(color->R / 255.0, color->G / 255.0, color->B / 255.0, color->A / 255.0)), text.c_str());
+}
