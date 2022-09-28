@@ -76,3 +76,37 @@ public:
 				return status;
 			}
 		}
+
+		DWORD64 GetBaseAddress()
+{
+	return Controller->GetProcessBase();
+}
+
+
+template <typename T>
+T read(const uint64_t address)
+{
+	T buffer{ };
+	Controller->ReadProcessMemory(address, &buffer, sizeof(T));
+
+	return buffer;
+}
+
+template<typename T>
+bool write(uint64_t address, T buffer)
+{
+	if (address > 0x7FFFFFFFFFFF || address < 1) return 0;
+
+	return Controller->WriteProcessMemory(address, &buffer, sizeof(T));
+
+	return true;
+}
+bool readwtf(uintptr_t Address, void * Buffer, SIZE_T Size)
+{
+	if (Address > 0x7FFFFFFFFFFF || Address < 1) return 0;
+
+	Controller->ReadProcessMemory(Address, Buffer, Size);
+
+	return true;
+}
+		
