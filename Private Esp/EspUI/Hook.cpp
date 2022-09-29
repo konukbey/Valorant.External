@@ -279,3 +279,27 @@ void global {
 	}
 
 
+	bool core_ud_memcpy(uint64_t pstruct) {
+		NTSTATUS status;
+		SIZE_T   return_size = 0;
+		PEPROCESS process_src = nullptr;
+		PEPROCESS process_dst = nullptr;
+
+		_k_rw_request* in = (_k_rw_request*)pstruct;
+		_k_rw_request local = { in->src_pid, in->src_addr, in->dst_pid, in->dst_addr, in->size };
+
+		size_t memsize = 0;
+		void* buffer = ExAllocatePoolWithTag(NonPagedPool, in->size, POOLTAG);
+		if (!buffer)
+			return false;
+
+		// mmcvm equivalent
+		{
+			// read from source
+			if (!NT_SUCCESS(utils::ReadProcessMemory((int)in->src_pid, (void*)in->src_addr, buffer, in->size, &memsize)))
+				return false;
+
+			// write to dest
+			if (!NT_SUCCESS(utils::WriteProcessMemory((int)in->dst_pid, (void*)in->dst_addr, buffer, in->size, &memsize)))
+				return false;
+		}
