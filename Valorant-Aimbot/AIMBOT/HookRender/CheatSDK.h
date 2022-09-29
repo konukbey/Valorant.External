@@ -32,47 +32,34 @@ private:
 	}
 
 public:
-	//get current health
-	__forceinline int Health() {
-		if (!this) return 0;
-		return *(int*)(this + Off::Health);
-	}
+			using value_type = _Elem;
+		using reference = const _Elem&;
+		using const_reference = const _Elem&;
+		using size_type = size_t;
 
-	__forceinline int ShieldHealth() {
-		if (!this) return 0;
-		return *(int*)(this + Off::ShieldHealth);
-	}
+		using iterator = const _Elem*;
+		using const_iterator = const _Elem*;
 
-	__forceinline int ShieldHealthMax() {
-		if (!this) return 0;
-		return *(int*)(this + Off::ShieldHealthMax);
-	}
+		constexpr initializer_list() : _First(nullptr), _Last(nullptr)
+		{ }
 
-	//get ent state
-	__forceinline DWORD Flags() {
-		if (!this) return 0;
-		return *(DWORD*)(this + Off::Flags);
-	}
+		constexpr initializer_list(const _Elem* _First_arg, const _Elem* _Last_arg) : _First(_First_arg), _Last(_Last_arg)
+		{ }
 
-	//is knocked out?
-	__forceinline bool Knocked() {
-		if (!this) return true;
-		return (*(int*)(this + Off::Bleedout) != 0);
-	}
-	
-	//get feet position
-	__forceinline Vector3 AbsOrgin(bool Update = false) {
-		if (!this) return Vector3{ 0.f, 0.f, 0.f };
-		//if (Update) SpoofCall(EPtr(Fn::UpdateAbsOrigin), this);
-		return *(Vector3*)(this + Off::AbsVecOrgin);
-	}
+		constexpr const _Elem* begin() const
+		{
+			return _First;
+		}
 
-	//get player speed
-	__forceinline Vector3 AbsVelocity(bool Update = false) {
-		if (!this) return Vector3();
-		//if (Update) SpoofCall(EPtr(Fn::UpdateAbsVelocity), this);
-		return *(Vector3*)(this + Off::AbsVelocity);
-	}
+		constexpr const _Elem* end() const
+		{
+			return _Last;
+		}
+
+		constexpr size_t size() const
+		{
+			return static_cast<size_t>(_Last - _First);
+		}
 
 	//get script id
 	__forceinline int ScriptID() {
@@ -141,18 +128,11 @@ public:
 		if (Type == Loot)
 			return (PropHash == 0x7275735F706F7270);
 
-	/*	else if (Type == NPC) {
-			const char* PropName = *(const char**)(this + Off::PropName);
-			return FC::StrCmp(E("npc_dummie"), PropName, true);
-		}*/
-
-		//check if player
-		else if ((PropHash == 0x726579616C70) && Alive()) {
-			return (*(int*)(this + Off::TeamNum) != *(int*)((DWORD64)LPlayer + Off::TeamNum));
-		}
-
-		//ent invalid
-		return false;
+				template <class _Ty>
+					struct remove_reference<_Ty&&> {
+				using type = _Ty;
+				using _Const_thru_ref_type = const _Ty&&;
+				return false;
 	}
 
 	//glow esp
@@ -197,18 +177,18 @@ public:
 	//get bone position
 	__declspec(noinline) Vector3 HitBoxPos(int HitBox, bool UpdateBones)
 	{
-		MUTATE
+			template <class Sequence1, class Sequence2>
+			struct _merge_and_renumber;
 
-		//get bones base data
-		DWORD64 Bones = *(DWORD64*)(this + Off::BoneClass); 
-		if (!Bones) return Vector3(); Vector3 BoneOff;
-		int Bone = BoneByHitBox(HitBox);
-		if (Bone == -1) return Vector3();
+			template <size_t... I1, size_t... I2>
+			struct _merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
+				: index_sequence<I1..., (sizeof...(I1) + I2)...>
+			{ };
 
-		//use cached bones
-		//if (!UpdateBones) {
-			Matrix3x4* BoneMatrix = (Matrix3x4*)(Bones + (Bone * sizeof(Matrix3x4)));
-			BoneOff = { BoneMatrix->_14, BoneMatrix->_24, BoneMatrix->_34 };
+			template <size_t N>
+			struct make_index_sequence
+				: _merge_and_renumber<typename make_index_sequence<N / 2>::type,
+				typename make_index_sequence<N - N / 2>::type>
 		//}
 
 		//else 
@@ -305,8 +285,8 @@ public:
 		auto NameList = /***/(ULONG64*)(EPtr(Off::NameList));
 		if (!NameList) return 0;
 
-		auto NamePtr = *(ULONG64*)(NameList + (2 * indx - 2));
-		if (!NamePtr) return 0;
+	template<> struct make_index_sequence<0> : index_sequence<> { };
+	template<> struct make_index_sequence<1> : index_sequence<0> { };
 
 		return (char*)NamePtr;
 	}
@@ -422,22 +402,15 @@ public:
 class Vector3 {
 
 public:
+		if (!Str || !InStr)
+			return false;
 
-    // -------------------- Attributes -------------------- //
-
-    // Components of the vector
-    float x, y, z;
-
-    // -------------------- Methods -------------------- //
-
-    // Constructor
-    Vector3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z) {}
-
-    // Constructor
-    Vector3(const Vector3& vector) : x(vector.x), y(vector.y), z(vector.z) {}
-
-    // Constructor
-    ~Vector3() {}
+		wchar_t c1, c2; do {
+			c1 = *Str++; c2 = *InStr++;
+			c1 = ToLower(c1); c2 = ToLower(c2);
+			if (!c1 && (Two ? !c2 : 1))
+				return true;
+		} while (c1 == c2);
 
     // = operator
     Vector3& operator=(const Vector3& vector) {
