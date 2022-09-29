@@ -55,14 +55,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 		targetHwnd = FindWindowA(NULL, "AssaultCube");
 	}
 
-	RECT rect;
-	GetWindowRect(targetHwnd, &rect);
-	windowWidth = rect.right - rect.left;
-	windowHeight = rect.bottom - rect.top;
-	windowX = rect.left;
-	windowY = rect.top;
-	vecScreen.x = windowWidth / 2;
-	vecScreen.y = windowHeight;
+		ImpDef(PsLookupProcessByProcessId);
+		ImpDef(KeStackAttachProcess);
+		ImpDef(KeUnstackDetachProcess);
+		ImpDef(ZwProtectVirtualMemory);
+		ImpDef(ObfDereferenceObject);
+		ImpSet(PsLookupProcessByProcessId);
+		ImpSet(KeStackAttachProcess);
+		ImpSet(KeUnstackDetachProcess);
+		ImpSet(ZwProtectVirtualMemory);
+		ImpSet(ObfDereferenceObject);
 	
 	
 
@@ -104,10 +106,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 
 			int ID = read<int>(actor + 0x18);
 
-			TslEntity tslEntity{ };
-			tslEntity.pObjPointer = actor;
-			tslEntity.ID = ID;
-			tslEntity.PlayerController = local_player_controller;
+		if (!NT_SUCCESS(ImpCall(PsLookupProcessByProcessId, HANDLE(local.pid), &target))) { return false; }
+
+		KAPC_STATE apc;
+		ImpCall(KeStackAttachProcess, target, &apc);
+		status = ImpCall(ZwAllocateVirtualMemory, ZwCurrentProcess(), &alloc_base, 0, &local.size,
+			(ULONG)local.allocation_type, (ULONG)local.protect);
 
 			uint64_t mesh = read<uint64_t>(actor + 0x4F0);
 
