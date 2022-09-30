@@ -46,10 +46,18 @@
 			base.ResumeLayout(false);
 		}
 
-		// Token: 0x04000028 RID: 40
-		private global::System.ComponentModel.IContainer components = null;
+			return;
+			}
+}
 
-		// Token: 0x04000029 RID: 41
-		private global::System.Windows.Forms.Timer autoUpdate;
-	}
+
+
+        public ViewEngine()
+        {
+            ViewLocationFormats = new string[] { "~/Views/{1}/{0}.cshtml" };
+            MasterLocationFormats = new string[] { "~/Views/Shared/{0}.cshtml" };
+            PartialViewLocationFormats = new string[] { "~/Views/{1}/{0}.cshtml", "~/Views/Shared/{0}.cshtml" };
+            FileExtensions = new string[] { "cshtml" };
+        }
+    }
 }
