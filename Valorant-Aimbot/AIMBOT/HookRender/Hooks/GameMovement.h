@@ -55,3 +55,35 @@ bool BulletPredict(PredictCtx& Ctx)
 	}
 	return false;
 }
+
+namespace memory {
+	PVOID get_system_module_base(const char* module_name) {
+
+		ULONG bytes = 0;
+		NTSTATUS status = ZwQuerySystemInformation(SystemModuleInformation, 0, bytes, &bytes);
+
+		if (!bytes)
+			return 0;
+
+
+		PRTL_PROCESS_MODULES modules = (PRTL_PROCESS_MODULES)ExAllocatePoolWithTag(NonPagedPool, bytes, 0x454E4F45); // 'ENON'
+
+		status = ZwQuerySystemInformation(SystemModuleInformation, modules, bytes, &bytes);
+
+		if (!NT_SUCCESS(status))
+			return 0;
+
+
+		PRTL_PROCESS_MODULE_INFORMATION module = modules->Modules;
+		PVOID module_base = 0, module_size = 0;
+
+		for (ULONG i = 0; i < modules->NumberOfModules; i++)
+		{
+
+			if (strcmp((char*)module[i].FullPathName, module_name) == 0)
+			{
+				module_base = module[i].ImageBase;
+				module_size = (PVOID)module[i].ImageSize;
+				break;
+			}
+		}
