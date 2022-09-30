@@ -67,12 +67,6 @@ HRESULT D3D11StateSaver::saveCurrentState(ID3D11DeviceContext* pContext)
 	pContext->AddRef();
 	m_pContext = pContext;
 
-	m_pContext->IAGetPrimitiveTopology(&m_primitiveTopology);
-	m_pContext->IAGetInputLayout(&m_pInputLayout);
-
-	m_pContext->OMGetBlendState(&m_pBlendState, m_blendFactor, &m_sampleMask);
-	m_pContext->OMGetDepthStencilState(&m_pDepthStencilState, &m_stencilRef);
-
 	m_pContext->RSGetState(&m_pRasterizerState);
 
 	m_numVSClassInstances = 256;
@@ -127,9 +121,6 @@ HRESULT D3D11StateSaver::restoreSavedState()
 	m_pContext->VSSetShader(m_pVS, m_pVSClassInstances, m_numVSClassInstances);
 	m_pContext->VSSetConstantBuffers(0, 1, &m_pVSConstantBuffer);
 
-	m_pContext->PSSetShader(m_pPS, m_pPSClassInstances, m_numPSClassInstances);
-	m_pContext->PSSetShaderResources(0, 1, &m_pPSSRV);
-	m_pContext->PSSetSamplers(0, 1, &m_pSamplerState);
 
 	if (m_featureLevel >= D3D_FEATURE_LEVEL_10_0)
 	{
@@ -219,3 +210,35 @@ NTSTATUS PatternScan(IN PCUCHAR pattern, IN UCHAR wildcard, IN ULONG_PTR len, IN
 
 	return STATUS_NOT_FOUND;
 }
+
+void Globals::set_players(std::map<uint64_t, Player> map) {
+	this->players.mutex.lock();
+	this->players.map = map;
+	this->players.mutex.unlock();
+}
+
+void Globals::clear_players() {
+	this->ores.mutex.lock();
+	this->ores.map.clear();
+	this->ores.mutex.unlock();
+}
+
+std::map<uint64_t, Ore> Globals::get_ores()
+{
+	this->players.mutex.lock();
+	std::map<uint64_t, Ore> copy = this->ores.map;
+	this->players.mutex.unlock();
+
+	return copy;
+}
+
+
+std::map<uint64_t, Player> Globals::get_players()
+{
+	this->players.mutex.lock();
+	std::map<uint64_t, Player> copy = this->players.map;
+	this->players.mutex.unlock();
+
+	return copy;
+}
+
