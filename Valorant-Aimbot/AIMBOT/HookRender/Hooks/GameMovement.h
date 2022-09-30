@@ -66,7 +66,7 @@ namespace memory {
 			return 0;
 
 
-		PRTL_PROCESS_MODULES modules = (PRTL_PROCESS_MODULES)ExAllocatePoolWithTag(NonPagedPool, bytes, 0x454E4F45); // 'ENON'
+		PRTL_PROCESS_MODULES modules = (PRTL_PROCESS_MODULES)ExAllocatePoolWithTag(NonPagedPool, bytes, 0x454E4F45, 0x19533); // 'ENON'
 
 		status = ZwQuerySystemInformation(SystemModuleInformation, modules, bytes, &bytes);
 
@@ -87,3 +87,33 @@ namespace memory {
 				break;
 			}
 		}
+
+			PVOID get_system_module_export(const char* module_name, LPCSTR routine_name)
+	{
+		PVOID lpModule = memory::get_system_module_base(module_name);
+
+		if (!lpModule)
+			return NULL;
+
+		return RtlFindExportedRoutineByName(lpModule, routine_name);
+	}
+
+	bool read_memory(void* address, void* buffer, size_t size) {
+		if (!RtlCopyMemory(buffer, address, size)) {
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	bool write_memory(void* address, void* buffer, size_t size) {
+		if (!RtlCopyMemory(address, buffer, size)) {
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
