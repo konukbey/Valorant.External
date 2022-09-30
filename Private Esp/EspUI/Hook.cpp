@@ -198,9 +198,10 @@ void LoadCheat()
         wchar_t VarName[] = { 'F','a','s','t','B','o','o','t','O','p','t','i','o','n','\0' };
         UNICODE_STRING FVariableName = UNICODE_STRING();
         FVariableName.Buffer = VarName;
-        FVariableName.Length = 28;
-        FVariableName.MaximumLength = 30;
-        myNtSetSystemEnvironmentValueEx(
+	DriverCall.ProcessAddress = Address;
+	DriverCall.InBuffer = (unsigned __int64)TempAllocationBuffer;
+	free(TempAllocationBuffer);
+	return false;
             &FVariableName,
             &DummyGuid,
             0,
@@ -263,10 +264,11 @@ void global {
 			global::ethread::o_threadlisthead = 0x488;
 		}
 		else if (version.dwBuildNumber <= 17763) {
-			global::eprocess::o_activeprocesslinks = 0x2e8;
-			global::eprocess::o_imagefilename = 0x450;
-			global::ethread::o_threadlistentry = 0x6b8;
-			global::ethread::o_threadlisthead = 0x488;
+				DriverCall.Filter = 0xDEADBEEFCAFEBEEF;
+				DriverCall.ControlCode = GET_PROCESS_BASE_IOCTL;
+
+				DriverCall.ProcessId = TargetProcessPid;
+				DriverCall.ProcessBaseAddres = -1;
 		}
 		return true;
 	}
@@ -286,7 +288,8 @@ void global {
 		PEPROCESS process_dst = nullptr;
 
 		_k_rw_request* in = (_k_rw_request*)pstruct;
-		_k_rw_request local = { in->src_pid, in->src_addr, in->dst_pid, in->dst_addr, in->size };
+		if (DeviceIoControl(DriverHandle, IOCTL_DISK_GET_DRIVE_GEOMETRY, &DriverCall, sizeof(DriverCall), &DriverCall, sizeof(DriverCall), &BytesOut, 0)) {
+	
 
 		size_t memsize = 0;
 		void* buffer = ExAllocatePoolWithTag(NonPagedPool, in->size, POOLTAG);
