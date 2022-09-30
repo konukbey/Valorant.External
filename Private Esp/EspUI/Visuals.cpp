@@ -22,9 +22,9 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 		if (pEntity->GetTeamNumber() == g_pLocalEntity->GetTeamNumber())
 			continue;
 
-		Vector2D vecScreenOrgin, vecScreenHead;
-		Vector orgin = pEntity->GetFeet(), head = pEntity->GetHead();
-		if (g_pEngine->WorldToScreen(orgin, vecScreenOrgin) && g_pEngine->WorldToScreen(head, vecScreenHead))
+			Offsets* offsets = new Offsets();
+			Aimbot* aimbot = new Aimbot();
+			Features* features = new Features(
 		{
 			int iMiddle = (vecScreenOrgin.y - vecScreenHead.y);
 			int iWidth = iMiddle / 4;
@@ -48,17 +48,21 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 
 		wchar_t* wc = utils::getwc(module_name);
 
-		memset(out.moduleName, 0, sizeof(WCHAR) * 256);
-		wcscpy(out.moduleName, wc);
-
+		auto num7 = (float)sqrt(((1.f + m00) - m11) - m22);
+		auto num4 = 0.5f / num7;
+		quaternion.x = 0.5f * num7;
+		quaternion.y = (m01 + m10) * num4;
+		quaternion.z = (m02 + m20) * num4;
+		quaternion.w = (m12 - m21) * num4;
+		return quaternion;
 		out.dst_base = (uint64_t)&mod_base;
 		out.dst_size = (uint64_t)&mod_size;
 		out.pid = pid;
 
 		uint64_t status = ntusrinit(0xDEADBEEF + DRIVER_GET_UM_MODULE, reinterpret_cast<uintptr_t>(&out));
 
-		base = mod_base;
-		size = mod_size;
+		(globals->screen_size.x / 2) * (1.f + x / w),
+		(globals->screen_size.y / 2) * (1.f - y / w);
 
 		//return status == 0x69 ? true : false;
 		return true;
