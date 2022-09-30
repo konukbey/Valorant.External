@@ -2,81 +2,61 @@
 #define OFFSETS_H
 #include <cstdint>
 
-namespace offsets
-{
-	constexpr uint64_t uworld_state = 0x9015500;
+namespace offsets {
+	// global
+	uint64_t uworld_key = 0x90217F8; 
+	uint64_t uworld_state = 0x90217C0;
+	uint64_t g_object_state = 0x8E8FB00;
+	uint64_t g_object_key = 0x8E8FB38;
+	uint64_t line_of_sight = 0x2A0C680;
+	uint64_t bone_matrix = 0x49F14C0;
+	
+	uint64_t pakman_offset = 0x1C1C4B0;                     // deref_pointer_in_game_space_fn - https://www.unknowncheats.me/forum/valorant/503616-dumping-valorant-perfect-results-easy.html
+	
+	// world
+	uint64_t persistent_level = 0x38;			// world > persistent_level
+	uint64_t game_instance = 0x1A0;				// world > game_instance
 
-	constexpr uint64_t uworld_key = uworld_state + 0x38;
+	// player
+	uint64_t localplayers_array = 0x40;			// world > game_instance > localplayers_array
+	uint64_t localplayer = 0x40;				// world > game_instance > localplayers_array[0]
+	uint64_t player_controller = 0x38;			// world > game_instance > localplayers_array[0] > playercontroller
+	uint64_t apawn = 0x460;					// world > game_instance > localplayers_array[0] > playercontroller > apawn									// aactor > apawn
 
-	constexpr uint64_t override_materials = 0x4f8;
+	// vector
+	uint64_t root_component = 0x230;			// world > game_instance > localplayers_array[0] > playercontroller > apawn > root_component				// aactor > root_component
+	uint64_t root_position = 0x164;				// world > game_instance > localplayers_array[0] > playercontroller > apawn > root_component > root_position		// aactor > root_component > position
+	
+	// controllers
+	uint64_t damage_handler = 0x9A8;			// world > game_instance > localplayers_array[0] > playercontroller > apawn > damage_handler			// aactor > damage_controller
+	uint64_t camera_controller = 0x440;			// world > game_instance > localplayers_array[0] > playercontroller > camera_controller
 
-	constexpr uint64_t game_instance = 0x1A8;
+	// camera
+	uint64_t camera_position = 0x1260;			// world > game_instance > localplayers_array[0] > playercontroller > camera_controller > camera_position
+	uint64_t camera_rotation = 0x126C;			// world > game_instance > localplayers_array[0] > playercontroller > camera_controller > camera_rotation
+	uint64_t camera_fov = 0x1278;				// world > game_instance > localplayers_array[0] > playercontroller > camera_controller > camera_fov
+	uint64_t camera_manager = 0x478;			// world > game_instance > localplayers_array[0] > playercontroller > camera_manager
 
-	constexpr uint64_t persistent_level = 0x38;
 
-	constexpr uint64_t local_player_array = 0x40;
+	// level > actors
+	uint64_t actor_array = 0xA0;				// world > persistent_level > actor_array
+	uint64_t actors_count = 0xB8;				// world > persistent_level > actors_count
 
-	constexpr uint64_t local_player_controller = 0x38;
+	// level > actors info
+	uint64_t actor_id = 0x18;				// world > persistent_level > aactor > actor_id
+	uint64_t unique_id = 0x38;				// world > persistent_level > aactor > unique_id
+	uint64_t team_component = 0x628;			// world > persistent_level > aactor > player_state > team_component
+	uint64_t team_id = 0xF8;				// world > persistent_level > aactor > team_component > team_id
+	uint64_t health = 0x1B0;				// world > persistent_level > aactor > damage_controller > health
+	uint64_t dormant = 0x100;				// world > persistent_level > aactor > dormant
+	uint64_t player_state = 0x3F0;				// world > persistent_level > aactor > player_state
 
-	constexpr uint64_t local_player_pawn = 0x460;
-
-	constexpr uint64_t control_rotation = 0x440;
-
-	constexpr uint64_t camera_manager = 0x478;
-
-	constexpr uint64_t camera_position = 0x1240;
-
-	constexpr uint64_t camera_rotation = 0x124C;
-
-	constexpr uint64_t camera_fov = 0x1258;
-
-	constexpr uint64_t actor_array = 0xA0;
-
-	constexpr uint64_t actor_count = 0xB8;
-
-	constexpr uint64_t unique_id = 0x38;
-
-	constexpr uint64_t mesh_component = 0x430;
-
-	constexpr uint64_t last_render_time = 0x350;
-
-	constexpr uint64_t last_submit_time = 0x358;
-
-	constexpr uint64_t bone_array = 0x558;
-
-	constexpr uint64_t bone_count = 0x560; // MAY BE OUTDATED
-
-	constexpr uint64_t component_to_world = 0x250;
-
-	constexpr uint64_t root_component = 0x230;
-
-	constexpr uint64_t root_position = 0x164;
-
-	constexpr uint64_t damage_handler = 0x9A0;
-
-	constexpr uint64_t health = 0x1B0;
-
-	constexpr uint64_t dormant = 0x120;
-
-	constexpr uint64_t player_state = 0x3F0;
-
-	constexpr uint64_t team_component = 0x5A0;
-
-	constexpr uint64_t team_id = 0xF8;
-
-	constexpr auto FresnelIntensity = 0x6B8;
-
-	constexpr auto FresnelOffset = 0x694;
-
-	constexpr auto CachedFresnelColor = 0x680;
-
-	constexpr auto CachedFresnelOffset = 0x684;
-
-	constexpr auto CachedFresnelIntensity = 0x688;
-
-	constexpr auto CachedLocalFresnelOffset = 0x68c;
-
-	constexpr auto LineOfSight = 0x4A60CE0;
-
+	// mesh
+	uint64_t mesh = 0x430;					// world > persistent_level > aactor > mesh
+	uint64_t component_to_world = 0x250;			// world > persistent_level > aactor > mesh > component_to_world
+	uint64_t bone_array = 0x5C0;				// world > persistent_level > aactor > mesh > bone_array
+	uint64_t bone_count = 0x5C8;				// world > persistent_level > aactor > mesh > bone_array + (index * bone_count)
+	uint64_t last_submit_time = 0x378;			// world > persistent_level > aactor -> mesh -> last_submit_time
+	uint64_t last_render_time = 0x37C;			// world > persistent_level > aactor -> mesh -> last_render_time
 }
-#endif
+
