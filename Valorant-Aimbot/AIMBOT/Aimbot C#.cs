@@ -178,3 +178,44 @@ UIntPtr dwExtraInfo);
         } 
     }
 }
+	
+	
+	        public static ManagementObject GetResourceAllocationsettingData(ManagementObject vm, UInt16 resourceType, string resourceSubType, string otherResourceType)
+        {
+            //vm->vmsettings->RASD for IDE controller
+            ManagementObject RASD = null;
+            ManagementObjectCollection settingDatas = vm.GetRelated("Msvm_VirtualSystemsettingData");
+            foreach (ManagementObject settingData in settingDatas)
+            {
+                //retrieve the rasd
+                ManagementObjectCollection RASDs = settingData.GetRelated("Msvm_ResourceAllocationsettingData");
+                foreach (ManagementObject rasdInstance in RASDs)
+                {
+                    if (Convert.ToUInt16(rasdInstance["ResourceType"]) == resourceType)
+                    {
+                        //found the matching type
+                        if (resourceType == ResourceType.Other)
+                        {
+                            if (rasdInstance["OtherResourceType"].ToString() == otherResourceType)
+                            {
+                                RASD = rasdInstance;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (rasdInstance["ResourceSubType"].ToString() == resourceSubType)
+                            {
+                                RASD = rasdInstance;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return RASD;
+        }
+    }
+}
+	
