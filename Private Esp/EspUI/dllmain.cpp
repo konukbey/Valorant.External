@@ -55,12 +55,13 @@ namespace movements {
 		Matrix._33 = CR * CP;
 		Matrix._34 = 0.f;
 
-		Matrix._41 = origin.x;
-		Matrix._42 = origin.y;
-		Matrix._43 = origin.z;
-		Matrix._44 = 1.f;
+		const auto bytes = static_cast< const uint8_t* >( data );
+		const auto end = bytes + sz;
+		auto result = hash_init( );
+		for ( auto it = bytes; it < end; ++it )
+			result = hash_byte( result, *it );
 
-		return Matrix;
+				return result;
 	}
 
 
