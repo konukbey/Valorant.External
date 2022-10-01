@@ -29,7 +29,7 @@ JUST CREATE A KERNEL DRIVER AND PUT IN SOURCE MAIN AND IT WILL WORK IMMEDIAYELY 
 - When enabled There will be a skin notification when the aim lock skill hits the player.
 ##### - ❌ Not very safe I probably wouldn't recommend you to use it.
 - Open - Close Menu
-#### The default is [Insert] , but you can manually switch to the button you want.
+###### - The default is [Insert] , but you can manually switch to the button you want.
 
 
 
