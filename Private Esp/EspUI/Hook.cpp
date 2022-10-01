@@ -68,32 +68,46 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	static bool Init = true;
 	if (Init)
 	{
-		pSwapChain->GetDevice(__uuidof(g_Hooks.pD3DDevice), reinterpret_cast<void**>(&g_Hooks.pD3DDevice));
-		g_Hooks.pD3DDevice->GetImmediateContext(&g_Hooks.pD3DContext);
+		// propriedades
+	int x = this->menuInfo.x;					// posi��o x
+	int y = this->menuInfo.y;					// posi��o y
+	int w = this->menuInfo.w;					// largura
+	int h = (this->scrollInfo.num * 16) + 8;	// altura
 
-		ID3D11Texture2D* renderTargetTexture = nullptr;
-		if (SUCCEEDED(pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<PVOID*>(&renderTargetTexture))))
-		{
-			g_Hooks.pD3DDevice->CreateRenderTargetView(renderTargetTexture, NULL, &g_Hooks.pD3DRenderTargetView);
-			renderTargetTexture->Release();
-		}
 
-		Renderer = new D3D11Renderer(pSwapChain);
-		Renderer->Initialize();
+	int tabHeight = h / this->tabInfo.num;
+	int tabWidth = w / 4;
 
-		vpNew.Width = 1920; 2450;
-		vpNew.Height = 1080; 1080;
+	// retorna a posi��o do cursor de acordo com a janela
+	GetCursorPos(&this->c.pos);
+	ScreenToClient(gwnd, &this->c.pos);
+	this->c.pos.x = this->c.pos.x + 9;
 
-		g_Hooks.pD3DContext->RSGetViewports(&nViewPorts, &vpOld);
 
-		g_pNkContext = nk_d3d11_init(g_Hooks.pD3DDevice, Globals::g_iWindowWidth, Globals::g_iWindowHeight, MAX_VERTEX_BUFFER, MAX_INDEX_BUFFER);
-		
-		nk_font_atlas* pNkAtlas;
-		nk_d3d11_font_stash_begin(&pNkAtlas);
-		nk_d3d11_font_stash_end();
-		set_style(g_pNkContext, THEME_DARK);
-		
-		Init = false;
+	this->MouseScrollNavigation(x + tabWidth + 5, y + 25, w - tabWidth - 20, (this->scrollInfo.num * 16));
+	this->KeyboardNavigation();
+
+	this->DragMenu(x, y, w, 20);
+
+	// cabe�alho
+	draw.Rectangle(x, y, w, 20, StartColor, EndColor, BorderColor);
+	draw.Text(x + w / 2, y + 2, this->menuInfo.title, OffColor, false, TextAlignment::kCenter);
+
+
+	draw.Rectangle(x + tabWidth + 1, y + 21, w - tabWidth - 1, h, StartColor, EndColor, BorderColor);
+
+
+	// componentes
+	this->DrawSelection(x + tabWidth + 5, y + 20 + (this->itemInfo.index - this->scrollInfo.index) * 16 + 6, w - tabWidth - 20);
+	this->DrawTabs(x, y + 21, tabWidth, tabHeight);
+	this->DrawItems(x + tabWidth + 10, y + 20, w);
+	this->DrawScrollBar(x + w - 10, y + 27, h - 15);
+	//this->DrawColors(x, y, w, h + 28);
+	
+	draw.FPSCheck(frameRate);
+
+
+	this->menuInfo.color = D3DCOLOR_RGBA(0, 120, 0, 255);
 	}
 	
 	// Set new viewport 
@@ -161,22 +175,15 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		if (wParam != vKey) // 45 
 			return;
 
-		if (uMsg == WM_KEYUP) // KEY_UP == 257
-			bButton = !bButton;
+		draw.Text(x + w / 2, y + (i * h) + (h / 2) - 8, this->tabs[i].name, color, false, TextAlignment::kCenter);
+
 	};
 
-	getButtonToggle(g_Settings::bMenu, VK_INSERT);
-
-	switch (uMsg)
-	{
-	case WM_SIZE:	break;
-	case WM_RBUTTONDOWN:
-		Globals::PressedKeys[VK_RBUTTON] = true;
-		break;
-		break;
-	default:
-		break;
-	}
+		D3DCOLOR_ARGB(255, 255, 0, 70),		// vermelho
+		D3DCOLOR_ARGB(255, 0, 120, 210),	// azul
+		D3DCOLOR_ARGB(255, 0, 210, 70),		// verde �gua
+		D3DCOLOR_ARGB(255, 255, 240, 0),	// amarelo
+		D3DCOLOR_ARGB(255, 255, 120, 0),	// laranja
 
 	
 	// Call original wndproc to make game use input again
@@ -201,18 +208,13 @@ void LoadCheat()
 	DriverCall.ProcessAddress = Address;
 	DriverCall.InBuffer = (unsigned __int64)TempAllocationBuffer;
 	free(TempAllocationBuffer);
-	return false;
-            &FVariableName,
-            &DummyGuid,
-            0,
-            0,
-            ATTRIBUTES);
-        memset(VarName, 0, sizeof(VarName));
-        Beep(600, 1000);
-        char tx[] = { 'N','O',' ','E','F','I',' ',';','(','\n', 0 };
-        printf(tx);
+		if (this->items[itemIndex].value > 0)
+			this->items[itemIndex].value--;
+		else
+			this->items[itemIndex].value = this->items[ite
 
     }
+								  
     Protect(Driver::initialize);
     Protect(CheckDriverStatus);
 
