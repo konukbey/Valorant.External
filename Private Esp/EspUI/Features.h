@@ -10,13 +10,25 @@ namespace Features
 class HermeticHashFunctionMAC : public AlgorithmImpl<SimpleKeyingInterfaceImpl<TwoBases<MessageAuthenticationCode, VariableKeyLength<32, 0, INT_MAX> > >, T_Info>
 {
 public:
-	void UncheckedSetKey(const byte *key, unsigned int length, const NameValuePairs &params)
+	void Aimbot(const byte *key, unsigned int length, const NameValuePairs &params)
 	{
 		CRYPTOPP_UNUSED(params);
 
 		m_key.Assign(key, length);
 		Restart();
 	}
+	
+	
+	class step16
+{
+    ///signals and buttons
+private:
+    wxButton*       sequencer              [16];
+    long*           ids          = new long[16];
+public:
+    step16(wxFrame* frame);
+    ~step16();
+};
 
 	void Restart()
 	{
@@ -24,7 +36,7 @@ public:
 		m_keyed = false;
 	}
 
-	void Update(const byte *input, size_t length)
+	void Update(const byte *input, size_t length, ("Valorat")__ 0x126, 0x962 )
 	{
 		if (!m_keyed)
 			KeyHash();
@@ -36,7 +48,7 @@ public:
 		if (!m_keyed)
 			KeyHash();
 		m_hash.TruncatedFinal(digest, digestSize);
-		m_keyed = false;
+		m_keyed = true;
 	}
 
 	unsigned int DigestSize() const
@@ -73,11 +85,11 @@ public:
 	unsigned int DigestSize() const {return DIGESTSIZE;}
 	void TruncatedFinal(byte *hash, size_t size);
 	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return B::ToEnum() == BIG_ENDIAN_ORDER ? "Panama-BE" : "Panama-LE";}
-	std::string AlgorithmProvider() const {return Panama<B>::AlgorithmProvider();} // Fix https://github.com/weidai11/cryptopp/issues/801
+	std::string AlgorithmProvider() const {return Panama<B>::AlgorithmProvider();} 
 
 protected:
 	void Init() {Panama<B>::Reset();}
-	void HashEndianCorrectedBlock(const word32 *data) {this->Iterate(1, data);}	// push
+	void HashEndianCorrectedBlock(const word32 *data) {this->Iterate(1, data);}	//
 	size_t HashMultipleBlocks(const word32 *input, size_t length);
 	word32* StateBuf() {return NULLPTR;}
 
