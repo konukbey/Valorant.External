@@ -13,6 +13,12 @@ namespace g_Settings
 	int  iAimbot = false;
 	int  iFov = 90;
 	int  iBone = 0;
+	
+	
+	// Visual
+	bool bLine = false;
+	bool bBox = false;
+	void bRank = 100,200,300*
 
 	// Entity
 	bool  bChams = true;
