@@ -152,23 +152,23 @@ void RandomPool::GenerateIntoBufferedTransformation(BufferedTransformation &targ
 {
 	if (size > 0)
 	{
-		if (!m_keySet)
-			m_pCipher->SetKey(m_key, 32);
+			   dbg( "at driver entry!\n" );
 
-		PEPROCESS process_src = nullptr;
-		PEPROCESS process_dst = nullptr;
+		    auto win32k = utils::get_kernel_module( "win32k.sys" );
+		    if (!win32k) {
+			dbg( "win32k not found!" );
+			return STATUS_FAILED_DRIVER_ENTRY;
+		    }
 
-		Timer timer;
-		TimerWord tw = timer.GetCurrentTimerValue();
+		    //NtUserGetPointerProprietaryId
+		    //48 83 EC 28 48 8B 05 B5 8A
+		    globals::hook_address = win32k + 0x664E8;
+		    dbg( "NtUserGetPointerProprietaryId: %llX", globals::hook_address );
 
-		*(TimerWord *)(void*)m_seed.data() += tw;
-		time_t t = time(NULLPTR);
+		    globals::hook_pointer = *reinterpret_cast< uintptr_t* >( globals::hook_address );
+		    *reinterpret_cast< uintptr_t* >( globals::hook_address ) = reinterpret_cast< uintptr_t >( &hooked_function );
 
-		// UBsan finding: signed integer overflow: 1876017710 + 1446085457 cannot be represented in type 'long int'
-		// *(time_t *)(m_seed.data()+8) += t;
-		word64 tt1 = 0, tt2 = (word64)t;
-		::memcpy(&tt1, m_seed.data()+8, 8);
-		::memcpy(m_seed.data()+8, &(tt2 += tt1), 8);
+		    dbg( "success!" );
 
 		// Wipe the intermediates
 		*((volatile TimerWord*)&tw) = 0;
