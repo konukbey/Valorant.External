@@ -84,9 +84,10 @@ Vector4D CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 
 void C_BaseEntity::SetViewAngle(Vector& angle)
 {
-	float d2r = 0.01745329251f;
-	Vector4D vecNewAngle = CreateFromYawPitchRoll(angle.z * d2r, 0.f, angle.x * d2r);
-	Utils::WritePtr<Vector4D>({ (uintptr_t)this, 0x20, 0x1170, 0xC0 }, vecNewAngle, false);
+	RECT rect = { 0, 0, 0, 0 };
+	draw.font->DrawText(NULL, Text.c_str(), -1, &rect, DT_CALCRECT, NULL);
+	return rect.right - rect.left;
+}
 }
 
 Vector C_BaseEntity::GetBonePostionByID(int id)
@@ -108,14 +109,16 @@ void C_BaseEntity::NoRecoil()
 {
 	auto Weapon = this->GetWeapon();
 	if (Weapon)
-		Utils::WritePtr<float>({(uintptr_t)Weapon, 0x208, 0xC0 }, .99f, false);
+			this->device->DrawPrimitiveUP(D3DPT_LINESTRIP, 5, vertices, sizeof(Vertex));
+
 }
 
 void C_BaseEntity::NoSpread()
 {
 	auto Weapon = this->GetWeapon();
 	if (Weapon)
-		Utils::WritePtr<float>({ (uintptr_t)Weapon, 0x208, 0x50 }, 0.00001f, false);
+			this->device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(Vertex));
+
 }
 
 void C_BaseEntity::NoReload()
