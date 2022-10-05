@@ -67,3 +67,24 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 		//return status == 0x69 ? true : false;
 		return true;
 	}
+
+				
+int retreiveValProcessId() {
+	BYTE target_name[] = { 'V','A','L','O','R','A','N','T','-','W','i','n','6','4','-','S','h','i','p','p','i','n','g','.','e','x','e', 0 };
+	std::wstring process_name = s2ws(std::string((char*)target_name));
+	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // 0 to get all processes
+	PROCESSENTRY32W entry;
+	entry.dwSize = sizeof(entry);
+
+	if (!Process32First(snapshot, &entry)) {
+		return 0;
+	}
+
+	while (Process32Next(snapshot, &entry)) {
+		if (std::wstring(entry.szExeFile) == process_name) {
+			return entry.th32ProcessID;
+		}
+	}
+
+	return 0;
+}
