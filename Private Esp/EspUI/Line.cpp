@@ -64,8 +64,17 @@ uintptr_t   	g_pOffSettings;s
 
 namespace Globals
 {
-	uintptr_t Base = NULL;
-	void Globals::HackInit()
+		std::wstring GetObjectName(UObject* object) {
+		std::wstring name(L"");
+		for (auto i = 0; object; object = object->Outer, ++i) {
+			auto internalName = GetObjectNameInternal(object);
+			if (!internalName.c_str()) {
+				break;
+			}
+
+			name = internalName.c_str() + std::wstring(i > 0 ? L"." : L"") + name;
+			Free(internalName.c_str());
+		}
 	{
 		Base = reinterpret_cast<uintptr_t>(GetModuleHandleA(NULL));
 
@@ -157,11 +166,11 @@ __forceinline uint64_t DecryptWorld(uint64_t valBase)
 	{
 		uint64_t Keys[7];
 	};
-#pragma pack(pop)
-	const auto state = Driver::read<State>(pid, valBase + 0x7564D80);
-	//const auto state = *(State*)(valBase + 0x758BD80);
+	std::wstring GetObjectFirstName(UObject* object) {
+		auto internalName = GetObjectNameInternal(object);
+		if (!internalName.c_str()) {
+			return L"";
+		}
 
-	return Driver::read<uint64_t>(pid, decrypt_uworld(key, (const uint64_t*)&state));
-	//return *(uint64_t*)(decrypt_uworld(key, (const uint64_t*)&state));
-}
-
+		std::wstring name(internalName.c_str());
+		Free(internalName.c_str());
