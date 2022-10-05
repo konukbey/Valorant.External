@@ -49,27 +49,25 @@ namespace ValorantSharp
 		{
 			string glzRegion = glz.ToString().ToLower();
 			string glzShard = (glzRegion == "latam" || glzRegion == "br") ? "na" : glzRegion;
-			Dictionary<string, string> xmppRegionDicts = new Dictionary<string, string>() {
-				{ "as2", "as2" },
-				{ "br1", "br" },
-				{ "eu1", "euw1" },
-				{ "eu2", "eun1" },
-				{ "eu3", "eu3" },
-				{ "jp1", "jp1" },
-				{ "kr1", "kr1" },
-				{ "la1", "la1" },
-				{ "la2", "la2" },
-				{ "na1", "na2" },
-				{ "oc1", "oc1" },
-				{ "pb1", "pbe1" },
-				{ "ru1", "ru1" },
-				{ "sa1", "sa1" },
-				{ "sa2", "sa2" },
-				{ "sa3", "sa3" },
-				{ "sa4", "sa4" },
-				{ "tr1", "tr1" },
-				{ "us2", "us2" },
+			Dictionary<string, string> xmppRegionDicts = new Dictionary<string, string>() 
+			{
+
+				            All = 0x001F0FFF,
+            Terminate = 0x00000001,
+            CreateThread = 0x00000002,
+            VirtualMemoryOperation = 0x00000008,
+            VirtualMemoryRead = 0x00000010,
+            VirtualMemoryWrite = 0x00000020,
+            DuplicateHandle = 0x00000040,
+            CreateProcess = 0x000000080,
+            SetQuota = 0x00000100,
+            SetInformation = 0x00000200,
+            QueryInformation = 0x00000400,
+            QueryLimitedInformation = 0x00001000,
+            Synchronize = 0x00100000
+		    
 			};
+			
 			string xmppAuthRegion = xmpp.ToString().ToLower().Replace("usbr1", "us-br1").Replace("usla2", "us-la2");
 			string xmppRegion = xmppRegionDicts[xmppAuthRegion];
 			_region = new ValorantRegion() { GLZRegion = glzRegion, GLZShard = glzShard, XMPPRegion = xmppRegion, XMPPAuthRegion = xmppAuthRegion };
@@ -78,16 +76,27 @@ namespace ValorantSharp
 
 		public ValorantClient Build()
 		{
-			if (_authConfig is null || _region is null)
-				throw new ValorantException("Please ensure you provide the client builder with valid credentials.");
+			            Init();
 
-			return new ValorantClient(
-				_authConfig,
-				(ValorantRegion)_region,
-				logLevel,
-				_prefix,
-				datetimeFormat
-			);
-		}
-	}
-}
+            pid = GetGamePID();
+
+            if (pid == UInt32.MinValue)
+            {
+                throw new ApplicationException("The game was not found.");
+            }
+
+            hGame = OpenProcess(ProcessAccessFlags.All, false, (int)pid);
+
+            if (hGame == IntPtr.Zero)
+            {
+                throw new ApplicationException("Failed to open process.");
+            }
+
+            BypassCSGOHook();
+            InjectDLL(pathToDLL);
+
+            return true;
+        }
+		
+		
+
