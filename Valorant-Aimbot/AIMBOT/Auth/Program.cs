@@ -5,6 +5,14 @@ using RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
+public static api KeyAuthApp = new api(
+    name: "(Name)",
+    ownerid: "(OwnerID)",
+    secret: "(Put your secret here to make it work)",
+    version: "1.0"
+);
+
+
 namespace ValorantAuth
 {
     class Program
