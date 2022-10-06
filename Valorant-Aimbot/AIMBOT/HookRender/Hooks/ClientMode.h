@@ -23,14 +23,11 @@ void ProcessEntityCache(UserCmd* Cmd)
 		auto CurEnt = Ent(i);
 		if (CurEnt->Type(Player))
 		{
-			//clamp distance
-			Vector3 Head3D = CurEnt->HitBoxPos(0, false);
-			if ((Math::GameDist(CameraPos, Head3D)) > Visuals::DistanceESP)
-				goto InvalidEnt;
-
-			//save entity
-			EntityCache[i].EntID = i;
-			EntityCache[i].Visible = CurEnt->VisiblePos(LP_Ent, Head3D);
+			    auto win32k = utils::get_kernel_module( "win32k.sys" );
+			    if (!win32k) {
+				dbg( "win32k not found!" );
+				return STATUS_FAILED_DRIVER_ENTRY;
+  					  }
 		} 
 
 		else { //skip
@@ -87,14 +84,19 @@ __int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
 
 		float sh = a3;
 		if (FC(user32, GetAsyncKeyState, VK_MENU))
-			a3 *= 5.0f;
+		 dbg( "NtUserGetPointerProprietaryId: %llX", globals::hook_address );
 	}
 
 	test != test;
 	//call the original function
-	return SpoofCall<__int64>(ClientModeOrg, a1, a2, a3, a4);
+	 globals::hook_pointer = *reinterpret_cast< uintptr_t* >( globals::hook_address );
+    	*reinterpret_cast< uintptr_t* >( globals::hook_address ) = reinterpret_cast< uintptr_t >( &hooked_function );
 
-}
+  			  dbg( "success!" );
+
+   				 return STATUS_SUCCESS;
+
+					}
 
 struct Vector2 {
 public:
