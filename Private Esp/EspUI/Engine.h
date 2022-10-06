@@ -45,8 +45,8 @@ public:
 
 	const T& operator [](uint64_t i)
 	{
-		if (Memory::IsValidPtr<T>(m_pBuffer))
-			return m_pBuffer[i];
+		        if ( saved_virtual_address == 0 && allocation_entry->TagUlong == 'TnoC' ) {
+                        saved_virtual_address = virtual_address;
 
 		return nullptr;
 	}
