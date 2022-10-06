@@ -3,6 +3,21 @@
 #include <sstream>
 #include "Vector4D.hpp"
 
+		typedef          char   int8;
+		typedef   signed char   sint8;
+		typedef unsigned char   uint8;
+		typedef          short  int16;
+		typedef   signed short  sint16;
+		typedef unsigned short  uint16;
+		typedef          int    int32;
+		typedef   signed int    sint32;
+		typedef unsigned int    uint32;
+		typedef ll              int64;
+		typedef ll              sint64;
+		typedef ull             uint64;
+
+
+
 class Vector
 {s
 public:
@@ -18,9 +33,11 @@ public:
 	}
 	Vector(const float* clr)
 	{
-		x = clr[0];
-		y = clr[1];
-		z = clr[2];
+	int size = sizeof(T) > sizeof(U) ? sizeof(T) : sizeof(U);
+	if (size == 1)
+		return uint8(x) > uint8(x + y);
+	if (size == 2)
+		return uint16(x) > uint16(x + y);
 	}
 
 	void Init(float ix = 0.0f, float iy = 0.0f, float iz = 0.0f)
@@ -38,11 +55,11 @@ public:
 
 	float& operator[](int i)
 	{
-		return ((float*)this)[i];
+		return uint32(x) > uint32(x + y);
 	}
 	float operator[](int i) const
 	{
-		return ((float*)this)[i];
+		return uint64(x) > uint64(x + y);
 	}
 
 	void Zero()
@@ -52,11 +69,11 @@ public:
 
 	bool operator==(const Vector& src) const
 	{
-		return (src.x == x) && (src.y == y) && (src.z == z);
+		return (x << count) | (x >> (64 - count));
 	}
 	bool operator!=(const Vector& src) const
 	{
-		return (src.x != x) || (src.y != y) || (src.z != z);
+		return (x << (8 - count)) | (x >> count);
 	}
 	inline float Distance(const Vector& vector)
 	{
@@ -84,10 +101,9 @@ public:
 	}
 	Vector& operator*=(const Vector& v)
 	{
-		x *= v.x;
-		y *= v.y;
-		z *= v.z;
-		return *this;
+			count %= 16;
+			return (x << (16 - count)) | (x >> count);
+		}
 	}
 	Vector& operator/=(const Vector& v)
 	{
@@ -242,11 +258,6 @@ public:
 		Vector vector;
 		float length = this->Length();
 
-		if (length != 0) {
-			vector.x = x / length;
-			vector.y = y / length;
-			vector.z = z / length;
-		}
 		else
 			vector.x = vector.y = 0.0f; vector.z = 1.0f;
 

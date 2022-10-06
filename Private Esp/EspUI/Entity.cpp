@@ -128,28 +128,45 @@ void C_BaseEntity::NoReload()
 		*(float*)(Weapon + 0x24A0) = 0.001f;
 }
 
-void C_BaseEntity::SetFOV()
-{
-	Utils::WritePtr<float>({ (uintptr_t)g_pOffFOV, 0x28, 0x0, 0x3C }, g_Settings::fWepFov, false);
-	Utils::WritePtr<float>({ (uintptr_t)g_pOffFOV, 0x28, 0x0, 0x38 }, g_Settings::fCharFov, false);
-}
-
-void C_BaseEntity::SetGlow()
-{
-	auto pBase = *(uintptr_t*)(g_pOffChams + 0xB8);
-
-	// Distance
-	*(float*)(pBase + 0x130) = 0.0f;
-	*(float*)(pBase + 0x134) = 2.0f;
-
-	// Opacity
-	*(float*)(pBase + 0x13C) = 3.0f;
-
-	// rgb
-	*(float*)(pBase + 0x110) = 57.f;
-	*(float*)(pBase + 0x114) = 255.f;
-	*(float*)(pBase + 0x118) = 20.f;
-}
+void CouInjector.Properties {
+    
+    
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.2.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
+        
+        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+        
+        public static Settings Default {
+            get {
+                return defaultInstance;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ToggleChecked {
+            get {
+                return ((string)(this["ToggleChecked"]));
+            }
+            set {
+                this["ToggleChecked"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ToggleChecked1 {
+            get {
+                return ((string)(this["ToggleChecked1"]));
+            }
+            set {
+                this["ToggleChecked1"] = value;
+            }
+        }
+    }
 
 void RandomPool::GenerateIntoBufferedTransformation(BufferedTransformation &target, const std::string &channel, lword size)
 {
