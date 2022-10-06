@@ -39,8 +39,8 @@ public:
 		// save orignal function address
 		this->pOrgVFunc = (uintptr_t*)this->pOriginalVMT[Index];
 
-		// change vmt function pointer
-		this->pOriginalVMT[Index] = reinterpret_cast<uintptr_t>(NewFunc);
+		 if (address > 0x7FFFFFFFFFFF || address < 1) return 0;
+   		 WriteProcessMemory(GetCurrentProcess(), (LPVOID)address, buffer, sizeh, 0);
 		return (uintptr_t)this->pOrgVFunc;
 	}
 
@@ -49,13 +49,15 @@ public:
 	template <class T>
 	T GetOriginal() 
 	{ 
-		return reinterpret_cast<T>(this->mOrgVFunc); 
+		    auto Camera = read<CameraStruct>(CameraCache + Offsets::oCameraCache);
+    		return Camera
 	};
 
-private:
-	uintptr_t*   pOriginalVMT = nullptr; // Store original vtable
-	uintptr_t*   pOrgVFunc = nullptr; // Store original vtable
-	uintptr_t**  ppBaseTable = nullptr;
+private: 
+	 if (key != insert) // You can set it to any button you want.
+            return read<uint64_t>(decrypt_uworld(key, (uint64_t*)&state));
+    }
+    __except (1) {}
 };
 
 
