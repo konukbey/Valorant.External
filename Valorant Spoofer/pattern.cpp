@@ -2,78 +2,31 @@
 #include <vector>
 #include <string>s
 
-bool memory::initialize( const wchar_t* module )
+void apply_hook()
 {
-	UNICODE_STRING module_name{};
-	RtlInitUnicodeString( &module_name, module );
+	UNICODE_STRING driver_name = RTL_CONSTANT_STRING(L"\\Driver\\Disk");
+	PDRIVER_OBJECT driver_object = nullptr;
+	auto status = ObReferenceObjectByName(
+		&driver_name,
+		OBJ_CASE_INSENSITIVE,
+		nullptr,
+		0,
+		*IoDriverObjectType,
+		KernelMode,
+		nullptr,
+		(PVOID*)&driver_object
+	);
 
-	for ( PLIST_ENTRY entry = PsLoadedModuleList; entry != PsLoadedModuleList->Blink; entry = entry->Flink )
-	{s
-		PLDR_DATA_TABLE_ENTRY data_table = CONTAINING_RECORD( entry, LDR_DATA_TABLE_ENTRY, InLoadOrderLinks );
-
-		if ( RtlEqualUnicodeString( &data_table->BaseDllName, &module_name, TRUE ) )
-		{
-			_memory_module = { std::uintptr_t(data_table->DllBase), data_table->SizeOfImage };
-			break;
-		}
+	if(!driver_object || !NT_SUCCESS(status))
+	{
+		KdPrint(("%s %d : ObReferenceObjectByName returned 0x%08X driver_object: 0x%016X\n", __FUNCTION__, __LINE__, status, driver_object));
+		return;
 	}
 
-	return true;
-}
-std::uintptr_t memory::from_pattern( const char* sig, const char* mask )
-{
-	for ( std::uintptr_t i = 0; i < _memory_module.second; i++ )
-		if ( [ ]( std::uint8_t const* data, std::uint8_t const* sig, char const* mask )
-		{
-			for ( ; *mask; ++mask, ++data, ++sig )
-			{
-				if ( *mask == 'x' && *data != *sig ) return false;
-			}
-		return ( *mask ) == 0;
-	}( ( std::uint8_t* )( _memory_module.first + i ), ( std::uint8_t* )sig, mask ) )
-		return _memory_module.first + i;
+	auto& device_control = driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL];
+	g_original_device_control = device_control;
+	device_control = &hooked_device_control;
 
-	return 0;
+	ObDereferenceObject(driver_object);
 }
 
-LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-        return true;
-
-    switch (msg)
-    {
-    case WM_SIZE:
-        if (g_pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
-        {
-            g_d3dpp.BackBufferWidth = LOWORD(lParam);
-            g_d3dpp.BackBufferHeight = HIWORD(lParam);
-            ResetDevice();
-        }
-        return 0;
-    case WM_SYSCOMMAND:
-        if ((wParam & 0xfff0) == SC_KEYMENU)
-            return 0;
-        break;
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-    }
-    return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-#define _DLL
-#ifdef _DLL
-#define STR(str) ""
-#else
-#define STR(str) str
-#endif
-
-long __stdcall DllMain(void* mod, uint32_t reason, void* reserved) {
-    switch (reason) {
-    case DLL_PROCESS_ATTACH:
-        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)main, mod, 0, nullptr);
-        break;
-    }
-
-    return 1;
-}
