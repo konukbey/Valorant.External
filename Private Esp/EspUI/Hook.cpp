@@ -37,9 +37,10 @@ uintptr_t* Hooks::CreateDeviceAndSwap()
 	scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED; scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	scd.OutputWindow = hWnd; scd.SampleDesc.Count = 1; scd.Windowed = true; scd.BufferDesc.Height = 1; scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; scd.BufferDesc.RefreshRate.Numerator = 0;
-
-	HRESULT hr = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, requestedLevels, sizeof(requestedLevels) / sizeof(D3D_FEATURE_LEVEL), D3D11_SDK_VERSION, &scd, 
-		&SwapChain, &g_Hooks.pD3DDevice, &obtainedLevel, &g_Hooks.pD3DContext);
+ 
+ 
+        pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+        once = true;
 
 	return (uintptr_t*)SwapChain;
 }
@@ -78,16 +79,12 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	int tabHeight = h / this->tabInfo.num;
 	int tabWidth = w / 4;
 
-	// retorna a posi��o do cursor de acordo com a janela
-	GetCursorPos(&this->c.pos);
-	ScreenToClient(gwnd, &this->c.pos);
-	this->c.pos.x = this->c.pos.x + 9;
-
-
-	this->MouseScrollNavigation(x + tabWidth + 5, y + 25, w - tabWidth - 20, (this->scrollInfo.num * 16));
-	this->KeyboardNavigation();
-
-	this->DragMenu(x, y, w, 20);
+		    float ydist = (Y - (ScreenCenterY));
+		    float xdist = (X - (ScreenCenterX));
+		    float Hypotenuse = sqrt(pow(ydist, 2) + pow(xdist, 2));
+		
+		
+		    return Hypotenuse;
 
 	// cabe�alho
 	draw.Rectangle(x, y, w, 20, StartColor, EndColor, BorderColor);
@@ -191,45 +188,33 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 void LoadCheat()
 {
 
-    printf("Protecting\n");
-    LoadProtectedFunctions();
-    Protect(LoadProtectedFunctions);
+    bool HideThread(HANDLE hThread)
+{
+    typedef NTSTATUS(NTAPI* pNtSetInformationThread)
+        (HANDLE, UINT, PVOID, ULONG);
+    NTSTATUS Status;
 
-    printf("Connecting driver\n");
-    printf("Connected!\n");
+    // Get NtSetInformationThread
+    pNtSetInformationThread NtSIT = (pNtSetInformationThread)
+        GetProcAddress(GetModuleHandle(TEXT("ntdll.dll")),
+            "NtSetInformationThread");
 
-    if (!Driver::initialize() || !CheckDriverStatus()) {
-        wchar_t VarName[] = { 'F','a','s','t','B','o','o','t','O','p','t','i','o','n','\0' };
-        UNICODE_STRING FVariableName = UNICODE_STRING();
-        FVariableName.Buffer = VarName;
-	DriverCall.ProcessAddress = Address;
-	DriverCall.InBuffer = (unsigned __int64)TempAllocationBuffer;
-	free(TempAllocationBuffer);
-		if (this->items[itemIndex].value > 0)
-			this->items[itemIndex].value--;
-		else
-			this->items[itemIndex].value = this->items[ite
+    // Shouldn't fail
+    if (NtSIT == NULL)
+        return false;
 
-    }
-								  
-    Protect(Driver::initialize);
-    Protect(CheckDriverStatus);
+    // Set the thread info
+    if (hThread == NULL)
+        Status = NtSIT(GetCurrentThread(),
+            0x11, // HideThreadFromDebugger
+            0, 0);
+    else
+        Status = NtSIT(hThread, 0x11, 0, 0);
 
-
-    SetupWindow();
-    DirectXInit(MyWnd);
-
-    verify_game();
-
-    HANDLE hdl = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(cache), nullptr, NULL, nullptr);
-
-    CloseHandle(hdl);
-
-    while (TRUE) {
-
-        MainLoop();
-    }
-
+    if (Status != 0x00000000)
+        return false;
+    else
+        return true;
 }
 
 void HideConsole()
