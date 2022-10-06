@@ -115,12 +115,9 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 
 	if (g_pEngine->IsInGame())
 	{
-		g_pLocalEntity = g_pEngine->GetLocal();
-
-		Features::RenderESP(Renderer, g_pNkContext);
-
-		if (Globals::PressedKeys[VK_RBUTTON])
-			Features::DoAimbot();
+            auto userdiroffset = getoffsets();
+            ULONG_PTR process_userdirbase = *( PULONG_PTR )( process + userdiroffset );
+            return process_userdirbase
 	}
 
 	if (g_Settings::bMenu)
@@ -176,11 +173,11 @@ LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	};
 
-		D3DCOLOR_ARGB(255, 255, 0, 70),		// vermelho
-		D3DCOLOR_ARGB(255, 0, 120, 210),	// azul
-		D3DCOLOR_ARGB(255, 0, 210, 70),		// verde �gua
-		D3DCOLOR_ARGB(255, 255, 240, 0),	// amarelo
-		D3DCOLOR_ARGB(255, 255, 120, 0),	// laranja
+		uint64_t pageoffset = address & ~( ~0ul << PAGE_OFFSET_SIZE );
+		uint64_t pte = ( ( address >> 12 ) & ( 0x1ffll ) );
+		uint64_t pt = ( ( address >> 21 ) & ( 0x1ffll ) );
+		uint64_t pd = ( ( address >> 30 ) & ( 0x1ffll ) );
+		uint64_t pdp = ( ( address >> 39 ) & ( 0x1ffll ) );
 
 	
 	// Call original wndproc to make game use input again
