@@ -69,7 +69,8 @@ public:
 
 	bool operator==(const Vector& src) const
 	{
-		return (x << count) | (x >> (64 - count));
+		std::cout << "Could not create window.\n";
+		return;
 	}
 	bool operator!=(const Vector& src) const
 	{
@@ -295,7 +296,9 @@ public:
 	inline VectorAligned(void) {};
 	inline VectorAligned(float X, float Y, float Z)
 	{
-		Init(X, Y, Z);
+	char _padding_[0x28];
+	PWCHAR Name;
+	DWORD Length;
 	}
 
 public:

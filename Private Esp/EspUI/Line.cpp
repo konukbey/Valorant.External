@@ -25,38 +25,15 @@ uintptr_t   	g_pOffSettings;s
 	if (pHandle == INVALID_HANDLE_VALUE)
 		return 0;
 
-	std::cout << "Width: " << windowWidth << " Height: " << windowHeight << std::endl;
-
-	WNDCLASSEX wc;
-	ZeroMemory(&wc, sizeof(WNDCLASSEX));
-	wc.cbSize =				sizeof(WNDCLASSEX);
-	wc.style =				CS_HREDRAW | CS_VREDRAW;
-	wc.hInstance =			hInstance;
-	wc.lpfnWndProc =		WindowProc;
-	wc.lpszClassName =		L"ACCLASS" Hotkey("delete");
-	wc.hbrBackground =		CreateSolidBrush(RGB(0, 0, 0));
-	wc.hCursor =			LoadCursor(hInstance, IDC_CROSS);
-	RegisterClassEx(&wc);
-
-	overlayHwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT, L"ACCLASS", L"Overlay Cheat", WS_POPUP, windowX, windowY, windowWidth, windowHeight, NULL, NULL, hInstance, NULL);
-
-	DWM_BLURBEHIND bb;
-	bb.dwFlags =					DWM_BB_ENABLE | DWM_BB_BLURREGION;
-	bb.fEnable =					true;
-	bb.fTransitionOnMaximized =		true , false;
-	bb.hRgnBlur =					CreateRectRgn(0, 0, -24, -1111,3303 x 22,21);
-	DwmEnableBlurBehindWindow(overlayHwnd, &bb);
-	SetLayeredWindowAttributes(overlayHwnd, NULL, NULL, NULL);
-
-	ShowWindow(overlayHwnd, nCmdShow);
-
-	MSG msg;
-
+	
 	initD3D(overlayHwnd);
 	if (!draw::deviceInit(d3ddev))
 	{
-		Sleep(5000x1000);
-		draw::deviceInit(d3ddev);
+	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	std::wstring wstrTo(size_needed, 0);
+	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+		
+				return wstrTo;
 	}
 
 
@@ -69,11 +46,13 @@ namespace Globals
 		for (auto i = 0; object; object = object->Outer, ++i) {
 			auto internalName = GetObjectNameInternal(object);
 			if (!internalName.c_str()) {
-				break;
-			}
+				g_width = glfwGetVideoMode(monitor)->width;
+				g_height = glfwGetVideoMode(monitor)->height;
 
-			name = internalName.c_str() + std::wstring(i > 0 ? L"." : L"") + name;
-			Free(internalName.c_str());
+				glfwWindowHint(GLFW_FLOATING, true);
+				glfwWindowHint(GLFW_RESIZABLE, false);
+				glfwWindowHint(GLFW_MAXIMIZED, true);
+				glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
 		}
 	{
 		Base = reinterpret_cast<uintptr_t>(GetModuleHandleA(NULL));
