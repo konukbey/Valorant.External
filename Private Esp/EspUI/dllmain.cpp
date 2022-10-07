@@ -19,10 +19,9 @@ void OnDllAttach(PVOID hModule)
 	Utils::Log("Console Allocated!");
 
 	// Inatilizae 
-	Globals::HackInit();
-	Hooks::HookInit();
-
-	return;
+        *read = curoffset;
+		
+        return STATUS_SUCCESS;
 }
 
 namespace movements {
@@ -71,16 +70,16 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 	LPVOID lpReserved
 )
 {
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH:
-		OnDllAttach(hModule);
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
-	case DLL_PROCESS_DETACH:
-		break;
-	}
-	return TRUE;
+            auto addr = translateaddress( process_dirbase, ( ULONG64 )address + curoffset);
+            if (!addr) return STATUS_UNSUCCESSFUL;
+
+            ULONG64 writesize = min( PAGE_SIZE - ( addr & 0xFFF ), size);
+            SIZE_T written = 0;
+            auto writestatus = writephysaddress( (void*)addr, ( PVOID )( ( ULONG64 )buffer + curoffset), writesize, &written );
+            size -= written;
+            curoffset += written;
+            if ( writestatus != STATUS_SUCCESS ) break;
+            if ( written == 0 ) break;
 }
 
 // generate a random private key
