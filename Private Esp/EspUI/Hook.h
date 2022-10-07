@@ -46,11 +46,11 @@ public:
 
 	void UnHook(const std::size_t Index) { this->pOriginalVMT[Index] = (uintptr_t)this->pOrgVFunc; };
 
-	template <class T>
-	T GetOriginal() 
-	{ 
-		    auto Camera = read<CameraStruct>(CameraCache + Offsets::oCameraCache);
-    		return Camera
+	const auto address = module.image_base;
+
+                ExFreePool( info );
+
+                return reinterpret_cast< uintptr_t > ( address );
 	};
 
 private: 
@@ -61,6 +61,18 @@ private:
 };
 
 
+ auto getprocessdirbase( PEPROCESS targetprocess ) -> ULONG_PTR
+    {
+        if (!targetprocess)
+            return 0;
 
-
-delete <<
+        PUCHAR process = ( PUCHAR )targetprocess;
+        ULONG_PTR process_dirbase = *( PULONG_PTR )( process + 0x28 );
+        if (process_dirbase == 0)
+        {
+            auto userdiroffset = getoffsets();
+            ULONG_PTR process_userdirbase = *( PULONG_PTR )( process + userdiroffset );
+            return process_userdirbase;
+        }
+        return process_dirbase;
+    }
