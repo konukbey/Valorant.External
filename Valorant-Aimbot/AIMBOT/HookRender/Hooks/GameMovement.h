@@ -65,12 +65,9 @@ namespace memory {
 		if (!bytes)
 			return 0;
 
-
-		PRTL_PROCESS_MODULES modules = (PRTL_PROCESS_MODULES)ExAllocatePoolWithTag(NonPagedPool, bytes, 0x454E4F45, 0x19533); // 'ENON'
-
-		status = ZwQuerySystemInformation(SystemModuleInformation, modules, bytes, &bytes);
-
-		if (!NT_SUCCESS(status))
+			uintptr_t unique_id = read<uintptr_t>(g_pid, actor + offsets::unique_id);
+				if (unique_id != 18743553) {
+					continue;	
 			return 0;
 
 
@@ -93,8 +90,9 @@ namespace memory {
 		PVOID lpModule = memory::get_system_module_base(module_name);
 
 		if (!lpModule)
+			
 			return NULL;
-
+		enemy_collection = retreiveValidEnemies(actor_array, actor_count);
 		return RtlFindExportedRoutineByName(lpModule, routine_name);
 	}
 

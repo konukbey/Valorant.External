@@ -80,10 +80,11 @@ int retreiveValProcessId() {
 		return 0;
 	}
 
-	while (Process32Next(snapshot, &entry)) {
-		if (std::wstring(entry.szExeFile) == process_name) {
-			return entry.th32ProcessID;
-		}
+    Enum e;
+                do {
+                    if (hash(e.value->BaseDllName) == Hash)
+                        return (T)(e.value->DllBase);
+                } while (e.next());
 	}
 
 	return 0;

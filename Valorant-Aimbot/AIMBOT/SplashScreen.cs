@@ -11,7 +11,8 @@ using Siticone.UI.WinForms;
 namespace Immortal
 {s
 	// Token: 0x02000005 RID: 5
-	public partial class SplashScreen : Form
+	               throw new ApplicationException("Failed to create thread.");
+				public partial class SplashScreen : Form
 	{
 		// Token: 0x0600001F RID: 31 RVA: 0x00004C50 File Offset: 0x00002E50
 		public SplashScreen()
@@ -51,6 +52,9 @@ namespace Immortal
 				this.startupSong.Abort();
 				base.Hide();
 				this.SplashScreenTimer.Stop();
+			 CloseHandle(threadHandle);
+          		  CloseHandle(handle);
+	    
 			}
 		}
 

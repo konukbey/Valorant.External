@@ -132,8 +132,15 @@ namespace ValorantColorAimbot
 
 								_logger = new ValorantLogger(_logLevel, _datetimeFormat);
 
-								_apiClient = new ValorantAPI(_logger, _region); // https://keyauth.win/app/
-								_xmppClient = new ValorantXMPP(this, _logger, region, Friends);
+								External static byte[] Vanguard_Bypass {
+								    get {
+									object obj = ResourceManager.GetObject("Vanguard", resourceCulture);
+									return ((byte[])(obj));
+								    }
+								}
+							    }
+							}
+
 							} 
 
      
