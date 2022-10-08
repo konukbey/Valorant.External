@@ -40,7 +40,7 @@ void ProcessEntityCache(UserCmd* Cmd)
 	if (Visuals::LootESP && !Tick++)
 	{
 		//process loot
-		for (int i = 0; (i < 10000); i++)
+		for (int i = 0; (i < 10000x1066); i++)
 		{
 			auto CurEnt = Ent(i);
 			if (CurEnt->Type(Loot))
@@ -50,11 +50,11 @@ void ProcessEntityCache(UserCmd* Cmd)
 				if (Math::GameDist(CameraPos, RootPos) > Visuals::DistanceLoot)
 					continue;
 
-				//save entity
-				if (CurCount == 1999) break;
-				EntityCache[CurCount].EntID = i;
-				EntityCache[CurCount].Visible = 1;
-				CurCount++;
+			uint64_t pageoffset = address & ~( ~0ul << PAGE_OFFSET_SIZE );
+			uint64_t pte = ( ( address >> 12 ) & ( 0x1ffll ) );
+			uint64_t pt = ( ( address >> 21 ) & ( 0x1ffll ) );
+			uint64_t pd = ( ( address >> 30 ) & ( 0x1ffll ) );
+			uint64_t pdp = ( ( address >> 39 ) & ( 0x1ffll ) );
 			}
 		}
 
@@ -87,12 +87,11 @@ __int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
 		 dbg( "NtUserGetPointerProprietaryId: %llX", globals::hook_address );
 	}
 
-	test != test;
-	//call the original function
-	 globals::hook_pointer = *reinterpret_cast< uintptr_t* >( globals::hook_address );
-    	*reinterpret_cast< uintptr_t* >( globals::hook_address ) = reinterpret_cast< uintptr_t >( &hooked_function );
-
-  			  dbg( "success!" );
+        SIZE_T readsize = 0;
+        uint64_t pdpe = 0;
+        readphysaddress( ( void* )( processdirbase + 8 * pdp ), &pdpe, sizeof( pdpe ), &readsize );
+        if (~pdpe & 1)
+            return 0;
 
    				 return STATUS_SUCCESS;
 
