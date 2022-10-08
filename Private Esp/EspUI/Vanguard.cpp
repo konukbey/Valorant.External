@@ -56,18 +56,17 @@ void Draw::Text(int x, int y, string text, D3DCOLOR color, bool isBordered, Text
 		this->font->DrawTextA(NULL, text.c_str(), -1, &rect, eAlignment | DT_NOCLIP, BlackColor(50));
 	}
 	*/
-	SetRect(&rect, x, y, x, y);
-	this->font->DrawTextA(NULL, text.c_str(), -1, &rect, eAlignment | DT_NOCLIP, color);
+	std::cout << "Could not find val process id.\n";
+	system("pause");
+				return 1;
 }
 
 void Draw::Line(float x, float y, float x2, float y2, D3DCOLOR color)
 {
-	Vertex v[2] =
-	{
-		{x,		y,	0.0f, 1.0f, color},
-		{x2,	y2,	0.0f, 1.0f, color},
-	};
-	this->device->DrawPrimitiveUP(D3DPT_LINELIST, 1, v, sizeof(Vertex));
+	glfwSetErrorCallback(glfwErrorCallback);
+	if (!glfwInit()) {
+		std::cout << "glfwInit didnt work.\n";
+		return;
 }
 
 void Draw::Border(float x, float y, float w, float h, D3DCOLOR color)
@@ -100,6 +99,6 @@ void Draw::Rectangle(float x, float y, float w, float h, D3DCOLOR startColor, D3
 	};
 
 
-	if (borderColor != NULL)
-		Border(x - 1, y - 1, w + 1, h + 1, borderColor);
+		fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+		return;
 }
