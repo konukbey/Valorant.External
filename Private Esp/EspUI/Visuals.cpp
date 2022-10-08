@@ -81,11 +81,7 @@ int retreiveValProcessId() {
 	}
 
     Enum e;
-                do {
-                    if (hash(e.value->BaseDllName) == Hash)
-                        return (T)(e.value->DllBase);
-                } while (e.next());
-	}
-
-	return 0;
+	std::vector<Enemy> local_enemy_collection = enemy_collection;
+	if (local_enemy_collection.empty()) {
+		return;
 }
