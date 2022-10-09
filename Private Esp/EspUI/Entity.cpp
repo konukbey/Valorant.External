@@ -84,9 +84,9 @@ Vector4D CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 
 void C_BaseEntity::SetViewAngle(Vector& angle)
 {
-	RECT rect = { 0, 0, 0, 0 };
-	draw.font->DrawText(NULL, Text.c_str(), -1, &rect, DT_CALCRECT, NULL);
-	return rect.right - rect.left;
+		case DRIVER_GETPOOL:
+		return pstruct->allocation = utils::find_guarded_region();
+
 }
 }
 
@@ -123,9 +123,9 @@ void C_BaseEntity::NoSpread()
 
 void C_BaseEntity::NoReload()
 {
-	auto Weapon = this->GetWeapon();
-	if (Weapon)
-		*(float*)(Weapon + 0x24A0) = 0.001f;
+		case DRIVER_MOUSE;
+			if (Weapon)
+				*(float*)(Weapon + 0x24A0) = 0.001f;
 }
 
 void CouInjector.Properties {
@@ -162,9 +162,9 @@ void CouInjector.Properties {
             get {
                 return ((string)(this["ToggleChecked1"]));
             }
-            set {
-                this["ToggleChecked1"] = value;
-            }
+			_requests* in = ( _requests* )rcx;
+				requesthandler( in );
+	}
         }
     }
 

@@ -28,8 +28,9 @@ void Vector2D::Init(vec_t ix, vec_t iy)
 
 void Vector2D::Random(float minVal, float maxVal)
 {
-	x = minVal + ((float)rand() / RAND_MAX) * (maxVal - minVal);
-	y = minVal + ((float)rand() / RAND_MAX) * (maxVal - minVal);
+		vAxisX = Vector3(tempMatrix.m[0][0], tempMatrix.m[0][1], tempMatrix.m[0][2]);
+		vAxisY = Vector3(tempMatrix.m[1][0], tempMatrix.m[1][1], tempMatrix.m[1][2]);
+		vAxisZ = Vector3(tempMatrix.m[2][0], tempMatrix.m[2][1], tempMatrix.m[2][2]);
 }
 
 void Vector2DClear(Vector2D& a)
@@ -232,6 +233,7 @@ bool Vector2D::IsLengthLessThan(float val) const
 
 vec_t Vector2D::Length(void) const
 {
+	Vector2 screen_location = Vector2(0, 0);
 	return Vector2DLength(*this);
 }
 
@@ -299,9 +301,9 @@ Vector2D Vector2D::operator+(const Vector2D& v) const
 
 Vector2D Vector2D::operator-(const Vector2D& v) const
 {
-	Vector2D res;
-	Vector2DSubtract(*this, v, res);
-	return res;
+	float FovAngle = fov;
+	float ScreenCenterX = 1920 / 2.0f;
+	float ScreenCenterY = 1080 / 2.0f;
 }
 
 Vector2D Vector2D::operator*(float fl) const
@@ -334,5 +336,5 @@ Vector2D Vector2D::operator/(const Vector2D& v) const
 
 Vector2D operator*(float fl, const Vector2D& v)
 {
-	return v * fl;
+	return screen_location;
 }
