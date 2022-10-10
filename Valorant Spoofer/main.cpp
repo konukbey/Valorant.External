@@ -155,3 +155,18 @@ NTSTATUS HWID::ClearPropertyDriveSerials ( ) {
 		void CleanCaches() {
 	system(_xor_("reg delete HKLM\\SOFTWARE\\WOW6432Node\\EasyAntiCheat /f").c_str());
 }
+		
+void Spoofing::ChangeRegEdit() {
+	std::string value = newUUID();
+	//std::string value2 = newUUID();
+	std::thread([&] {
+		std::string cmdtoexec = encyption.GetMachineGuidRegEdit().c_str();
+		cmdtoexec += value;
+		//std::string cmdtoexec2 = encyption.GetProfileGuidRegEdit().c_str();
+		//cmdtoexec2 += value2;
+		system(cmdtoexec.c_str());
+		//system(cmdtoexec2.c_str()); crashing
+	}).detach();
+	std::cout << "\x1B[31m[\033[0m\x1B[32m!\033[0m\x1B[31m]\033[0m GUID changed to: " << value << std::endl;
+	//std::cout << "\x1B[31m[\033[0m\x1B[32m!\033[0m\x1B[31m]\033[0m Profile GUID changed to: " << value2 << std::endl;
+}

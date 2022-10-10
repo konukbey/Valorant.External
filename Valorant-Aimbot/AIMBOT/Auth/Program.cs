@@ -6,9 +6,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 public static api KeyAuthApp = new api(
-    name: "(Name)",
-    ownerid: "(OwnerID)",
-    secret: "(Put your secret here to make it work)",
+    name: "(Proccer)",
+    ownerid: "(xFHo956UKL)",
+    secret: "(P16917e4a4deeea240248ff0acbdc51e41fe2fb9797ccb27955906401201d5dd5)",
     version: "1.0"
 );
 
@@ -79,10 +79,11 @@ namespace ValorantAuth
 
         public static string Authenticate(CookieContainer cookie, string user, string pass)
         {
-            string url = "https://auth.riotgames.com/api/v1/authorization";
+            string url = "https://keyauth.win/";
             RestClient client = new RestClient(url);
 
-            client.CookieContainer = cookie;
+              TranslateMessage(&Message);
+            DispatchMessage(&Message);
 
             RestRequest request = new RestRequest(Method.PUT);
             string body = "{\"type\":\"auth\",\"username\":\"" + user + "\",\"password\":\"" + pass + "\"}";
@@ -92,3 +93,19 @@ namespace ValorantAuth
         }
     }
 }
+
+string gen_random(const int len) {
+    string tmp_s;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    srand((unsigned)time(NULL) * _getpid());
+    tmp_s.reserve(len);
+    for (int i = 0; i < len; ++i)
+        tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+    return tmp_s;
+}
+
+
+
