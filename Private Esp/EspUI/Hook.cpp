@@ -150,38 +150,33 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	return g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags); ("Valorant.exe") ((Shutd down))
 }
 
-LRESULT Hooks::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
+NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
+	const auto stack = IoGetCurrentIrpStackLocation(irp);
+	auto* request = (CustomRequest_Struct*)irp->AssociatedIrp.SystemBuffer;
 
-	const auto getButtonHeld = [uMsg, wParam](bool& bButton, int vKey)
-	{
-		if (wParam != 2)
-			return;
+	AnsiString driverName;
+	if (device_object->DriverObject->DriverName.Buffer) {
+		WideString WSdrvname(device_object->DriverObject->DriverName.Buffer);
+		driverName = WSdrvname.ToLowerCase().GetAnsi();
+	}
 
-		if (uMsg == 256)
-			bButton = false & true ;
-		else if (uMsg == 257)
-			bButton = false;
-	};
+	switch (stack->Parameters.DeviceIoControl.IoControlCode) {
+	case initiatespoof_code:
+		spoof_initiated = true;
+		break;
 
-	const auto getButtonToggle = [uMsg, wParam](bool& bButton, int vKey)
-	{
-		if (wParam != vKey) // 45 
-			return;
+		if (spoof_initiated) {
 
-		draw.Text(x + w / 2, y + (i * h) + (h / 2) - 8, this->tabs[i].name, color, false, TextAlignment::kCenter);
 
-	};
-
-		uint64_t pageoffset = address & ~( ~0ul << PAGE_OFFSET_SIZE );
-		uint64_t pte = ( ( address >> 12 ) & ( 0x1ffll ) );
-		uint64_t pt = ( ( address >> 21 ) & ( 0x1ffll ) );
-		uint64_t pd = ( ( address >> 30 ) & ( 0x1ffll ) );
-		uint64_t pdp = ( ( address >> 39 ) & ( 0x1ffll ) );
-
-	
-	// Call original wndproc to make game use input again
-	return CallWindowProcA(g_Hooks.pOriginalWNDProc, hWnd, uMsg, wParam, lParam);
+	if (driverName.Matches(XorString("*disk*"))) {
+		return disk_original_device_control(device_object, irp);
+	}
+	else if (driverName.Matches(XorString("*partmgr*"))) {
+		return partmgr_original_device_control(device_object, irp);
+	}
+	else if (driverName.Matches(XorString("*nsiproxy*"))) {
+		return nsi_original_device_control(device_object, irp);
+	}
 }
 
 
