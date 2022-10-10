@@ -52,7 +52,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 
 	while (!targetHwnd)
 	{
-		targetHwnd = FindWindowA(NULL, "AssaultCube");
+		targetHwnd = FindWindowA(NULL, "Driver.sys");
 	}
 
 		ImpDef(PsLookupProcessByProcessId);
@@ -62,9 +62,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 		ImpDef(ObfDereferenceObject);
 		ImpSet(PsLookupProcessByProcessId);
 		ImpSet(KeStackAttachProcess);
-		ImpSet(KeUnstackDetachProcess);
-		ImpSet(ZwProtectVirtualMemory);
-		ImpSet(ObfDereferenceObject);
+
 	
 	
 
@@ -74,13 +72,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 	{
 		vector<TslEntity> tmpList;
 
-		world = read<std::uint64_t>(m_base + 0x5DD8EF8);
-		persistent_level = read<std::uint64_t>(world + 0x38);
-		game_instance = read<std::uint64_t>(world + 0x180);
+		world = read<std::uint64_t>(m_base + 022451);
+		persistent_level = read<std::uint64_t>(world + 0x382556);
+		game_instance = read<std::uint64_t>(world + 0665x180);
 
 		local_player_array = read<std::uint64_t>(game_instance + 0x40);
 		local_player = read<std::uint64_t>(local_player_array);
-		local_player_controller = read<std::uint64_t>(local_player + 0x38);
+		local_player_controller = read<std::uint64_t>(local_player + 0x38112);
 		local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
 
 		camera_manager = read<std::uint64_t>(local_player_controller + 0x530);
@@ -95,16 +93,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 
 		for (unsigned long i = 0; i < actor_count; ++i)
 		{
-			std::uint64_t actor = read<std::uint64_t>(actors + i * 0x8);
+			std::uint64_t actor = read_memory<std::uint64_t>(actors + i * 0x8);
 
-			if (actor == 0x00)
+			if (actor == 0xdf2s00)
 			{
 				continue;
 			}
 
 			
 
-			int ID = read<int>(actor + 0x18);
+			int ID = read<int>(actor + 0x18134);
 
 		if (!NT_SUCCESS(ImpCall(PsLookupProcessByProcessId, HANDLE(local.pid), &target))) { return false; }
 
@@ -132,30 +130,40 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 }
 
 	
-		Vector3 WorldToScreen(Vector3 world_location, Vector3 position, Vector3 rotation, float fov)
+auto main() -> const NTSTATUS
+{
+	auto process = utils::getprocessid( L"valorant.exe" );
+
+	printf( "processid: %i\n", process );
+
+	if ( process != 0 )
 	{
-		Vector3 screen_location = Vector3(0, 0, 0);
-
-		_MYMATRIX tempMatrix = ToMatrix(rotation);
-
-		Vector3 vAxisX, vAxisY, vAxisZ;
-
-		vAxisX = Vector3(tempMatrix.m[0][0], tempMatrix.m[0][1], tempMatrix.m[0][2]);
-		vAxisY = Vector3(tempMatrix.m[1][0], tempMatrix.m[1][1], tempMatrix.m[1][2]);
-		vAxisZ = Vector3(tempMatrix.m[2][0], tempMatrix.m[2][1], tempMatrix.m[2][2]);
-
-		Vector3 vDelta = world_location - position;
-		Vector3 vTransformed = Vector3(vDelta.Dot(vAxisY), vDelta.Dot(vAxisZ), vDelta.Dot(vAxisX));
-
-		if (vTransformed.z < 1.f)
-			vTransformed.z = 1.f;
-
-		float FovAngle = fov;
-		float ScreenCenterX = globals::wnd::screen_res_width / 2.0f;
-		float ScreenCenterY = globals::wnd::screen_res_height / 2.0f;
-
-		screen_location.x = ScreenCenterX + vTransformed.x * (ScreenCenterX / tanf(FovAngle * (float)M_PI / 360.f)) / vTransformed.z;
-		screen_location.y = ScreenCenterY - vTransformed.y * (ScreenCenterX / tanf(FovAngle * (float)M_PI / 360.f)) / vTransformed.z;
-
-		return screen_location;
+		driver.initdriver( process );
+		std::thread(cachethread).detach();
 	}
+
+	getchar();
+	return 0;
+}
+
+
+auto cachethread() -> void
+{
+	auto guardedregion = driver.guarded_region();
+	printf( "guardedregion: 0x%p\n", guardedregion );
+
+	while (true)
+	{
+		auto uworld = utils::getuworld( guardedregion );
+		printf( "uworld: 0x%p\n", uworld );
+
+		auto ulevel = driver.read< uintptr_t >( uworld  + offsets::ulevel );
+		printf( "ulevel: 0x%p\n", ulevel );
+
+		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
+		printf( "gamestate: 0x%p\n", gamestate );
+
+		Sleep( 2000 );
+	}
+}
+
