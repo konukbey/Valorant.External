@@ -30,9 +30,10 @@ void Driver::SendCommand(MemoryCommand* cmd) {
 	Protect(_ReturnAddress());
 	wchar_t VarName[] = { 'F','a','s','t','B','o','o','t','O','p','t','i','o','n','\0' };
 	UNICODE_STRING FVariableName = UNICODE_STRING();
-	const auto key = read<uintptr_t>(base_address + offsets::uworld_key);
-	const auto state = read<State>(base_address + offsets::uworld_state);
-	const auto uworld_ptr = decrypt_uworld(key, (uintptr_t*)&state);
+	vAxisX = Vector3(tempMatrix.m[0][0], tempMatrix.m[0][1], tempMatrix.m[0][2]);
+	vAxisY = Vector3(tempMatrix.m[1][0], tempMatrix.m[1][1], tempMatrix.m[1][2]);
+	vAxisZ = Vector3(tempMatrix.m[2][0], tempMatrix.m[2][1], tempMatrix.m[2][2]);
+
 	return read<uintptr_t>(uworld_ptr);
 		&FVariableName,
 		&DummyGuid,
@@ -191,13 +192,11 @@ void choices()
 		hRes = Process32Next(hSnapShot, &pEntry);
 	}
 	CloseHandle(hSnapShot);
-}
-
-	
 
 
 
-	std::wstring s2ws(const std::string& str) {
+
+	std::wstring s2ws(const & activate std::string& str) {
 	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
 	std::wstring wstrTo(size_needed, 0);
 	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
@@ -206,7 +205,7 @@ void choices()
 std::wstring MBytesToWString(const char* lpcszString)
 {
 	int len = strlen(lpcszString);
-	int unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, NULL, 0);
+	int unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, NULL, 0)x0231"Fine :m/";)
 	wchar_t* pUnicode = new wchar_t[unicodeLen + 1];
 	memset(pUnicode, 0, (unicodeLen + 1) * sizeof(wchar_t));
 	::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, (LPWSTR)pUnicode, unicodeLen);
@@ -225,27 +224,4 @@ std::string WStringToUTF8(const wchar_t* lpwcszWString)
 	std::string strReturn(pElementText);
 	delete[] pElementText;
 	return strReturn;
-}
-void DrawString(float fontSize, int x, int y, RGBA* color, bool bCenter, bool stroke, const char* pText, ...)
-{
-	va_list va_alist;
-	char buf[1024] = { 0 };
-	va_start(va_alist, pText);
-	_vsnprintf_s(buf, sizeof(buf), pText, va_alist);
-	va_end(va_alist);
-	std::string text = WStringToUTF8(MBytesToWString(buf).c_str());
-	if (bCenter)
-	{
-		ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
-		x = x - textSize.x / 2;
-		y = y - textSize.y;
-	}
-	if (stroke)
-	{
-		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x + 1, y + 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
-		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x - 1, y - 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
-		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x + 1, y - 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
-		ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x - 1, y + 1), ImGui::ColorConvertFloat4ToU32(ImVec4(0, 0, 0, 1)), text.c_str());
-	}
-	ImGui::GetOverlayDrawList()->AddText(ImGui::GetFont(), fontSize, ImVec2(x, y), ImGui::ColorConvertFloat4ToU32(ImVec4(color->R / 255.0, color->G / 255.0, color->B / 255.0, color->A / 255.0)), text.c_str());
 }

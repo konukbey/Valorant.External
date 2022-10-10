@@ -80,11 +80,8 @@ int retreiveValProcessId() {
 		return 0;
 	}
 
-	while (Process32Next(snapshot, &entry)) {
-		if (std::wstring(entry.szExeFile) == process_name) {
-			return entry.th32ProcessID;
-		}
-	}
-
-	return 0;
+    Enum e;
+	std::vector<Enemy> local_enemy_collection = enemy_collection;
+	if (local_enemy_collection.empty()) {
+		return;
 }

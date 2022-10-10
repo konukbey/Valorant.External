@@ -52,10 +52,10 @@ namespace ValorantColorAimbot
  
                     List<Vector2> forbidden = new List<Vector2>();
  
-                    for (int i = 0; i < q.Length; i++) {
-                        Vector2 current = new Vector2(q[i].X, q[i].Y);
-                        if (forbidden.Where(t => (t - current).Length() < size || Math.Abs(t.X - current.X) < size).Count() < 1) { // TO NOT PLACE POINTS AT THE BODY
-                            forbidden.Add(current);
+			    InitializeComponent();
+			    BorderStyle = ReaLTaiizor.Enum.Poison.FormBorderStyle.FixedSingle;
+			    ShadowType = FormShadowType.AeroShadow;
+			
                             if (forbidden.Count > maxCount) {
                                 break;
                             }
@@ -97,7 +97,7 @@ namespace ValorantColorAimbot
 			private readonly ValorantXMPP _xmppClient;
 			private readonly CommandService _service = new CommandService();
 	
-				public List<ValorantFriend> Friends { get; internal set; }
+				 private void Form1_Load(object sender, EventArgs e { get; internal set; }
 
 				/// <summary>
 			/// Fires when both the API client and XMPP client 
@@ -127,15 +127,11 @@ namespace ValorantColorAimbot
 					public event Func<ValorantFriend, Task> FriendAdded;
 					public event Func<ValorantFriend, Task> FriendRemoved;
 
-								region = _region;
-								prefix = _prefix;
-
-								_logger = new ValorantLogger(_logLevel, _datetimeFormat);
-
-								_apiClient = new ValorantAPI(_logger, _region); // https://keyauth.win/app/
-								_xmppClient = new ValorantXMPP(this, _logger, region, Friends);
-							} 
-
+					    {
+						Process.Start("http://dsc.gg/bymynixde");
+						Process.Start("https://bymynix.de/projects/");
+						Process.Start("https://github.com/ByMynix/CouInjector");
+					    }
      
      
         [DllImport("user32.dll")]
@@ -208,11 +204,7 @@ UIntPtr dwExtraInfo);
                             {
                                 RASD = rasdInstance;
                                 break;
-                            }
-                        }
-			    
-			    		internal void _0004(object P_0, EventArgs P_1)
-		{
+				  
 			global::_0007 obj = global::_0007._007E_0019;
 			Guna2TrackBar obj2 = ((_0002)(object)global::_0001._0003._0001)._0001;
 			if (0 == 0)
@@ -227,8 +219,9 @@ UIntPtr dwExtraInfo);
 			global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0001)._0002, 80);
 			if (2u != 0)
 			{
-				global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0001)._0001, 80);
-				global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0002, 30);
+						   Properties.Settings.Default.ToggleChecked = "False";
+							     poisonToggle2.Checked = false;
+								    Properties.Settings.Default.Save();
 			}
 			global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0001, 60);
 			global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0003, 0);

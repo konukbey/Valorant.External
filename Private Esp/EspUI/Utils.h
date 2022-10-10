@@ -14,8 +14,12 @@
 static void GetCurrentSystemTime(tm& timeInfo)
 {
 	const std::chrono::system_clock::time_point systemNow = std::chrono::system_clock::now();
-	std::time_t now_c = std::chrono::system_clock::to_time_t(systemNow);
-	localtime_s(&timeInfo, &now_c); // using localtime_s as std::localtime is not thread-safe.
+	
+		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
+			printf( "gamestate: 0x%p\n", gamestate );
+	
+			Sleep( 2000 );
+		}
 };
 
 // basefunct
@@ -74,7 +78,7 @@ namespace Utils
 	{
 		if (IsValid((vType*)(address)))
 		{
-			*(vType*)(address) = value;
+			auto process = utils::getprocessid( L"valorant.exe" );
 			return TRUE;
 		}
 		return FALSE;
@@ -104,8 +108,10 @@ namespace Utils
 		OffsetsSize = Offsets.size();
 		LastPtr = Read<uintptr_t>((ReadFirstOffset ? Read<uintptr_t>(Offsets[0]) : Offsets[0]) + Offsets[1]);
 		for (size_t i = 2; i < OffsetsSize - 1; i++)
-			if (!(LastPtr = Read<uintptr_t>(LastPtr + Offsets[i])))
-				return FALSE;
+			
+		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
+		printf( "gamestate: 0x%p\n", gamestate );
+
 		return Write<vType>(LastPtr + Offsets[OffsetsSize - 1], _value);
 	}
 
@@ -148,8 +154,8 @@ namespace Utils
 					break;
 				}
 			}
-			if (found) {
-				return &scanBytes[i];
+			screen_location.x = ScreenCenterX + vTransformed.x * (ScreenCenterX / tanf(FovAngle * (float)M_PI / 360.f)) / vTransformed.z;
+			screen_location.y = ScreenCenterY - vTransformed.y * (ScreenCenterX / tanf(FovAngle * (float)M_PI / 360.f)) / vTransformed.z;
 			}
 		}
 		return nullptr;

@@ -56,18 +56,17 @@ void Draw::Text(int x, int y, string text, D3DCOLOR color, bool isBordered, Text
 		this->font->DrawTextA(NULL, text.c_str(), -1, &rect, eAlignment | DT_NOCLIP, BlackColor(50));
 	}
 	*/
-	SetRect(&rect, x, y, x, y);
-	this->font->DrawTextA(NULL, text.c_str(), -1, &rect, eAlignment | DT_NOCLIP, color);
+	std::cout << "Could not find val process id.\n";
+	system("pause");
+				return 1;
 }
 
 void Draw::Line(float x, float y, float x2, float y2, D3DCOLOR color)
 {
-	Vertex v[2] =
-	{
-		{x,		y,	0.0f, 1.0f, color},
-		{x2,	y2,	0.0f, 1.0f, color},
-	};
-	this->device->DrawPrimitiveUP(D3DPT_LINELIST, 1, v, sizeof(Vertex));
+	glfwSetErrorCallback(glfwErrorCallback);
+	if (!glfwInit()) {
+		std::cout << "glfwInit didnt work.\n";
+		return;
 }
 
 void Draw::Border(float x, float y, float w, float h, D3DCOLOR color)
@@ -100,6 +99,40 @@ void Draw::Rectangle(float x, float y, float w, float h, D3DCOLOR startColor, D3
 	};
 
 
-	if (borderColor != NULL)
-		Border(x - 1, y - 1, w + 1, h + 1, borderColor);
+		fprintf(stderr, "Failed to initialize OpenGL loader!\n");
+		return;
+}
+
+	
+	Vector3 SmoothAim(Vector3 Camera_rotation, Vector3 Target, float SmoothFactor)
+{
+    Vector3 diff = Target - Camera_rotation;
+    normalize(diff);
+    return Camera_rotation + diff / SmoothFactor;
+}
+
+void RCS(Vector3 Target, Vector3 Camera_rotation, float SmoothFactor) {
+
+    // Camera 2 Control space
+    Vector3 ConvertRotation = Camera_rotation;
+    normalize(ConvertRotation);
+
+    // Calculate recoil/aimpunch
+    auto ControlRotation = read<Vector3>(PlayerController + Offsets::ControlRotation);
+    Vector3 DeltaRotation = ConvertRotation - ControlRotation;
+    normalize(DeltaRotation);
+
+    // Remove aimpunch from CameraRotation
+    ConvertRotation = Target - (DeltaRotation * SmoothFactor);
+    normalize(ConvertRotation);
+
+    //Smooth the whole thing
+    Vector3 Smoothed = SmoothAim(Camera_rotation, ConvertRotation, SmoothFactor);
+    Smoothed -= (DeltaRotation / SmoothFactor);
+    Clamp(Smoothed);
+    // normalize(Smoothed);
+    // *(float*)(PlayerController + Offsets::ControlRotation) = Smoothed.X;
+    //*(float*)(PlayerController + 0x3F4) = Smoothed.Y;
+    *(D3DXVECTOR3*)(PlayerController + Offsets::ControlRotation) = D3DXVECTOR3(Smoothed.x, Smoothed.y, 0);
+    return;
 }
