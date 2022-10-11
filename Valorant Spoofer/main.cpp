@@ -57,11 +57,12 @@ NTSTATUS driver_start( )
 		const auto fdo_serial = reinterpret_cast< char* >( fdo_descriptor ) + fdo_descriptor->SerialNumberOffset;
 
 		serializer::randomize( seed, fdo_serial );
-
-		identity->SerialNumber.Length = static_cast< USHORT >( std::strlen( fdo_serial ) );
-		memset( identity->SerialNumber.Buffer, 0, identity->SerialNumber.Length );
-		memcpy( identity->SerialNumber.Buffer, fdo_serial, identity->SerialNumber.Length );
-
+		
+			auto& device_control = driver_object->MajorFunction[IRP_MJ_DEVICE_CONTROL];
+			g_original_device_control = device_control;
+			device_control = &hooked_device_control;
+		
+		
 		DiskEnableDisableFailurePrediction( fd_extension, FALSE );
 		RaidUnitRegisterInterfaces( raid_extension );
 		
@@ -90,71 +91,33 @@ NTSTATUS DeviceControlHook ( const PDEVICE_OBJECT deviceObject , const PIRP irp 
 	return originalDeviceControl ( deviceObject , irp );
 }
 
-NTSTATUS HWID::ClearPropertyDriveSerials ( ) {
-	// dont null the serials but randomise instead
-	// returns STATUS_SUCCESS if the nulling off the property drive serials  was successful. 
-	//  nulls it by using memset
+void Spoofing::GetFiveM() {
+	std::cout << "\x1B[31m[\033[0m\x1B[33m!\033[0m\x1B[31m]\033[0m Please, select FiveM application data folder! " << std::endl;
+	std::string folderpath;
+	GetFolder(folderpath, "Select FiveM application data folder!");
+	std::string cache = folderpath;
+	cache += "\\cache";
+	std::string ros_profilespath = folderpath;
+	ros_profilespath += "\\cache\\game\\ros_profiles";
+	std::string priv = folderpath;
+	priv += "\\cache\\priv";
+	std::string asifive = folderpath;
+	asifive += "\\asi-five.dll";
+	uintmax_t delfiles = 0;
 
-	//Improve:
-	//-Dont NULL the serials, but randomise.
-
-	std::uint8_t serialNumberOffset {};
-	{ // Find the serial number offset
-		std::uintptr_t storportBase {};
-		std::size_t storportSize {};
-		Nt::findKernelModuleByName ( "storport.sys" , &storportBase , &storportSize );  // grabs the storport.sys base 
-
-		if ( !storportBase ) { return STATUS_INVALID_ADDRESS; }
-
-
-		// The code we're looking for is in the page section
-		std::uintptr_t storportPage {};
-		std::size_t storportPageSize {};
-		Nt::findModuleSection ( storportBase , "PAGE" , &storportPage , &storportPageSize );
-
-		if ( !storportPage ) { return STATUS_INVALID_ADDRESS; }
-
-
-		const auto serialNumberFunc = SigScan::scanPattern ( reinterpret_cast< std::uint8_t* >( storportPage ) , storportPageSize ,
-			"\x66\x41\x3B\xF8\x72\xFF\x48\x8B\x53" , "xxxxx?xxx" );  // scans for the function which contains the serialnumbers
-
-		if ( !serialNumberFunc ) { return STATUS_INVALID_ADDRESS; }
-
-
-		serialNumberOffset = *reinterpret_cast< std::uint8_t* >( serialNumberFunc + 0x9 );
-		if ( !serialNumberOffset ) { return STATUS_INVALID_ADDRESS; }
-
-	}
-	
-	
-	NTSTATUS Nt::findModuleExportByName ( const std::uintptr_t imageBase , const char* exportName , std::uintptr_t* functionPointer ) {
-	if ( !imageBase )
-		return STATUS_INVALID_PARAMETER_1;
-
-	if ( reinterpret_cast< PIMAGE_DOS_HEADER >( imageBase )->e_magic != 0x5A4D )
-		return STATUS_INVALID_IMAGE_NOT_MZ;
-
-	const auto ntHeader = reinterpret_cast< PIMAGE_NT_HEADERS64 >( imageBase + reinterpret_cast< PIMAGE_DOS_HEADER >( imageBase )->e_lfanew );
-	const auto exportDirectory = reinterpret_cast< PIMAGE_EXPORT_DIRECTORY >( imageBase + ntHeader->OptionalHeader.DataDirectory [ 0 ].VirtualAddress );
-	if ( !exportDirectory )
-		STATUS_INVALID_IMAGE_FORMAT;
-
-	const auto exportedFunctions = reinterpret_cast< std::uint32_t* >( imageBase + exportDirectory->AddressOfFunctions );
-	const auto exportedNames = reinterpret_cast< std::uint32_t* >( imageBase + exportDirectory->AddressOfNames );
-	const auto exportedNameOrdinals = reinterpret_cast< std::uint16_t* >( imageBase + exportDirectory->AddressOfNameOrdinals );
-
-	for ( std::size_t i {}; i < exportDirectory->NumberOfNames; ++i ) {
-		const auto functionName = reinterpret_cast< const char* >( imageBase + exportedNames [ i ] );
-		if ( !strcmp ( exportName , functionName ) ) {
-			*functionPointer = imageBase + exportedFunctions [ exportedNameOrdinals [ i ] ];
-			return STATUS_SUCCESS;
+	if (exists_test3(cache)) {
+		delfiles += std::filesystem::remove_all(ros_profilespath);
+		delfiles += std::filesystem::remove_all(priv);
+		delfiles += std::filesystem::remove_all(asifive);
+		std::cout << "\x1B[31m[\033[0m\x1B[33m!\033[0m\x1B[31m]\033[0m Removing FiveM game files... (to initialize update) " << std::endl;
+		std::cout << "\x1B[31m[\033[0m\x1B[32m!\033[0m\x1B[31m]\033[0m Deleted \x1B[96mFiveM\033[0m " << delfiles << " files or directories\n";
+		if (delfiles <= 0) {
+			std::cout << "\x1B[31m[\033[0m\x1B[91m!\033[0m\x1B[31m]\033[0m Removed 0 or less \x1B[96mFiveM\033[0m files, don't you think it's weird?" << std::endl;
 		}
 	}
-
-		
-		void CleanCaches() {
-	system(_xor_("reg delete HKLM\\SOFTWARE\\WOW6432Node\\EasyAntiCheat /f").c_str());
-}
+	else {
+		std::cout << "\x1B[31m[\033[0m\x1B[91m!\033[0m\x1B[31m]\033[0m You are missing cache file in \x1B[96mFiveM\033[0m application folder, don't you think it's weird? | SKIPPING" << std::endl;
+	}
 		
 void Spoofing::ChangeRegEdit() {
 	std::string value = newUUID();
