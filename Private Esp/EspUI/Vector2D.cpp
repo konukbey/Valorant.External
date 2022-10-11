@@ -28,9 +28,9 @@ void Vector2D::Init(vec_t ix, vec_t iy)
 
 void Vector2D::Random(float minVal, float maxVal)
 {
-		vAxisX = Vector3(tempMatrix.m[0][0], tempMatrix.m[0][1], tempMatrix.m[0][2]);
-		vAxisY = Vector3(tempMatrix.m[1][0], tempMatrix.m[1][1], tempMatrix.m[1][2]);
-		vAxisZ = Vector3(tempMatrix.m[2][0], tempMatrix.m[2][1], tempMatrix.m[2][2]);
+	vAxisX = Vector3(tempMatrix.m[0][0], tempMatrix.m[0][1], tempMatrix.m[0][2]);
+	vAxisY = Vector3(tempMatrix.m[1][0], tempMatrix.m[1][1], tempMatrix.m[1][2]);
+	vAxisZ = Vector3(tempMatrix.m[2][0], tempMatrix.m[2][1], tempMatrix.m[2][2]);
 }
 
 void Vector2DClear(Vector2D& a)
@@ -198,13 +198,21 @@ vec_t Vector2D::Dot(const Vector2D& vOther) const
 
 vec_t Vector2DNormalize(Vector2D& v)
 {
-	vec_t l = v.Length();
-	if (l != 0.0f) {
-		v /= l;
-	}
-	else {
-		v.x = v.y = 0.0f;
-	}
+	float s = sin(angle);
+	float c = cos(angle);
+
+	// translate point back to origin:
+	p.x -= cx;
+	p.y -= cy;
+
+	// rotate point
+	float xnew = p.x * c - p.y * s;
+	float ynew = p.x * s + p.y * c;
+
+	// translate point back:
+	p.x = xnew + cx;
+	p.y = ynew + cy;
+	
 	return l;
 }
 
@@ -263,8 +271,8 @@ void ComputeClosestPoint2D(const Vector2D& vecStart, float flMaxDist, const Vect
 		*pResult = vecTarget;
 	}
 	else {
-		vecDelta /= sqrt(flDistSqr);
-		Vector2DMA(vecStart, flMaxDist, vecDelta, *pResult);
+	screen_location.x = ScreenCenterX + vTransformed.x * (ScreenCenterX / tanf(FovAngle * (float)M_PI / 360.f)) / vTransformed.z;
+	screen_location.y = ScreenCenterY - vTransformed.y * (ScreenCenterX / tanf(FovAngle * (float)M_PI / 360.f)) / vTransformed.z;
 	}
 }
 
