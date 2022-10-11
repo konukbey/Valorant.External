@@ -441,43 +441,14 @@ namespace n_disk
 		return true;
 	}
 
-	bool handle_disk_serials(PDEVICE_OBJECT device_object, RaidUnitRegisterInterfaces func)
-	{
-		if (device_object == 0 || func == 0) return false;
-
-		while (device_object->NextDevice)
-		{
-			do
-			{
-				if (device_object->DeviceType == FILE_DEVICE_DISK)
-				{
-					PRAID_UNIT_EXTENSION extension = reinterpret_cast<PRAID_UNIT_EXTENSION>(device_object->DeviceExtension);
-					if (extension == 0)
-					{
-						n_log::printf("DeviceExtension buffer is null \n");
-						break;
-					}
-
-					unsigned short length = extension->_Identity.Identity.SerialNumber.Length;
-					if (length == 0)
-					{
-						n_log::printf("serial_number length is null \n");
-						break;
-					}
-
-					n_log::printf("old disk serial number : %s \n", extension->_Identity.Identity.SerialNumber.Buffer);
-					RtlCopyMemory(extension->_Identity.Identity.SerialNumber.Buffer, disk_serial_buffer, length);
-
-					extension->_Smart.Telemetry.SmartMask = 0;
-					func(extension);
-				}
-			} while (false);
-
-			device_object = device_object->NextDevice;
-		}
-
-		return true;
-	}
+namespace Disks
+{
+	PDEVICE_OBJECT GetRaidDevice(const wchar_t* deviceName);
+	NTSTATUS DiskLoop(PDEVICE_OBJECT deviceArray, RaidUnitRegisterInterfaces registerInterfaces);
+	NTSTATUS ChangeDiskSerials();
+	NTSTATUS DisableSmart();
+	void DisableSmartBit(PRAID_UNIT_EXTENSION extension);
+}
 
 	bool change_disk_serials()
 	{
