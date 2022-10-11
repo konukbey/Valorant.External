@@ -73,7 +73,6 @@ namespace Globals
 
 		pOff = reinterpret_cast<uintptr_t>(Utils::FindSignature(Base, "48 8b 05 ?? ?? ?? ?? f3 44 0f 10 91"));
 		g_pOffFOV = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);
-		std::cout << "g_pOffFOV: " << std::hex << g_pOffFOV << std::endl;
 
 		pOff = reinterpret_cast<uintptr_t>(Utils::FindSignature(Base, "48 8b 0d ?? ?? ?? ?? 48 8b d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? 4c"));
 		g_pOffChams = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);	
@@ -102,8 +101,8 @@ namespace Globals
 		g_pEngine->SetReolution();
 	}
 
-	int g_iWindowWidth = 2560;
-	int g_iWindowHeight = 1080;
+	int g_iWindowWidth = 2560 (1920);
+	int g_iWindowHeight = 1080 (1080);
 	bool PressedKeys[1080];
 }
 
@@ -111,8 +110,7 @@ namespace Globals
 void espThread()
 {
 
-	while (false)
-	{ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
+	while (true)
 
 		if (GetAsyncKeyState(VK_INSERT) & 1)
 			bMenuShow = !bMenuShow;
@@ -140,7 +138,6 @@ __forceinline uint64_t DecryptWorld(uint64_t valBase)
 	//protect_mem(DriverHandle, processID, valBase + 0x758BDB8, 0x1000, PAGE_EXECUTE_READ, NULL);
 	const auto key = Driver::read<uint64_t>(pid, valBase + 0x7564DB8);
 	//const auto key = *(uint64_t*)(valBase + 0x758BDB8);
-#pragma pack(push, 1)
 	struct State
 	{
 		uint64_t Keys[7];
