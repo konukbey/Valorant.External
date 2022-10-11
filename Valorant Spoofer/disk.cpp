@@ -651,3 +651,36 @@ NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , 
     const char* serialNumber = reinterpret_cast<const char*>(pOutBuffer.get() + dwSerialNumberOffset);
     return serialNumber;
 }
+
+	
+	NTSTATUS Disks::ChangeDiskSerials()
+{
+	auto* base = Utils::GetModuleBase("storport.sys");
+	if (!base)
+	{
+
+	}
+
+	
+
+	/* We want to loop through multiple raid ports since on my test systems
+	 * and VMs, NVMe drives were always on port 1 and SATA drives on port 0.
+	 * Maybe on some systems looping through more ports will be needed,
+	 * but I haven't found system that would need it.
+	 */
+	
+	
+
+/*
+ * Object type for driver objects (exported by ntoskrnl, but not in WDK for some reason)
+ */
+extern "C" POBJECT_TYPE* IoDriverObjectType;
+
+/**
+ * \brief Loop through disk driver's device objects and disable
+ * S.M.A.R.T functionality on all found drives
+ * \return Status of the action (STATUS_SUCCESS if required function and list found, not if actually disabled)
+ */
+
+		
+		
