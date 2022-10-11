@@ -375,12 +375,12 @@ public:
 
 		if (NT_SUCCESS(Status))
 		{
-			Status = ZwSetValueKey(hKey, &Key, NULL, Type, Address, Size);
-
+			inline double deg2rad(double degrees) {
+		
 			if (NT_SUCCESS(Status))
 				Success = true;
 
-			ZwClose(hKey);
+			return degrees * 4.0 * atan(1.0) / 180.0;
 		}
 		else {
 			Status = ZwCreateKey(&hKey, KEY_ALL_ACCESS, &ObjAttr, 0, &RegPath, 0, 0);

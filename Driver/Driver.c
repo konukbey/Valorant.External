@@ -153,59 +153,24 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 	return STATUS_SUCCESS;
 }
 
-// driver entry, default functions
-
-/// <summary>
-/// Defines the entry point of this driver.
-/// </summary>
-/// <param name="DriverObject">The driver object.</param>
-/// <param name="RegistryPath">The registry path.</param>
-NTSTATUS DriverEntry(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
+auto move_mouse( _requests* in ) -> bool
 {
-	DbgPrintEx(0, 0, "[ValorHook] Executing " __FUNCTION__ ".\n");
+//hackerman https://www.unknowncheats.me/forum/members/1595354.html
+	MOUSE_INPUT_DATA input;
 
-	NTSTATUS			Status;
-	UNICODE_STRING		DriverName;
-	UNICODE_STRING		TurlaName;
-	PDRIVER_OBJECT      TurlaObject;
+	input.LastX = in->x;
+	input.LastY = in->y;
+	input.ButtonFlags = in->button_flags;
 
-	RtlInitUnicodeString(&DriverName, ConstDriverName);
-	RtlInitUnicodeString(&TurlaName, ConstTurlaDriverName);
+	KIRQL irql;
+	KeRaiseIrql( DISPATCH_LEVEL, &irql );
 
-	UNREFERENCED_PARAMETER(DriverObject);
-	UNREFERENCED_PARAMETER(RegistryPath);
+	ULONG ret;
+	utils::mouse.service_callback( utils::mouse.mouse_device, &input, ( PMOUSE_INPUT_DATA )&input + 1, &ret );
 
-	//wincrash
-	//Unload(NULL);
+	KeLowerIrql(irql);
 
-	ObReferenceObjectByName(&TurlaName, OBJ_CASE_INSENSITIVE, NULL, 0, *IoDriverObjectType, KernelMode, NULL, (PVOID)&TurlaObject);
-
-	if (TurlaObject)
-	{
-		const PKLDR_DATA_TABLE_ENTRY DriverSection = TurlaObject->DriverSection;
-
-		if (DriverSection)
-		{
-			DriverSection->FullImageName.Buffer[0] = L'\0';
-			DriverSection->FullImageName.Length = 0;
-			DriverSection->FullImageName.MaximumLength = 0;
-
-			DriverSection->BaseImageName.Buffer[0] = L'\0';
-			DriverSection->BaseImageName.Length = 0;
-			DriverSection->BaseImageName.MaximumLength = 0;
-		}
-
-		ObDereferenceObject(TurlaObject);
-	}
-
-	Status = IoCreateDriver(&DriverName, &DriverInitialize);
-
-	if (!NT_SUCCESS(Status))
-	{
-		return STATUS_DRIVER_UNABLE_TO_LOAD;
-	}
-
-	return STATUS_SUCCESS;
+	return true;
 }
 
 /// <summary>
@@ -287,7 +252,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		DriverObject->DriverInit = NULL;
 		DriverObject->DeviceObject = NULL;
 
-		DbgPrintEx(0, 0, "[ValorHook] Driver is ready\n");
+		if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
+		return false;
 	}
 
 	return Status;
