@@ -61,10 +61,10 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 
 		uint64_t status = ntusrinit(0xDEADBEEF + DRIVER_GET_UM_MODULE, reinterpret_cast<uintptr_t>(&out));
 
-		(globals->screen_size.x / 2) * (1.f + x / w),
-		(globals->screen_size.y / 2) * (1.f - y / w);
-
-		//return status == 0x69 ? true : false;
+		GetWindowThreadProcessId(hwnd, &process_id);
+	if (process_id == g_pid) {
+		valorant_window = hwnd;
+	}
 		return true;
 	}
 
@@ -85,3 +85,48 @@ int retreiveValProcessId() {
 	if (local_enemy_collection.empty()) {
 		return;
 }
+
+
+std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_count) {
+	std::vector<Enemy> temp_enemy_collection{};
+	size_t size = sizeof(uintptr_t);
+	for (int i = 0; i < actor_count; i++) {
+		uintptr_t actor = read<uintptr_t>(g_pid, actor_array + (i * size));
+		if (actor == 0x00) {
+			continue;
+
+		uintptr_t mesh = read<uintptr_t>(g_pid, actor + offsets::mesh_component);
+		if (!mesh) {
+			continue;
+		}
+
+		uintptr_t player_state = read<uintptr_t>(g_pid, actor + offsets::player_state);
+		uintptr_t team_component = read<uintptr_t>(g_pid, player_state + offsets::team_component);
+		int team_id = read<int>(g_pid, team_component + offsets::team_id);
+		int bone_count = read<int>(g_pid, mesh + offsets::bone_count);
+		bool is_bot = bone_count == 103;
+		if (team_id == g_local_team_id && !is_bot) {
+			continue;
+		}
+
+		uintptr_t damage_handler = read<uintptr_t>(g_pid, actor + offsets::damage_handler);
+		uintptr_t root_component = read<uintptr_t>(g_pid, actor + offsets::root_component);
+		uintptr_t bone_array = read<uintptr_t>(g_pid, mesh + offsets::bone_array);
+
+		Enemy enemy{
+			actor,
+			damage_handler,
+			player_state,
+			root_component,
+			mesh,
+			bone_array,
+			bone_count,
+			true
+		};
+
+		temp_enemy_collection.push_back(enemy);
+	}
+
+	return temp_enemy_collection;
+}
+	
