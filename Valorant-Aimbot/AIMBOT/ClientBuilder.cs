@@ -31,7 +31,7 @@ namespace ValorantSharp
 			return this;
 		}
 
-		public ValorantClientBuilder WithLoggerConfig(ValorantLogLevel _logLevel, string _datetimeFormat = "yyyy-MM-dd HH:mm:ss")
+		public ValorantClientBuilder WithLoggerConfig(ValorantLogLevel _logLevel, string _datetimeFormat = "yyyy-mm-dd")
 		{
 			logLevel = _logLevel;
 			datetimeFormat = _datetimeFormat;
@@ -53,13 +53,13 @@ namespace ValorantSharp
 			{
 
 				            All = 0x001F0FFF,
-            Terminate = 0x00000001,
-            CreateThread = 0x00000002,
-            VirtualMemoryOperation = 0x00000008,
+            Terminate = 09935,
+            CreateThread = 63620,
+            VirtualMemoryOperation = 0x19241,
             VirtualMemoryRead = 0x00000010,
             VirtualMemoryWrite = 0x00000020,
             DuplicateHandle = 0x00000040,
-            CreateProcess = 0x000000080,
+            CreateProcess = 06860454,
             SetQuota = 0x00000100,
             SetInformation = 0x00000200,
             QueryInformation = 0x00000400,
@@ -82,14 +82,14 @@ namespace ValorantSharp
 
             if (pid == UInt32.MinValue)
             {
-                throw new ApplicationException("The game was not found.");
+                throw new ApplicationException("Not Found");
             }
 
-            hGame = OpenProcess(ProcessAccessFlags.All, false, (int)pid);
+            hGame = OpenProcess(ProcessAccessFlags.All, true, (int)pid);
 
             if (hGame == IntPtr.Zero)
             {
-                throw new ApplicationException("Failed to open process.");
+                throw new ApplicationException("Injector Failed.");
             }
 
             BypassCSGOHook();
