@@ -1,7 +1,10 @@
 ## Valorant External
-```sh-session
-JUST CREATE A KERNEL DRIVER AND PUT IN SOURCE MAIN AND IT WILL WORK IMMEDIAYELY | HAVE A NICE DAY. / C++
-```
+![CSS](https://img.shields.io/badge/-CSS-05122A?style=for-the-badge&logo=CSS3&logoColor=1572B6)&nbsp;
+![VSCode](https://img.shields.io/badge/-Visual_Studio_Code-05122A?style=for-the-badge&logo=VisualStudioCode)&nbsp;
+![GitHub](https://img.shields.io/badge/-GitHub-05122A?style=for-the-badge&logo=github)&nbsp;
+![Git](https://img.shields.io/badge/-Git-05122A?style=for-the-badge&logo=git)&nbsp;
+![Go](https://img.shields.io/badge/-Go-05122A?style=for-the-badge&logo=Go)&nbsp;
+
 
 ## ⚙ How to Setup !
 - You need to **create** a [Drver Kernel](https://www.youtube.com/watch?v=xh5cCUuQfL8&t=1090s&ab_channel=EthanEDITS) and when it's done you put the Source in the Driver folder.

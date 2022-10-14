@@ -20,26 +20,22 @@ NTSTATUS FindGameProcessByName(CHAR* process_name, PEPROCESS* process, int range
 	{
 		RtlCopyMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x450) /*EPROCESS->ImageFileName*/, sizeof(image_name));
 
-		if (strstr(image_name, process_name))
-		{
-			DWORD64 active_threads;
-			RtlCopyMemory((PVOID)&active_threads, (PVOID)((uintptr_t)cur_entry + 0x498) /*EPROCESS->ActiveThreads*/, sizeof(active_threads));
-			if (active_threads)
-			{
-				*process = cur_entry;
-				return STATUS_SUCCESS;
-			}
-		}
+		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
+		utils::setup_mouclasscallback( &utils::mouse );
 
-		PLIST_ENTRY list = (PLIST_ENTRY)((uintptr_t)(cur_entry)+0x2F0) /*EPROCESS->ActiveProcessLinks*/;
-		cur_entry = (PEPROCESS)((uintptr_t)list->Flink - 0x2F0);
+	switch ( pstruct->request_key ) {
 
-		range--;
+	case DRIVER_GETPOOL:
+		return pstruct->allocation = utils::find_guarded_region();
 
-	} while (cur_entry != sys_process && range > 0);
+	case DRIVER_READVM:
+		return readvm( pstruct );
 
-	return STATUS_NOT_FOUND;
-}
+	case DRIVER_MOUSE:
+		return move_mouse( pstruct );
+	}
+
+	return true;
 
 // IOCTL handler for memory commands
 
@@ -95,8 +91,8 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 
 	Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
 
-	pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
-	switch (pIoStackLocation->Parameters.DeviceIoControl.IoControlCode)
+		_requests* in = ( _requests* )rcx;
+		requesthandler( in );
 	{
 	case IOCTL_MEMORY_COMMAND:
 		DbgPrintEx(0, 0, "[ValorHook] IOCTL command received\n");
@@ -197,11 +193,9 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 
 	if (NT_SUCCESS(Status))
 	{
-		DbgPrintEx(0, 0, "[ValorHook] Created device\n");
-
-		Status = IoCreateSymbolicLink(&SymbolicName, &DeviceName);
-
-		if (NT_SUCCESS(Status))
+		PEPROCESS source_process = NULL;
+	if ( in->src_pid == 0 ) return STATUS_UNSUCCESSFUL;
+		
 		{
 			DbgPrintEx(0, 0, "[ValorHook] Created symlink\n");
 
@@ -210,14 +204,13 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 				DriverObject->MajorFunction[i] = &UnsupportedCall;
 			}
 
-			DriverObject->MajorFunction[IRP_MJ_CREATE] = &Function_IRP_MJ_CREATE;
-			DriverObject->MajorFunction[IRP_MJ_CLOSE] = &Function_IRP_MJ_CLOSE;
-			DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = &Function_IRP_DEVICE_CONTROL;
+			NTSTATUS status = PsLookupProcessByProcessId( ( HANDLE )in->src_pid, &source_process);
+			if (status != STATUS_SUCCESS) return false;
 
-			// Flags..
+			size_t memsize = 0;
 
-			DeviceObject->Flags |= DO_BUFFERED_IO;
-			DeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
+				if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
+				return false;
 
 			// Globals..
 
@@ -251,10 +244,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		DriverObject->DriverUnload = NULL;
 		DriverObject->DriverInit = NULL;
 		DriverObject->DeviceObject = NULL;
+		
 
-		if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
-		return false;
-	}
-
-	return Status;
+	return true;
 }
