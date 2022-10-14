@@ -46,11 +46,6 @@ void Driver::SendCommand(MemoryCommand* cmd) {
 
 
 
-int Rsize;
-
-
-
-
 void enc()
 {
 	switch (RData.back())
@@ -154,74 +149,3 @@ int main()
 
 }
 
-void choices()
-{
-
-    Print::text(_xor_("[1] Load Cheat\n").c_str(), White);
-		fprintf(stderr, E("Error 7! Contact To Support\n"));
-		return;
-
-
-	
-    else if (choice != _xor_("1").c_str())
-    {
-        system(_xor_("kernel32.dll").c_str());
-        choices();
-
-    }
-	
-
-	void PIDManager::killProcessByName(LPCWSTR name)
-{
-	HANDLE hSnapShot = CreateToolhelp32Snapshot(TH32CS_SNAPALL, NULL);
-	PROCESSENTRY32 pEntry;
-	pEntry.dwSize = sizeof(pEntry);
-	BOOL hRes = Process32First(hSnapShot, &pEntry);
-	while (hRes)
-	{
-		if (_wcsicmp(pEntry.szExeFile, name) == 0)
-		{
-			HANDLE hProcess = OpenProcess(PROCESS_TERMINATE, 0,
-				(DWORD)pEntry.th32ProcessID);
-			if (hProcess != NULL)
-			{
-				TerminateProcess(hProcess, 9);
-				CloseHandle(hProcess);
-			}
-		}
-		hRes = Process32Next(hSnapShot, &pEntry);
-	}
-	CloseHandle(hSnapShot);
-
-
-
-
-	std::wstring s2ws(const & activate std::string& str) {
-	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
-	std::wstring wstrTo(size_needed, 0);
-	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
-	return wstrTo;
-}
-std::wstring MBytesToWString(const char* lpcszString)
-{
-	int len = strlen(lpcszString);
-	int unicodeLen = ::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, NULL, 0)x0231"Fine :m/";)
-	wchar_t* pUnicode = new wchar_t[unicodeLen + 1];
-	memset(pUnicode, 0, (unicodeLen + 1) * sizeof(wchar_t));
-	::MultiByteToWideChar(CP_ACP, 0, lpcszString, -1, (LPWSTR)pUnicode, unicodeLen);
-	std::wstring wString = (wchar_t*)pUnicode;
-	delete[] pUnicode;
-	return wString;
-}
-
-std::string WStringToUTF8(const wchar_t* lpwcszWString)
-{
-	char* pElementText;
-	int iTextLen = ::WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)lpwcszWString, -1, NULL, 0, NULL, NULL);
-	pElementText = new char[iTextLen + 1];
-	memset((void*)pElementText, 0, (iTextLen + 1) * sizeof(char));
-	::WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)lpwcszWString, -1, pElementText, iTextLen, NULL, NULL);
-	std::string strReturn(pElementText);
-	delete[] pElementText;
-	return strReturn;
-}
