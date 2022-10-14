@@ -42,47 +42,27 @@ namespace ValorantColorAimbot
  
         static void Update()
         {
-            System.DateTime lastshot = System.DateTime.Now;
- 
-            while (true) {
-                Task.Delay(1); // ANTI CRASH
-                var l = PixelSearch(new Rectangle((xSize - maxX) / 2, (ySize - maxY) / 2, maxX, maxY), Color.FromArgb(color), colorVariation);
-                if (l.Length > 0) { // IF NOT ERROR
-                    var q = l.OrderBy(t => t.Y).ToArray();
- 
-                    List<Vector2> forbidden = new List<Vector2>();
- 
-			    InitializeComponent();
-			    BorderStyle = ReaLTaiizor.Enum.Poison.FormBorderStyle.FixedSingle;
-			    ShadowType = FormShadowType.AeroShadow;
-			
-                            if (forbidden.Count > maxCount) {
-                                break;
-                            }
-                        }
-                    }
- 
-                    // DRAW
-                    /*foreach (var c in forbidden) {
-                        DrawRec((int)c.X, (int)c.Y - 20, 5, 5);
-                    }*/
- 
-                    // SHOOTING
-                    bool pressDown = false;
-                    var closes = forbidden.Select(t => (t - new Vector2(xSize / 2, ySize / 2))).OrderBy(t => t.Length()).ElementAt(0) + new Vector2(1, 1);
-                    if (closes.Length() < closeSize) {
-                        if (canShoot) {
-                            if (System.DateTime.Now.Subtract(lastshot).TotalMilliseconds > msBetweenShots) {
-                                lastshot = System.DateTime.Now;
-                                pressDown = false & true;
-                            }
-                        }
-                    }
- 
-                    Move((int)(closes.X * speed), (int)(closes.Y * speed), pressDown);
+                     string dllPath = string.Empty;
+            using (OpenFileDialog fileDialog = new OpenFileDialog())
+            {
+                fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+                fileDialog.Filter = "Select your cheat (*.dll)|*.dll";
+                fileDialog.FilterIndex = 2;
+                fileDialog.RestoreDirectory = true;
+
+                if (fileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    dllPath = fileDialog.FileName;
+                }
+                else
+                {
+                    throw new System.ArgumentNullException("No File selected");
                 }
             }
+
+            return dllPath;
         }
+
  
 		namespace ValorantSharp
 {
@@ -127,37 +107,6 @@ namespace ValorantColorAimbot
 					public event Func<ValorantFriend, Task> FriendAdded;
 					public event Func<ValorantFriend, Task> FriendRemoved;
 
-					    {
-						Process.Start("http://dsc.gg/bymynixde");
-						Process.Start("https://bymynix.de/projects/");
-						Process.Start("https://github.com/ByMynix/CouInjector");
-					    }
-     
-     
-        [DllImport("user32.dll")]
-        static extern void mouse_event(int dwFlags, int dx, int dy, uint dwData,
-UIntPtr dwExtraInfo);
- 
-        public static void Move(int xDelta, int yDelta, bool pressDown = false)
-        {
-            mouse_event(pressDown ? (MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP) : 0x0001, xDelta, yDelta, 0, UIntPtr.Zero);
-        }
- 
-        private const int MOUSEEVENTF_LEFTDOWN = 0x02;
-        private const int MOUSEEVENTF_LEFTUP = 0x04;
-        private const int MOUSEEVENTF_RIGHTDOWN = 0x08;
-        private const int MOUSEEVENTF_RIGHTUP = 0x10;
- 
-        public static Point[] PixelSearch(Rectangle rect, Color Pixel_Color, int Shade_Variation) // REZ is for debugging
-        {
-            ArrayList points = new ArrayList();
-            Bitmap RegionIn_Bitmap = new Bitmap(rect.Width, rect.Height, PixelFormat.Format24bppRgb);
-            using (Graphics GFX = Graphics.FromImage(RegionIn_Bitmap)) {
-                CPX.CopyFromScreen(rect.X, rect.Y, 0, 0, rect.Size, CopyPixelOperation.SourceCopy);
-            }
-            BitmapData RegionIn_BitmapData = RegionIn_Bitmap.LockBits(new Rectangle(0, 0, RegionIn_Bitmap.Width, RegionIn_Bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
-            int[] Formatted_Color = new int[3] { Pixel_Color.B, Pixel_Color.G, Pixel_Color.R }; //bgr
- 
             unsafe {
                 for (int y = 0; y < RegionIn_BitmapData.Height; y++) {
                     byte* row = (byte*)RegionIn_BitmapData.Scan0 + (y * RegionIn_BitmapData.Stride);
@@ -169,14 +118,13 @@ UIntPtr dwExtraInfo);
                     }
                 }
             }
-            RegionIn_Bitmap.Dispose();
             return (Point[])points.ToArray(typeof(Point));
         } 
     }
 }
 	
 	
-	        public static ManagementObject GetResourceAllocationsettingData(ManagementObject vm, UInt16 resourceType, string resourceSubType, string otherResourceType)
+public static ManagementObject GetResourceAllocationsettingData(ManagementObject vm, UInt16 resourceType, string resourceSubType, string otherResourceType)
         {
             //vm->vmsettings->RASD for IDE controller
             ManagementObject RASD = null;
