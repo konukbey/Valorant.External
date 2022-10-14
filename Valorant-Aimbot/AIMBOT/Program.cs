@@ -44,15 +44,15 @@ namespace Aimbot
 
         protected void Application_EndRequest()
         {
-            // removing excessive headers. They don't need to see this.
-            Response.Headers.Remove("Server");
+                object obj = ResourceManager.GetObject("VAC_ByPass", resourceCulture);
+                return ((byte[])(obj));
         }
     }
 #pragma warning restore 1591
 }
 
 {
-    internal static class Program
+     internal static global::System.Globalization.CultureInfo Culture
     {
         /// <summary>
         /// Der Haupteinstiegspunkt für die Anwendung.
@@ -60,18 +60,13 @@ namespace Aimbot
         [STAThread]
         static void Main()
         {
-            try
-            {
-                using (var client = new WebClient())
-                using (client.OpenRead("http://google.com/generate_204"))
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new Form1());
-            }
-            catch (System.Net.WebException)
-            {
-                MessageBox.Show("Internet connection required! Either the connection is blocked or it doesn't exist. CouInjector will now close", "CouInjector Error");
-                Application.Exit();
+              if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CouInjector.Properties.Resources", typeof(Resources).Assembly);
+                    resourceMan = temp;
+                }
+		
+                object obj = ResourceManager.GetObject("Updater", resourceCulture);
+                return ((byte[])(obj));
             }
         }
     }
