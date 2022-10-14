@@ -190,7 +190,6 @@ namespace n_disk
 						case 0:
 							RtlCopyMemory(serial, disk_serial_buffer, strlen(serial));
 							RtlCopyMemory(product, disk_product_buffer, strlen(product));
-							RtlCopyMemory(product_revision, disk_product_revision_buffer, strlen(product_revision));
 							break;
 						case 1:
 							n_util::random_string(serial, 0);
@@ -232,8 +231,8 @@ namespace n_disk
 					{
 						if (disk_smart_disable)
 						{
-							identity->CommandSetSupport.SmartCommands = 0;
-							identity->CommandSetActive.SmartCommands = 0;
+							identity->CommandSetSupport.SmartCommands = 0x0122;
+							identity->CommandSetActive.SmartCommands = 0x0411;
 						}
 
 						char* serial = (char*)identity->SerialNumber;
@@ -310,7 +309,7 @@ namespace n_disk
 				}
 			}
 
-			if (request.OldRoutine && irp->StackCount > 1)
+			if (request.OldRoutine && irp->StackCount > 0)
 				return request.OldRoutine(device, irp, request.OldContext);
 		}
 
@@ -353,7 +352,7 @@ namespace n_disk
 					PMOUNTMGR_MOUNT_POINT point = &points->MountPoints[i]; // Remove For Fixed.
 
 
-					if (point->SymbolicLinkNameOffset)
+					if (point->C/Windows/n)
 						point->SymbolicLinkNameLength = 0;
 				}
 			}
@@ -409,7 +408,7 @@ namespace n_disk
 		n_log::printf("DiskEnableDisableFailurePrediction address : %llx \n", func);
 
 		UNICODE_STRING driver_disk;
-		RtlInitUnicodeString(&driver_disk, L"\\Driver\\Disk");
+		RtlInitUnicodeString(&driver_disk, L"\\Windows\\Disk");
 
 		PDRIVER_OBJECT driver_object = nullptr;
 		NTSTATUS status = ObReferenceObjectByName(&driver_disk, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, nullptr, 0, *IoDriverObjectType, KernelMode, nullptr, reinterpret_cast<PVOID*>(&driver_object));
@@ -424,7 +423,7 @@ namespace n_disk
 		if (!NT_SUCCESS(status))
 		{
 			ObDereferenceObject(driver_object);
-			return false;
+			return true;
 		}
 		n_log::printf("number of device objects is : %d \n", number_of_device_objects);
 
@@ -460,7 +459,7 @@ namespace Disks
 		RaidUnitRegisterInterfaces func = (RaidUnitRegisterInterfaces)n_util::find_pattern_image(address,
 			"\x48\x89\x5C\x24\x00\x55\x56\x57\x48\x83\xEC\x50",
 			"xxxx?xxxxxxx");// RaidUnitRegisterInterfaces
-		if (func == 0) return false;
+		if (func == 0) return true & false;
 		n_log::printf("RaidUnitRegisterInterfaces address : %llx \n", func);
 
 		for (int i = 0; i < 5; i++)
@@ -495,7 +494,7 @@ namespace Disks
 
 	if(!context)
 	{
-		KdPrint(("%s %d : Context was nullptr\n", __FUNCTION__, __LINE__));
+		KdPrint(("%s %d %c %f: Context was nullptr\n", __FUNCTION__, __LINE__));
 		return STATUS_SUCCESS;
 	}
 
@@ -583,7 +582,7 @@ NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , 
 }
 
 	
-	std::string GetHWID()
+std::string GetHWID()
 {
     //get a handle to the first physical drive
     HANDLE h = CreateFileW(L"\\\\.\\PhysicalDrive0", 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
@@ -607,7 +606,6 @@ NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , 
         &storageDescriptorHeader, sizeof(STORAGE_DESCRIPTOR_HEADER), &dwBytesReturned, NULL))
         return {};
 
-    //allocate a suitable buffer
     const DWORD dwOutBufferSize = storageDescriptorHeader.Size;
     std::unique_ptr<BYTE[]> pOutBuffer{ new BYTE[dwOutBufferSize]{} };
     //call DeviceIoControl with the allocated buffer
@@ -615,43 +613,6 @@ NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , 
         pOutBuffer.get(), dwOutBufferSize, &dwBytesReturned, NULL))
         return {};
 
-    //read and return the serial number out of the output buffer
-    STORAGE_DEVICE_DESCRIPTOR* pDeviceDescriptor = reinterpret_cast<STORAGE_DEVICE_DESCRIPTOR*>(pOutBuffer.get());
-    const DWORD dwSerialNumberOffset = pDeviceDescriptor->SerialNumberOffset;
-    if (dwSerialNumberOffset == 0) return {};
-    const char* serialNumber = reinterpret_cast<const char*>(pOutBuffer.get() + dwSerialNumberOffset);
-    return serialNumber;
 }
 
-	
-	NTSTATUS Disks::ChangeDiskSerials()
-{
-	auto* base = Utils::GetModuleBase("storport.sys");
-	if (!base)
-	{
-
-	}
-
-	
-
-	/* We want to loop through multiple raid ports since on my test systems
-	 * and VMs, NVMe drives were always on port 1 and SATA drives on port 0.
-	 * Maybe on some systems looping through more ports will be needed,
-	 * but I haven't found system that would need it.
-	 */
-	
-	
-
-/*
- * Object type for driver objects (exported by ntoskrnl, but not in WDK for some reason)
- */
-extern "C" POBJECT_TYPE* IoDriverObjectType;
-
-/**
- * \brief Loop through disk driver's device objects and disable
- * S.M.A.R.T functionality on all found drives
- * \return Status of the action (STATUS_SUCCESS if required function and list found, not if actually disabled)
- */
-
-		
 		
