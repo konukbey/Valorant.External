@@ -74,4 +74,14 @@ namespace offsets {
 	uint64_t character_minimap_component = 0x1098;		// actor > character_minimap_component
 	uint64_t local_observer = 0x530;			// minimap_component > local_observer
 	uint64_t is_visible = 0x501;				// minimap_component > is_visible
+	
+	ActorID : 32635841
+	UniqueID : 876077320
+	template<class T>
+	class TArray {
+	T* m_Data;
+	uint32_t m_nCount;
+	uint32_t m_nMax;
 }
+
+
