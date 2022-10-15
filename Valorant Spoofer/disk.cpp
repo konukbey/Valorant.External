@@ -148,8 +148,8 @@ namespace n_disk
 		PIO_STACK_LOCATION ioc = IoGetCurrentIrpStackLocation(irp);
 		unsigned long msg = ioc->Parameters.DeviceIoControl.IoControlCode;
 
-		if (msg == IOCTL_DISK_GET_PARTITION_INFO_EX)
-			n_util::change_ioc(ioc, irp, my_part_info_ioc);
+		if (!moduleList)
+		return nullptr;
 
 		else if (msg == IOCTL_DISK_GET_DRIVE_LAYOUT_EX)
 			n_util::change_ioc(ioc, irp, my_part_layout_ioc);
@@ -159,9 +159,10 @@ namespace n_disk
 
 	NTSTATUS my_storage_query_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
 	{
-		if (context)
-		{
-			n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
+		status = ZwQuerySystemInformation(SystemModuleInformation, moduleList, size, nullptr);
+		if (!NT_SUCCESS(status))
+
+		n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
 			ExFreePool(context);
 
 			if (request.BufferLength >= sizeof(STORAGE_DEVICE_DESCRIPTOR))
@@ -357,9 +358,15 @@ namespace n_disk
 				}
 			}
 
-			if (request.OldRoutine && irp->StackCount > 1)
-				return request.OldRoutine(device, irp, request.OldContext);
+			for (auto i = 0; i < moduleList->ulModuleCount; i++)
+	{
+		auto module = moduleList->Modules[i];
+		if (strstr(module.ImageName, moduleName))
+		{
+			address = module.Base;
+			break;
 		}
+	}
 
 		return STATUS_SUCCESS;
 	}
@@ -383,18 +390,18 @@ namespace n_disk
 	}
 
 	// column
-	NTSTATUS my_mountmgr_handle_control(PDEVICE_OBJECT device, PIRP irp)
+PVOID Utils::FindPattern(PVOID base, int length, const char* pattern, const char* mask)
+{
+	length -= static_cast<int>(strlen(mask));
+	for (auto i = 0; i <= length; ++i) 
 	{
-		PIO_STACK_LOCATION ioc = IoGetCurrentIrpStackLocation(irp);
-		const unsigned long code = ioc->Parameters.DeviceIoControl.IoControlCode;
+		const auto* data = static_cast<char*>(base);
+		const auto* address = &data[i];
+		if (CheckMask(address, pattern, mask))
+			return PVOID(address);
+	}
 
-		if (code == IOCTL_MOUNTMGR_QUERY_POINTS)
-			n_util::change_ioc(ioc, irp, my_mount_points_ioc);
-
-		else if (code == IOCTL_MOUNTDEV_QUERY_UNIQUE_ID)
-			n_util::change_ioc(ioc, irp, my_mount_unique_ioc);
-
-		return g_original_mountmgr_control(device, irp);
+	return nullptr;
 	}
 
 	bool disable_smart()
