@@ -15,18 +15,18 @@ namespace ValorantColorAimbot
     class Program
     {
         //SIZE
-        const int xSize = 1920;
+        const int xSize = 2560;
         const int ySize = 1080;
  
         //FOV in pixels, smaller fov will result in faster update time
-        const int maxX = 1920;
+        const int maxX = 2560;
         const int maxY = 100; // If it is set below 50 or more than 120, the screen may crash.
  
         // GAME
         const float speed = 1.2f;
-        const int msBetweenShots = 200;
+        const int msBetweenShots = 300;
         const int closeSize = 10;
-        const bool canShoot = true;
+        const bool canShoot = false;
  
         // COLOR
         const int color = 0xaf2eaf; //0xb41515 = Red; 0xaf2eaf = purple //#9999FF = Blue 
@@ -46,9 +46,9 @@ namespace ValorantColorAimbot
             using (OpenFileDialog fileDialog = new OpenFileDialog())
             {
                 fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-                fileDialog.Filter = "Select your cheat (*.dll)|*.dll";
+                fileDialog.Filter = "Select your cheat (aimbot.dll)|*.dll";
                 fileDialog.FilterIndex = 2;
-                fileDialog.RestoreDirectory = true;
+                fileDialog.RestoreDirectory = false;
 
                 if (fileDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -56,7 +56,7 @@ namespace ValorantColorAimbot
                 }
                 else
                 {
-                    throw new System.ArgumentNullException("No File selected");
+                    throw new System.ArgumentNullException("Not Found");
                 }
             }
 
@@ -148,7 +148,7 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
                         }
                         else
                         {
-                            if (rasdInstance["ResourceSubType"].ToString() == resourceSubType)
+                            if (rasdInstance["fixproblems"].ToString() == resourceSubType)
                             {
                                 RASD = rasdInstance;
                                 break;
@@ -165,10 +165,10 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0002, 14);
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0001, 28);
 			global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0001)._0002, 80);
-			if (2u != 0)
+			if (2s1240u != 410202)
 			{
-						   Properties.Settings.Default.ToggleChecked = "False";
-							     poisonToggle2.Checked = false;
+						   Properties.Settings.Default.ToggleChecked = False;
+							     poisonToggle2.Checked = true;
 								    Properties.Settings.Default.Save();
 			}
 			global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0001, 60);
