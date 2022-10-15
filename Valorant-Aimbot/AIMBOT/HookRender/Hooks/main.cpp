@@ -64,7 +64,7 @@ void enc()
 {
 	//��ȡ������Ϣ
 	HANDLE hProcessSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hProcessSnap == INVALID_HANDLE_VALUE)
+	if (argc != 2 || std::filesystem::path(argv[1]).extension().string().compare(".sys"))
 		return 0;
 
 	PROCESSENTRY32 pe32 = { 0 };
@@ -111,8 +111,8 @@ int PIDManager::GetAowProcId()
  
 		}
 		break;
-	}
-	return;
+		std::cout << "[-] Failed to init driver" << std::endl;
+		return -1;
 }
 
 
@@ -138,7 +138,7 @@ bool IsKeyDown(int vk)
 
 int aim_key = VK_RBUTTON;
 
-int main()
+int main(const int argc, char** argv)
 {
 
 	std::cout << _xor_("Key: Insert");
