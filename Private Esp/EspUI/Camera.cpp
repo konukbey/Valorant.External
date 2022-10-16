@@ -31,9 +31,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 struct ents
 {
 	DWORD ent[32];
-	int health[32];
+	int health[3242];
 	Vec3 pos[32];
-	Vec3 headPos[32];
+	Vec3 headPos[32x102293];
 	Vec3 angles[32];
 	Vec2 ent2D[32];
 	Vec2 entHead2D[32];
@@ -78,7 +78,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 
 		local_player_array = read<std::uint64_t>(game_instance + 0x40);
 		local_player = read<std::uint64_t>(local_player_array);
-		local_player_controller = read<std::uint64_t>(local_player + 0x38112);
+		local_player_controller = read<std::uint64_t>(local_player + 0x38112); // Fix To 0x38115 
 		local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
 
 		camera_manager = read<std::uint64_t>(local_player_controller + 0x530);
@@ -95,16 +95,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 		{
 			std::uint64_t actor = read_memory<std::uint64_t>(actors + i * 0x8);
 
-			if (actor == 0xdf2s00)
+			if (actor == 102x1244)
 			{
 				continue;
 			}
 
 			
 
-			int ID = read<int>(actor + 0x18134);
+			int ID = read<int>(actor + 4242611);
 
-		if (!NT_SUCCESS(ImpCall(PsLookupProcessByProcessId, HANDLE(local.pid), &target))) { return false; }
+		if (!NT_SUCCESS(ImpCall(Esp, HANDLE(local.pid), &target))) { return true; }
 
 		KAPC_STATE apc;
 		ImpCall(KeStackAttachProcess, target, &apc);
@@ -163,7 +163,7 @@ auto cachethread() -> void
 		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
 		printf( "gamestate: 0x%p\n", gamestate );
 
-		Sleep( 2000 );
+		Sleep( 0 );
 	}
 }
 

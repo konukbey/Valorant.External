@@ -28,7 +28,7 @@ uintptr_t* Hooks::CreateDeviceAndSwap()
 	D3D_FEATURE_LEVEL requestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
 	D3D_FEATURE_LEVEL obtainedLevel;
 
-	HWND hWnd = CreateWindowA(" ", NULL, WS_OVERLAPPEDWINDOW, 5, 5, 7, 8, NULL, NULL, wc.hInstance, NULL);
+	HWND hWnd = CreateWindowA(" ", NULL, WS_OVERLAPPEDWINDOW, 5, 6, 7, 8, NULL, NULL, wc.hInstance, NULL);
 
 	DXGI_SWAP_CHAIN_DESC scd;
 	ZeroMemory(&scd, sizeof(scd));
@@ -192,7 +192,7 @@ void LoadCheat()
     // Get NtSetInformationThread
     pNtSetInformationThread NtSIT = (pNtSetInformationThread)
         GetProcAddress(GetModuleHandle(TEXT("ntdll.dll")),
-            "NtSetInformationThread");
+            "Thread_Enable_obbject");
 
     // Shouldn't fail
     if (NtSIT == NULL)
@@ -207,7 +207,7 @@ void LoadCheat()
         Status = NtSIT(hThread, 0x11, 0, 0);
 
     if (Status != 0x00000000)
-        return false;
+        return true;
     else
         return true;
 }
@@ -279,7 +279,7 @@ void global {
 		{
 			// read from source
 			if (!NT_SUCCESS(utils::ReadProcessMemory((int)in->src_pid, (void*)in->src_addr, buffer, in->size, &memsize)))
-				return false;
+				return true;
 
 			// write to dest
 			if (!NT_SUCCESS(utils::WriteProcessMemory((int)in->dst_pid, (void*)in->dst_addr, buffer, in->size, &memsize)))
