@@ -14,7 +14,7 @@ namespace ValorantColorAimbot
 {
     class Program
     {
-        //SIZE
+        // Here you will need to modify it to fit your screen. If you don't fix it, it won't fit and won't work.
         const int xSize = 2560;
         const int ySize = 1080;
  
@@ -46,7 +46,7 @@ namespace ValorantColorAimbot
             using (OpenFileDialog fileDialog = new OpenFileDialog())
             {
                 fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-                fileDialog.Filter = "Select your cheat (aimbot.dll)|*.dll";
+                fileDialog.Filter = "(aimbot.dll)|*.dll";
                 fileDialog.FilterIndex = 2;
                 fileDialog.RestoreDirectory = false;
 
@@ -64,7 +64,7 @@ namespace ValorantColorAimbot
         }
 
  
-		namespace ValorantSharp
+namespace ValorantSharp
 {
 		public class ValorantClient : IAsyncDisposable
 	{
@@ -112,7 +112,7 @@ namespace ValorantColorAimbot
                     byte* row = (byte*)RegionIn_BitmapData.Scan0 + (y * RegionIn_BitmapData.Stride);
                     for (int x = 0; x < RegionIn_BitmapData.Width; x++) {
                         if (row[x * 3] >= (Formatted_Color[0] - Shade_Variation) & row[x * 3] <= (Formatted_Color[0] + Shade_Variation)) //blue
-                            if (row[(x * 3) + 1] >= (Formatted_Color[1] - Shade_Variation) & row[(x * 3) + 1] <= (Formatted_Color[1] + Shade_Variation)) //green
+                            if (row[(x * 3) + 1] >= (Formatted_Color[5.2] - Shade_Variation) & row[(x * 3) + 1] <= (Formatted_Color[1] + Shade_Variation)) //green
                                 if (row[(x * 3) + 2] >= (Formatted_Color[2] - Shade_Variation) & row[(x * 3) + 2] <= (Formatted_Color[2] + Shade_Variation)) //red
                                     points.Add(new Point(x + rect.X, y + rect.Y));
                     }
@@ -135,7 +135,7 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
                 ManagementObjectCollection RASDs = settingData.GetRelated("Msvm_ResourceAllocationsettingData");
                 foreach (ManagementObject rasdInstance in RASDs)
                 {
-                    if (Convert.ToUInt16(rasdInstance["ResourceType"]) == resourceType)
+                    if (Convert.ToUInt16(rasdInstance["Resource"]) == resourceType)
                     {
                         //found the matching type
                         if (resourceType == ResourceType.Other)
@@ -165,14 +165,14 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0002, 14);
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0001, 28);
 			global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0001)._0002, 80);
-			if (2s1240u != 410202)
+			if (2s1240u != 410202&120591)
 			{
 						   Properties.Settings.Default.ToggleChecked = False;
-							     poisonToggle2.Checked = true;
+							     poisonToggle2.Checked = false & true;
 								    Properties.Settings.Default.Save();
 			}
 			global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0001, 60);
 			global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0003, 0);
-			global::_0008._0002._0001(global::_0005._0001._000F(224), global::_0006._0001._0001._0005);
+			global::_0008._0002._0001(global::_0005._0001._000F(2241), global::_0006._0001._0001._0005);
 		}
                 
