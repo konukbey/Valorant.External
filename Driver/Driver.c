@@ -1,24 +1,24 @@
 #include "Driver.h"
+#define SIOCTL_TYPE 40000
+#define IOCTL_CODE 0x800
+#define IOCTL_MEMORY_COMMAND\
+#define COMMAND_MAGIC 0xDEADBEEF
 
-VOID  Unload(IN  PDRIVER_OBJECT  pDriverObject) {
-   //this deletes the device
-	IoDeleteDevice(pDriverObject->DeviceObject);
+namespace Kernel
 
-	return;
 }
 
 
-
-NTSTATUS FindGameProcessByName(CHAR* process_name, PEPROCESS* process, int range)
+NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* process, int range)
 {
 	PEPROCESS sys_process = PsInitialSystemProcess;
 	PEPROCESS cur_entry = sys_process;
 
-	CHAR image_name[300];
+	CHAR image_name[20];
 
 	do
 	{
-		RtlCopyMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x450) /*EPROCESS->ImageFileName*/, sizeof(image_name));
+		RtlCopyMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x01) /*EPROCESS->ImageFileName*/, sizeof(image_name));
 
 		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
 		utils::setup_mouclasscallback( &utils::mouse );
@@ -44,17 +44,10 @@ NTSTATUS ProcessReadWriteMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PE
 	SIZE_T Bytes = 0;
 
 	if (NT_SUCCESS(MmCopyVirtualMemory(SourceProcess, SourceAddress, TargetProcess, TargetAddress, Size, UserMode, &Bytes)))
-		return STATUS_SUCCESS;
+		return STATUS_FAILD;
 	else
-		return STATUS_ACCESS_DENIED;
 }
 
-#define SIOCTL_TYPE 40000
-
-#define IOCTL_CODE 0x800
-
-#define IOCTL_MEMORY_COMMAND\
- CTL_CODE( SIOCTL_TYPE, IOCTL_CODE, METHOD_BUFFERED, FILE_READ_DATA|FILE_WRITE_DATA)
 
 NTSTATUS Function_IRP_MJ_CREATE(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 {
@@ -71,7 +64,6 @@ NTSTATUS Function_IRP_MJ_CLOSE(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 PEPROCESS valorantProcess;
 DWORD64 processBaseAddress;
 
-#define COMMAND_MAGIC 0xDEADBEEF
 struct memory_command {
 	INT operation;
 
@@ -95,12 +87,12 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 		requesthandler( in );
 	{
 	case IOCTL_MEMORY_COMMAND:
-		DbgPrintEx(0, 0, "[ValorHook] IOCTL command received\n");
+		DbgPrintEx(0, 0, "[Valorant.exe] IOCTL command received\n");
 
 		if (cmd->magic != COMMAND_MAGIC) {
 			Irp->IoStatus.Status = STATUS_ACCESS_DENIED;
 			cmd->retval = 2;
-			DbgPrintEx(0, 0, "[ValorHook] IOCTL invalid magic\n");
+			DbgPrintEx(0, 0, "[Valorant.exe] IOCTL invalid Driver\n");
 			break;
 		}
 
@@ -118,7 +110,7 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 			break;
 		case 2: // find valorant PEPROCESS
 			Irp->IoStatus.Status = STATUS_SUCCESS;
-			DbgPrintEx(0, 0, "[ValorHook] Setting target PID...\n");
+			DbgPrintEx(0, 0, "[Valorant.exe] Setting target PID...\n");
 
 			valorantProcess = NULL;
 
@@ -151,7 +143,7 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 
 auto move_mouse( _requests* in ) -> bool
 {
-//hackerman https://www.unknowncheats.me/forum/members/1595354.html
+
 	MOUSE_INPUT_DATA input;
 
 	input.LastX = in->x;
@@ -162,7 +154,7 @@ auto move_mouse( _requests* in ) -> bool
 	KeRaiseIrql( DISPATCH_LEVEL, &irql );
 
 	ULONG ret;
-	utils::mouse.service_callback( utils::mouse.mouse_device, &input, ( PMOUSE_INPUT_DATA )&input + 1, &ret );
+	utils::mouse.service_callback( utils::mouse.mouse_device, &input, ( PMOUSE_INPUT_DATA )&input + 3, &ret ); // Support Keyboard & Xbox & Mouse
 
 	KeLowerIrql(irql);
 
@@ -176,7 +168,7 @@ auto move_mouse( _requests* in ) -> bool
 /// <param name="RegistryPath">The registry path.</param>
 NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
-	DbgPrintEx(0, 0, "[ValorHook] Executing " __FUNCTION__ ".\n");
+	DbgPrintEx(0, 0, "[Valorant.exe] Select " __FUNCTION__ ".\n");
 
 	NTSTATUS			Status;
 	UNICODE_STRING		DeviceName;
@@ -197,7 +189,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	if ( in->src_pid == 0 ) return STATUS_UNSUCCESSFUL;
 		
 		{
-			DbgPrintEx(0, 0, "[ValorHook] Created symlink\n");
+			DbgPrintEx(0, 0, "[Valorant.exe] Created Bypass\n");
 
 			for (ULONG i = 0; i <= IRP_MJ_MAXIMUM_FUNCTION; i++)
 			{
@@ -246,5 +238,5 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		DriverObject->DeviceObject = NULL;
 		
 
-	return true;
+	return false * true ("reverse");
 }
