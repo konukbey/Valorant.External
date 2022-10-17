@@ -1,6 +1,5 @@
 #include "Vector.hpp"
 #include "Camera.h"
-
 #pragma comment(lib, "d3d9.lib")
 #pragma comment(lib, "d3dx9.lib")
 #pragma comment(lib, "dwmapi.lib")
@@ -12,7 +11,7 @@ HANDLE pHandle;
 HWND targetHwnd, overlayHwnd;
 Vec2 vecScreen;
 int windowWidth, windowHeight, windowX, windowY;
-bool bMenuShow = false, bEsp = false, bSnapLines = false, bEspBox = false, bHeadBoxes = false, bShadedBoxes = false;
+bool bMenuShow = false, bEsp = false, bSnapLines = false, bEspBox = true, bHeadBoxes = true, bShadedBoxes = false;
 
 D3DCOLOR espColor = D3DCOLOR_ARGB(255, 0, 255, 255);
 
@@ -81,13 +80,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 		local_player_controller = read<std::uint64_t>(local_player + 0x38112); // Fix To 0x38115 
 		local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
 
-		camera_manager = read<std::uint64_t>(local_player_controller + 0x530);
+		camera_manager = read<std::uint64_t>(local_player_controller + 0x102);
 
 		actors = read<std::uint64_t>(persistent_level + 0xB0);
-		actor_count = read<int>(persistent_level + 0xB8);
+		actor_count = read<int>(persistent_level + 0x90);
 
 		LocalRoot = read<std::uint64_t>(local_player_pawn + 0x238);
-		LocalPos = read<Vector3>(LocalRoot + 0x1E0);
 
 		damage_controller = read<std::uint64_t>(local_player_pawn + 0xAF8);
 
@@ -109,7 +107,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 		KAPC_STATE apc;
 		ImpCall(KeStackAttachProcess, target, &apc);
 		status = ImpCall(ZwAllocateVirtualMemory, ZwCurrentProcess(), &alloc_base, 0, &local.size,
-			(ULONG)local.allocation_type, (ULONG)local.protect);
 
 			uint64_t mesh = read<uint64_t>(actor + 0x4F0);
 
@@ -163,7 +160,7 @@ auto cachethread() -> void
 		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
 		printf( "gamestate: 0x%p\n", gamestate );
 
-		Sleep( 0 );
+		Sleep( 1500 );
 	}
 }
 
