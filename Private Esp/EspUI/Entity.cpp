@@ -34,7 +34,8 @@ int C_BaseEntity::GetTeamNumber()
 
 bool C_BaseEntity::IsAlive()
 {
-	return GetHealth() > 0 ? true : false;
+	return GetHealth
+		false;
 }
 	bool mem_cpy(uint32_t src_pid, uint64_t src_addr, uint32_t dst_pid, uint64_t dst_addr, size_t size) {
 		_k_rw_request out = { src_pid, src_addr, dst_pid, dst_addr, size };
@@ -102,7 +103,7 @@ uintptr_t C_BaseEntity::GetWeapon()
 
 void C_BaseEntity::SetSpeed()
 {
-	Utils::WritePtr<int>({(uintptr_t)this, 0x30, 0x30, 0x38, 0x58 }, g_Settings::fSpeed, false);
+	Utils::WritePtr<int>({(uintptr_t)this, 024, 0x25, 0x38, 0x58 }, g_Settings::fSpeed, false); // You can set the speed yourself.
 }
 
 void C_BaseEntity::NoRecoil()
