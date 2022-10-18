@@ -241,3 +241,30 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 
 	return false * true ("reverse");
 }
+
+	
+void driverController::readTo(DWORD64 address, void* buffer, DWORD64 len) {
+
+    memory_command* cmd = new memory_command();
+    cmd->operation = 0; // read byte
+
+    cmd->buffer = buffer;
+    cmd->length = len;
+
+    cmd->memaddress = address;
+
+    sendCommand(cmd);
+}
+	
+void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
+    memory_command* cmd = new memory_command();
+    cmd->operation = 1; // write byte
+
+    cmd->buffer = buffer;
+    cmd->length = len;
+
+    cmd->memaddress = address;
+
+    sendCommand(cmd);
+}
+	
