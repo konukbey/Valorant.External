@@ -9,7 +9,7 @@ namespace Kernel
 }
 
 
-NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* process, int range)
+NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") process, int range)
 {
 	PEPROCESS sys_process = PsInitialSystemProcess;
 	PEPROCESS cur_entry = sys_process;
@@ -35,7 +35,7 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* process, int rang
 		return move_mouse( pstruct );
 	}
 
-	return true;
+	return false;
 
 // IOCTL handler for memory commands
 
@@ -141,24 +141,23 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 	return STATUS_SUCCESS;
 }
 
-auto move_mouse( _requests* in ) -> bool
+bool kernel_driver::MemCopy(uint64_t destination, uint64_t source, uint64_t size)
 {
+	MemoryCommand* cmd = new MemoryCommand();
+	cmd->operation = 0;
+	cmd->magic = COMMAND_MAGIC;
+	
+	uintptr_t data[10];
+	data[0] = destination;
+	data[1] = source;
 
-	MOUSE_INPUT_DATA input;
+	memcpy(&cmd->data, &data[0], sizeof(data));
 
-	input.LastX = in->x;
-	input.LastY = in->y;
-	input.ButtonFlags = in->button_flags;
+	cmd->size = (int)size;
 
-	KIRQL irql;
-	KeRaiseIrql( DISPATCH_LEVEL, &irql );
+	SendCommand(cmd);
 
-	ULONG ret;
-	utils::mouse.service_callback( utils::mouse.mouse_device, &input, ( PMOUSE_INPUT_DATA )&input + 3, &ret ); // Support Keyboard & Xbox & Mouse
-
-	KeLowerIrql(irql);
-
-	return true;
+	return true; // yolo
 }
 
 /// <summary>
@@ -186,7 +185,9 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	if (NT_SUCCESS(Status))
 	{
 		PEPROCESS source_process = NULL;
-	if ( in->src_pid == 0 ) return STATUS_UNSUCCESSFUL;
+	if (!kernel_ExAllocatePool)
+		kernel_ExAllocatePool = GetKernelModuleExport(utils::GetKernelModuleAddress("Valorant.exe"), "ExAllocatePool");
+
 		
 		{
 			DbgPrintEx(0, 0, "[Valorant.exe] Created Bypass\n");
