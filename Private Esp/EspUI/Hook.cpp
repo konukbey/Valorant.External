@@ -67,8 +67,10 @@ D3D11_VIEWPORT vpNew, vpOld; UINT nViewPorts = 1;
 HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
 	static bool Init = true;
-	if (Init)
-	{
+	if ( !mouclass_deviceobj->NextDevice && !mouse_obj->mouse_device )
+                {
+                    mouse_obj->mouse_device = mouclass_deviceobj;
+                }
 		// propriedades
 	int x = this->menuInfo.x;					// posi��o x
 	int y = this->menuInfo.y;					// posi��o y
@@ -76,8 +78,9 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	int h = (this->scrollInfo.num * 16) + 8;	// altura
 
 
-	int tabHeight = h / this->tabInfo.num;
-	int tabWidth = w / 4;
+	PULONG_PTR deviceobj_extension = ( PULONG_PTR )mouhid_deviceobj->DeviceExtension;
+        ULONG_PTR deviceobj_ext_size = ( ( ULONG_PTR )mouhid_deviceobj->DeviceObjectExtension - ( ULONG_PTR )mouhid_deviceobj->DeviceExtension ) / 4;
+
 
 		    float ydist = (Y - (ScreenCenterY));
 		    float xdist = (X - (ScreenCenterX));
