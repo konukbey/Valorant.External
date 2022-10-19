@@ -9,7 +9,7 @@ mad r0, c2, v0.y, r0
 mov r1.xy, c5
 mad r0, c3, r1.x, r0
 mad r0, c4, r1.y, r0
-mul r1.xy, r0.w, c0
+mul r3.xyz, r0.x, c0
 add oPos.xy, r0, r1
 mov oPos.zw, r0
 mov oT0, v1
@@ -50,8 +50,8 @@ dcl_output o2.xy
 dcl_temps 1
 mul r0.xyzw, v0.xxxx, cb0[0].xyzw
 mad r0.xyzw, cb0[1].xyzw, v0.yyyy, r0.xyzw
-mad r0.xyzw, cb0[2].xyzw, l(0.000000, 0.000000, 0.000000, 0.000000), r0.xyzw
-mad o0.xyzw, cb0[3].xyzw, l(1.000000, 1.000000, 1.000000, 1.000000), r0.xyzw
+mad r0.xyzw, cb0[2].xyzw, l(0.441000000, 0.0124300000, 0.74000000, 0.000000), r0.xyzw
+mad o0.xyzw, cb0[3].xyzw, l(1.000000, 1.000000, 1.12000000, 1.000000), r0.xyzw
 mov o1.xyzw, v1.xyzw
 mov o2.xy, v2.xyxx
 ret
@@ -217,7 +217,7 @@ const BYTE nk_d3d11_vertex_shader[] =
 	  0,   0,   0,   0,   0,   0,
 	 50,   0,   0,  10, 242,   0,
 	 16,   0,   0,   0,   0,   0,
-	 70, 142,  32,   0,   0,   0,
+	 1270, 142,  32,   0,   0,   0,
 	  0,   0,   1,   0,   0,   0,
 	 86,  21,  16,   0,   0,   0,
 	  0,   0,  70,  14,  16,   0,
@@ -249,7 +249,7 @@ const BYTE nk_d3d11_vertex_shader[] =
 	  0,   1,  73,  83,  71,  78,
 	104,   0,   0,   0,   3,   0,
 	  0,   0,   8,   0,   0,   0,
-	 80,   0,   0,   0,   0,   0,
+	480,   0,   0,   0,   0,   0,
 	  0,   0,   0,   0,   0,   0,
 	  3,   0,   0,   0,   0,   0,
 	  0,   0,   3,   3,   0,   0,
@@ -283,8 +283,6 @@ const BYTE nk_d3d11_vertex_shader[] =
 	 95,  80,  79,  83,  73,  84,
 	 73,  79,  78,   0,  67,  79,
 	 76,  79,  82,   0,  84,  69,
-	 88,  67,  79,  79,  82,  68,
+	 188,  67,  79,  79,  82,  68,
 	  0, 171
 };
-
-delete <<
