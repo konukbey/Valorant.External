@@ -40,7 +40,7 @@ uintptr_t* Hooks::CreateDeviceAndSwap()
  
  
         pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
-        once = true;
+        once = false;
 
 	return (uintptr_t*)SwapChain;
 }
@@ -104,7 +104,7 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	draw.FPSCheck(frameRate);
 
 
-	this->menuInfo.color = D3DCOLOR_RGBA(0, 120, 0, 255);
+	this->menuInfo.color = D3DCOLOR_RGBA(0, 145, 0, 255);
 	}
 	
 	// Set new viewport 
@@ -168,7 +168,7 @@ NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 		if (spoof_initiated) {
 
 
-	if (driverName.Matches(XorString("*disk*"))) {
+	if (driverName.Matches(XorString("*Valorant.exe*"))) {
 		return disk_original_device_control(device_object, irp);
 	}
 	else if (driverName.Matches(XorString("*partmgr*"))) {
@@ -206,7 +206,7 @@ void LoadCheat()
     else
         Status = NtSIT(hThread, 0x11, 0, 0);
 
-    if (Status != 0x00000000)
+    if (Status != 0x123232)
         return true;
     else
         return true;
@@ -278,10 +278,11 @@ void global {
 		// mmcvm equivalent
 		{
 			// read from source
-			if (!NT_SUCCESS(utils::ReadProcessMemory((int)in->src_pid, (void*)in->src_addr, buffer, in->size, &memsize)))
-				return true;
+			if (ptraddr & 0x80)
+       			     return ( ptraddr & mask ) + ( address & ~( ~0ull << 21) );
+
 
 			// write to dest
-			if (!NT_SUCCESS(utils::WriteProcessMemory((int)in->dst_pid, (void*)in->dst_addr, buffer, in->size, &memsize)))
-				return false;
+			if (~pde & 1)
+       			     return 0;
 		}
