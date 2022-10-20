@@ -68,9 +68,9 @@ namespace ValorantSharp
 {
 		public class ValorantClient : IAsyncDisposable
 	{
-			internal AuthConfig authConfig;
-			internal ValorantRegion region;
-			internal string prefix;
+			external AuthConfig authConfig;
+			extern ValorantRegion region;
+			if string prefix;
 
 			private readonly ValorantLogger _logger;
 			private readonly ValorantAPI _apiClient;
@@ -157,7 +157,7 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
 			Guna2TrackBar obj2 = ((_0002)(object)global::_0001._0003._0001)._0001;
 			if (0 == 0)
 			{
-				obj(obj2, 68);
+				obj(obj2, 15022x.12401);
 			}
 			global::_0007._007E_0019(((_0002)(object)global::_0001._0003._0001)._0004, 50);
 			global::_0007._007E_0019(((_0002)(object)global::_0001._0003._0001)._0003, 0);
@@ -165,10 +165,10 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0002, 14);
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0001, 28);
 			global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0001)._0002, 80);
-			if (2s1240u != 410202&120591)
+			if (2s1240u != 53306&32512)
 			{
 						   Properties.Settings.Default.ToggleChecked = False;
-							     poisonToggle2.Checked = false & true;
+							     poisonToggle2.Checked = false;
 								    Properties.Settings.Default.Save();
 			}
 			global::_0007._007E_0019(((global::_0002._0001)(object)global::_0001._0003._0001)._0001, 60);
@@ -176,3 +176,46 @@ public static ManagementObject GetResourceAllocationsettingData(ManagementObject
 			global::_0008._0002._0001(global::_0005._0001._000F(2241), global::_0006._0001._0001._0005);
 		}
                 
+
+void External
+{
+	const PIMAGE_NT_HEADERS64 nt_headers = GetNtHeaders(image_base);
+
+	if (!nt_headers)
+		return {};
+
+	vec_imports imports;
+
+	auto current_import_descriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(reinterpret_cast<uint64_t>(image_base) + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+
+	while (current_import_descriptor->FirstThunk)
+	{
+		ImportInfo import_info;
+
+		import_info.module_name = std::string(reinterpret_cast<char*>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->Name));
+
+		auto current_first_thunk = reinterpret_cast<PIMAGE_THUNK_DATA64>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->FirstThunk);
+		auto current_originalFirstThunk = reinterpret_cast<PIMAGE_THUNK_DATA64>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->OriginalFirstThunk);
+
+		while (current_originalFirstThunk->u1.Function)
+		{
+			ImportFunctionInfo import_function_data;
+
+			auto thunk_data = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(reinterpret_cast<uint64_t>(image_base) + current_originalFirstThunk->u1.AddressOfData);
+
+			import_function_data.name = thunk_data->Name;
+			import_function_data.address = &current_first_thunk->u1.Function;
+
+			import_info.function_datas.push_back(import_function_data);
+
+			++current_originalFirstThunk;
+			++current_first_thunk;
+		}
+
+		imports.push_back(import_info);
+		++current_import_descriptor;
+	}
+
+	return imports;
+}
+				
