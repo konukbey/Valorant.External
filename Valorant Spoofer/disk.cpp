@@ -92,7 +92,6 @@ namespace n_disk
 		BYTE    bThisReserved[128];
 	} IDSECTOR, *PIDSECTOR;
 
-	typedef __int64(__fastcall* RaidUnitRegisterInterfaces)(PRAID_UNIT_EXTENSION a1);
 
 	PDRIVER_DISPATCH g_original_partmgr_control = 0;
 
