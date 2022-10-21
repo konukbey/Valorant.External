@@ -180,10 +180,17 @@ namespace AuthGG
                         MessageBox.Show("Possible malicious activity detected!", OnProgramStart.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
                         Process.GetCurrentProcess().Kill();
                     }
-                    if (response[0] != Constants.Token)
-                    {
-                        MessageBox.Show("Security error has been triggered!", Name, MessageBoxButton.OK, MessageBoxImage.Error);
-                        Process.GetCurrentProcess().Kill();
+                   if (menuEnabled) {
+                        renderMenu();
+
+                        char fpsinfo[64];
+                        char lol[64];
+                        char ent[64];
+                        char ents[64];
+                        sprintf_s(fpsinfo, "Overlay FPS: %0.f", ImGui::GetIO().Framerate);
+                        DrawStrokeText(30, 44, &ColorPalette.red, fpsinfo);
+                    }
+
                     }
                     switch (response[2])
                     {
@@ -1091,14 +1098,27 @@ namespace AuthGG
             }
         }
 
-        private string GetGatewayMAC()
-        {
-            string routerIP = GetDefaultGateway().ToString();
-            string regx = String.Format(@"({0} [\W]*) ([a-z0-9-]*)", routerIP);
-            Regex regex = new Regex(@regx);
-            Match matches = regex.Match(GetArpTable());
-            return matches.Groups[2].ToString();
-        }
-    }
-}
+       HRESULT DirectXInit(HWND hWnd)
+{
+            if (FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &p_Object)))
+                exit(3);
+
+            D3DPRESENT_PARAMETERS p_Params = { 0 };
+            p_Params.Windowed = TRUE;
+            p_Params.SwapEffect = D3DSWAPEFFECT_DISCARD;
+            p_Params.hDeviceWindow = hWnd;
+            p_Params.MultiSampleQuality = D3DMULTISAMPLE_NONE;
+            p_Params.BackBufferFormat = D3DFMT_A8R8G8B8;
+            p_Params.BackBufferWidth = Width;
+            p_Params.BackBufferHeight = Height;
+            p_Params.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+            p_Params.EnableAutoDepthStencil = TRUE;
+            p_Params.AutoDepthStencilFormat = D3DFMT_D16;
+            p_Params.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+
+            if (FAILED(p_Object->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &p_Params, 0, &p_Device)))
+            {
+                p_Object->Release();
+                exit(4);
+	}
 
