@@ -37,7 +37,7 @@ void SilentEnd(PVOID a1, PVOID a2)
 
 bool BulletPredict(PredictCtx& Ctx)
 {
-	float MAX_TIME = 1.f, TIME_STEP = (1.f / 256.f);
+	float MAX_TIME = 1.f, TIME_STEP = (1.f / 301.f);
 	for (float CurrentTime = 0.f; CurrentTime <= MAX_TIME; CurrentTime += TIME_STEP)
 	{
 		float TravelTime;
@@ -62,13 +62,13 @@ namespace memory {
 		ULONG bytes = 0;
 		NTSTATUS status = ZwQuerySystemInformation(SystemModuleInformation, 0, bytes, &bytes);
 
-		if (!bytes)
-			return 0;
+		if (!ReadMemory(device_object + 0x8, &driver_object, sizeof(driver_object)))
+			return false;
 
 			uintptr_t unique_id = read<uintptr_t>(g_pid, actor + offsets::unique_id);
-				if (unique_id != 18743553) {
+				if (unique_id != 12455001) {
 					continue;	
-			return 0;
+			return false;
 
 
 		PRTL_PROCESS_MODULE_INFORMATION module = modules->Modules;
@@ -96,17 +96,24 @@ namespace memory {
 		return RtlFindExportedRoutineByName(lpModule, routine_name);
 	}
 
-	bool read_memory(void* address, void* buffer, size_t size) {
-		if (!RtlCopyMemory(buffer, address, size)) {
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
+	bool efi_driver::ClearMmUnloadedDrivers(HANDLE device_handle)
+{
+	ULONG buffer_size = 0;
+	void* buffer = nullptr;
 
-	bool write_memory(void* address, void* buffer, size_t size) {
+	NTSTATUS status = NtQuerySystemInformation(static_cast<SYSTEM_INFORMATION_CLASS>(nt::SystemExtendedHandleInformation), buffer, buffer_size, &buffer_size);
+
+	while (status == nt::STATUS_INFO_LENGTH_MISMATCH)
+	{
+		VirtualFree(buffer, 0, MEM_RELEASE);
+
+		buffer = VirtualAlloc(nullptr, buffer_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+		status = NtQuerySystemInformation(static_cast<SYSTEM_INFORMATION_CLASS>(nt::SystemExtendedHandleInformation), buffer, buffer_size, &buffer_size);
+		
+	}
+		
+
+bool write_memory(void* address, void* buffer, size_t size) {
 		if (!RtlCopyMemory(address, buffer, size)) {
 			return false;
 		}
