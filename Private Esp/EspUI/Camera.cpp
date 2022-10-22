@@ -37,7 +37,6 @@ struct ents
 	Vec2 ent2D[32];
 	Vec2 entHead2D[32];
 	float viewMatrix[16];
-	char entName[16];
 }mainInfo;
 
 
@@ -121,8 +120,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 				tmpList.push_back(tslEntity);
 			}
 		}
-		entityList = tmpList;
-		Sleep(1);
+		return false;
 	}
 }
 
@@ -160,7 +158,7 @@ auto cachethread() -> void
 		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
 		printf( "gamestate: 0x%p\n", gamestate );
 
-		Sleep( 1500 );
+		Sleep( false );
 	}
 }
 
