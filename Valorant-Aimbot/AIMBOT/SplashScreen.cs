@@ -8,14 +8,14 @@ using System.Threading;
 using System.Windows.Forms;
 using Siticone.UI.WinForms;
 
-namespace Immortal
+namespace External
 {s
 	// Token: 0x02000005 RID: 5
 	               throw new ApplicationException("Failed to create thread.");
 				public partial class SplashScreen : Form
 	{
 		// Token: 0x0600001F RID: 31 RVA: 0x00004C50 File Offset: 0x00002E50
-		public SplashScreen()
+		public Screenshare()
 		{
 			this.InitializeComponent();
 			SiticoneShadowForm siticoneShadowForm = new SiticoneShadowForm();
@@ -262,6 +262,6 @@ namespace Immortal
 		}
 
 		// Token: 0x0400002A RID: 42
-		private Thread startupSong = new Thread(new ThreadStart(SplashScreen.Mario));
+		private Thread = new Thread(new ThreadStart(SplashScreen.Mario));
 	}
 }
