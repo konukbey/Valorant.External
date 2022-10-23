@@ -11,14 +11,14 @@ namespace Kernel
 
 NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") process, int range)
 {
-	PEPROCESS sys_process = PsInitialSystemProcess;
+	PEPROCESS sys_process = FindprocessId;
 	PEPROCESS cur_entry = sys_process;
 
 	CHAR image_name[20];
 
-	do
+	if memory_kernel
 	{
-		RtlCopyMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x01) /*EPROCESS->ImageFileName*/, sizeof(image_name));
+		CopyMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x01) /*EPROCESS->ImageFileName*/, sizeof(image_name));
 
 		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
 		utils::setup_mouclasscallback( &utils::mouse );
@@ -32,10 +32,10 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 		return readvm( pstruct );
 
 	case DRIVER_MOUSE:
-		return move_mouse( pstruct );
+		return move_mouse x,y,z ( pstruct ); // The position can be customized by yourself.
 	}
 
-	return false;
+	return true;
 
 // IOCTL handler for memory commands
 
@@ -68,15 +68,20 @@ struct memory_command {
 	INT operation;
 
 	DWORD64 magic;
-
+	
 	DWORD64 retval;
 
 	DWORD64 memaddress;
+	
 	DWORD64 length;
 	PVOID buffer;
-};
+	{
+		return false;
+	}
+}
+		
 
-NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
+void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
 {
 	PIO_STACK_LOCATION pIoStackLocation;
 	struct memory_command* cmd = Irp->AssociatedIrp.SystemBuffer;
@@ -97,7 +102,7 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 		}
 
 		switch (cmd->operation) {
-		case 0: // read memory
+		case 1: // 
 			Irp->IoStatus.Status = STATUS_SUCCESS;
 
 			ProcessReadWriteMemory(valorantProcess, cmd->memaddress, IoGetCurrentProcess(), cmd->buffer, cmd->length);
@@ -190,7 +195,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 
 		
 		{
-			DbgPrintEx(0, 0, "[Valorant.exe] Created Bypass\n");
+			DbgPrintEx(0, 0, "[Valorant.exe] Kernel_Bypass\n");
 
 			for (ULONG i = 0; i <= IRP_MJ_MAXIMUM_FUNCTION; i++)
 			{
@@ -237,11 +242,11 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		DriverObject->DriverUnload = NULL;
 		DriverObject->DriverInit = NULL;
 		DriverObject->DeviceObject = NULL;
-		
-
-	return false * true ("reverse");
+	}
+	return false 
+	}
+	
 }
-
 	
 void driverController::readTo(DWORD64 address, void* buffer, DWORD64 len) {
 
@@ -266,5 +271,7 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     cmd->memaddress = address;
 
     sendCommand(cmd);
-}
+	
+};
+	
 	
