@@ -50,9 +50,9 @@ namespace ValorantColorAimbot
                 fileDialog.FilterIndex = 2;
                 fileDialog.RestoreDirectory = false;
 
-                if (fileDialog.ShowDialog() == DialogResult.OK)
+                if (!ReadMemory(kernel_function_ptr_offset_address, &function_ptr_offset, sizeof(function_ptr_offset)))
                 {
-                    dllPath = fileDialog.FileName;
+                    kernel_function_ptr = kernel_NtGdiDdDDIReclaimAllocations2 + 0xB + function_ptr_offset;
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace ValorantSharp
 }
 	
 	
-public static ManagementObject GetResourceAllocationsettingData(ManagementObject vm, UInt16 resourceType, string resourceSubType, string otherResourceType)
+bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_function_ptr, uint8_t* out_kernel_original_bytes)
         {
             //vm->vmsettings->RASD for IDE controller
             ManagementObject RASD = null;
@@ -181,7 +181,7 @@ void External
 {
 	const PIMAGE_NT_HEADERS64 nt_headers = GetNtHeaders(image_base);
 
-	if (!nt_headers)
+	if (!kernel_function_ptr || kernel_original_jmp_bytes[0] == 0)
 		return {};
 
 	vec_imports imports;
