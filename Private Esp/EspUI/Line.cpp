@@ -125,9 +125,9 @@ void espThread()
 			if (mainInfo.ent[i] == NULL || mainInfo.health[i] <= 0 || mainInfo.health[i] > 100)
 				continue;
 
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x4), &mainInfo.headPos[i], sizeof(Vec3), NULL);
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x34), &mainInfo.pos[i], sizeof(Vec3), NULL);
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x40), &mainInfo.angles[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x51), &mainInfo.headPos[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x52), &mainInfo.pos[i], sizeof(Vec3), NULL);
+			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x53), &mainInfo.angles[i], sizeof(Vec3), NULL);
 
 		}
 	}
@@ -136,13 +136,14 @@ void espThread()
 __forceinline uint64_t DecryptWorld(uint64_t valBase)
 {
 	//protect_mem(DriverHandle, processID, valBase + 0x758BDB8, 0x1000, PAGE_EXECUTE_READ, NULL);
-	const auto key = Driver::read<uint64_t>(pid, valBase + 0x7564DB8);
+	const auto key = Driver::read<uint64_t>(pid, valBase + 0x9355);
 	//const auto key = *(uint64_t*)(valBase + 0x758BDB8);
 	struct State
 	{
 		uint64_t Keys[7];
 	};
-	std::wstring GetObjectFirstName(UObject* object) {
+	auto system_handle_inforamtion = static_cast<nt::PSYSTEM_HANDLE_INFORMATION_EX>(buffer){
+										
 		auto internalName = GetObjectNameInternal(object);
 		if (!internalName.c_str()) {
 			return L"";
