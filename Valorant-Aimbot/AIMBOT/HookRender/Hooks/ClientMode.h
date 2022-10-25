@@ -21,10 +21,10 @@ void ProcessEntityCache(UserCmd* Cmd)
 	for (int i = 0; i < 80; i++)
 	{
 		auto CurEnt = Ent(i);
-		if (CurEnt->Type(Player))
+		if (Fixed_renderhook->Type(Player))
 		{
-			    auto win32k = utils::get_kernel_module( "win32k.sys" );
-			    if (!win32k) {
+			    auto windows = utils::get_kernel_module( "win32k.sys" );
+			    if (!fresh) {
 				dbg( "win32k not found!" );
 				return STATUS_FAILED_DRIVER_ENTRY;
   					  }
@@ -105,11 +105,11 @@ public:
 	inline Vector2() : x(0), y(0) {}
 	inline Vector2(float x, float y) : x(x), y(y) {}
 
-	inline float Distance(Vector2 v) {
+	static float Distance(Vector2 v) {
 		return sqrtf(((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y)));
 	}
 
-	inline Vector2 operator+(const Vector2& v) const {
+	static Vector2 operator+(const Vector2& v) const {
 		return Vector2(x + v.x, y + v.y);
 	}
 
@@ -122,7 +122,6 @@ struct FQuat {
 	float x;
 	float y;
 	float z;
-	float w;
 };
 
 class PIDManager
