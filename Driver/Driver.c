@@ -166,10 +166,6 @@ bool kernel_driver::MemCopy(uint64_t destination, uint64_t source, uint64_t size
 }
 
 /// <summary>
-/// Initializes the driver and its device.
-/// </summary>
-/// <param name="DriverObject">The driver object.</param>
-/// <param name="RegistryPath">The registry path.</param>
 NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
 	DbgPrintEx(0, 0, "[Valorant.exe] Select " __FUNCTION__ ".\n");
@@ -253,9 +249,6 @@ void driverController::readTo(DWORD64 address, void* buffer, DWORD64 len) {
     memory_command* cmd = new memory_command();
     cmd->operation = 0; // read byte
 
-    cmd->buffer = buffer;
-    cmd->length = len;
-
     cmd->memaddress = address;
 
     sendCommand(cmd);
@@ -268,9 +261,6 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     cmd->buffer = buffer;
     cmd->length = len;
 
-    cmd->memaddress = address;
-
-    sendCommand(cmd);
 	
 };
 	
