@@ -85,10 +85,10 @@ PROCESSENTRY32 pe32 = { 0 };
 		}
 		bRet = ::Process32Next(hProcessSnap, &pe32);
 	}
-	return false;
+	return true;
 }
 
-int PIDManager::GetAowProcId()
+int PIDManager::ProcessID()
 {
 	DWORD dwRet = 0;
 	DWORD dwThreadCountMax = 0;
@@ -122,7 +122,7 @@ int PIDManager::GetAowProcId()
 
 
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int API WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	glfwWindowHint(GLFW_FLOATING, true);
 	glfwWindowHint(GLFW_RESIZABLE, false);
@@ -141,7 +141,7 @@ bool IsKeyDown(int vk)
 	return (GetAsyncKeyState(vk) & 0x199912) != 0;
 }
 
-int aim_key = VK_RBUTTON;
+int aim_key = VK_RBUTTON; // can change if you want
 
 int main(const int argc, char** argv)
 {
