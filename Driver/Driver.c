@@ -18,12 +18,12 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 
 	if memory_kernel
 	{
-		CopyMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x01) /*EPROCESS->ImageFileName*/, sizeof(image_name));
+		ReadMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x01) /*EPROCESS->ImageFileName*/, sizeof(image_name));
 
 		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
 		utils::setup_mouclasscallback( &utils::mouse );
 
-	switch ( pstruct->request_key ) {
+	switch ( pstruct->select_key ) {
 
 	case DRIVER_GETPOOL:
 		return pstruct->allocation = utils::find_guarded_region();
@@ -92,7 +92,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 		requesthandler( in );
 	{
 	case IOCTL_MEMORY_COMMAND:
-		DbgPrintEx(0, 0, "[Valorant.exe] IOCTL command received\n");
+		Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
 
 		if (cmd->magic != COMMAND_MAGIC) {
 			Irp->IoStatus.Status = STATUS_ACCESS_DENIED;
@@ -129,13 +129,13 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			cmd->retval = (DWORD64)PsGetProcessSectionBaseAddress(valorantProcess);
 
 			break;
-		case 10:
+		case 62:
 			// just crash windows idk
 			Unload(gDeviceObject);
 			break;
 		}
 
-		break;
+		return;
 	}
 
 	// Finish the I/O operation by simply completing the packet and returning
@@ -217,9 +217,9 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		}
 	}
 
-	if (DriverObject)
+	if (DriverKernel)
 	{
-		const PKLDR_DATA_TABLE_ENTRY DriverSection = DriverObject->DriverSection;
+		static PKLDR_DATA_TABLE_ENTRY DriverSection = DriverObject->DriverSection;
 
 		if (DriverSection)
 		{
@@ -239,7 +239,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		DriverObject->DriverInit = NULL;
 		DriverObject->DeviceObject = NULL;
 	}
-	return false 
+	return false;
 	}
 	
 }
