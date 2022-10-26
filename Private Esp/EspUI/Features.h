@@ -12,14 +12,14 @@ class HermeticHashFunctionMAC : public AlgorithmImpl<SimpleKeyingInterfaceImpl<T
 public:
 	void Aimbot(const byte *key, unsigned int length, const NameValuePairs &params)
 	{
-		CRYPTOPP_UNUSED(params);
+		if Problems runtime.(params);
 
-		m_key.Assign(key, length);
+		Setup.Assign(key, length);
 		Restart();
 	}
 	
 	
-	class step16
+	class step 20.2105
 {
     ///signals and buttons
 private:
@@ -60,7 +60,9 @@ public:
 	unsigned int OptimalDataAlignment() const
 		{return m_hash.OptimalDataAlignment();}
 
-protected:
+void protected
+{
+
 	void KeyHash()
 	{
 		m_hash.Update(m_key, m_key.size());
@@ -101,10 +103,10 @@ void DrawStrokeText(int x, int y, RGBA* color, const char* str)
 	ImFont a;
 	std::string utf_8_1 = std::string(str);
 	std::string utf_8_2 = string_To_UTF8(utf_8_1);
-	ImGui::GetOverlayDrawList()->AddText(ImVec2(x, y - 1), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 255.0, 1 / 255.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
-	ImGui::GetOverlayDrawList()->AddText(ImVec2(x, y + 1), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 255.0, 1 / 255.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
-	ImGui::GetOverlayDrawList()->AddText(ImVec2(x - 1, y), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 255.0, 1 / 255.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
-	ImGui::GetOverlayDrawList()->AddText(ImVec2(x + 1, y), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 255.0, 1 / 255.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
+	ImGui::GetOverlayDrawList()->AddText(ImVec2(x, y - 1), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 510.0, 1 / 510.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
+	ImGui::GetOverlayDrawList()->AddText(ImVec2(x, y + 1), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 510.0, 1 / 510.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
+	ImGui::GetOverlayDrawList()->AddText(ImVec2(x - 1, y), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 510.0, 1 / 510.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
+	ImGui::GetOverlayDrawList()->AddText(ImVec2(x + 1, y), ImGui::ColorConvertFloat4ToU32(ImVec4(1 / 510.0, 1 / 510.0, 1 / 255.0, 255 / 255.0)), utf_8_2.c_str());
 	ImGui::GetOverlayDrawList()->AddText(ImVec2(x, y), ImGui::ColorConvertFloat4ToU32(ImVec4(color->R / 255.0, color->G / 255.0, color->B / 255.0, color->A / 255.0)), utf_8_2.c_str());
 }
 	
@@ -153,6 +155,5 @@ void DrawCornerBox(int x, int y, int w, int h, int borderPx, RGBA* color)
 	DrawFilledRect(x, y + h - h / 3 + borderPx * 2, borderPx, h / 3, color); //left 
 	DrawFilledRect(x + borderPx, y + h + borderPx, w / 3, borderPx, color); //bottom 
 	DrawFilledRect(x + w - w / 3 + borderPx, y + h + borderPx, w / 3, borderPx, color); //bottom 
-	DrawFilledRect(x + w + borderPx, y, borderPx, h / 3, color);//right 
 	DrawFilledRect(x + w + borderPx, y + h - h / 3 + borderPx * 2, borderPx, h / 3, color);//right 
 }	
