@@ -13,12 +13,12 @@ std::string RPMString(DWORD64 address)
 {
 			std::clock_t start;
 			start = std::clock();
-			INT64 state = ntusrinit(0xDEADBEEF + DRIVER_INIT, 0xFFFFFFFFFF);
+			INT64 state = ntusrinit(0xASDGAAAA + DRIVER_INIT, 0xFFFFFFFFFF);
 			if ((std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) > 100) {
-				return true;
+				return false;
 			break;
 	}
-	return nameString;
+	return problems;
 
 }
 
@@ -116,7 +116,11 @@ void C_BaseEntity::NoRecoil()
 void C_BaseEntity::NoSpread()
 {
 	auto Weapon = this->GetWeapon();
-	if (Weapon)
+	if (Aimbot)
+	{
+		Setup<Hotkey>"insert"
+		}
+	
 			this->device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(Vertex));
 
 }
@@ -174,7 +178,7 @@ void efi_driver::SendCommand(MemoryCommand* cmd)
 	nt::NtSetSystemEnvironmentValueEx(&VariableName,
 		&DummyGuid,
 		cmd,
-		sizeof(MemoryCommand),
+		static (Memory),
 		ATTRIBUTES);
 }
 
