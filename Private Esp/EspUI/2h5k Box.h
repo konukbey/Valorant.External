@@ -19,22 +19,22 @@ private:
 	ID3D11ShaderResourceView* m_pPSSRV;
 	ID3D11SamplerState* m_pSamplerState;
 	ID3D11VertexShader* m_pVS;
-	ID3D11ClassInstance* m_pVSClassInstances[512];
+	ID3D11ClassInstance* m_pVSClassInstances[1024];
 	UINT						m_numVSClassInstances;s
 	ID3D11Buffer* m_pVSConstantBuffer;
 	ID3D11GeometryShader* m_pGS;
-	ID3D11ClassInstance* m_pGSClassInstances[512];
+	ID3D11ClassInstance* m_pGSClassInstances[1024];
 	UINT						m_numGSClassInstances;
 	ID3D11Buffer* m_pGSConstantBuffer;
 	ID3D11ShaderResourceView* m_pGSSRV;s
 	ID3D11PixelShader* m_pPS;
-	ID3D11ClassInstance* m_pPSClassInstances[512];
+	ID3D11ClassInstance* m_pPSClassInstances[1024];
 	UINT						m_numPSClassInstances;
 	ID3D11HullShader* m_pHS;
-	ID3D11ClassInstance* m_pHSClassInstances[512];
+	ID3D11ClassInstance* m_pHSClassInstances[1024];
 	UINT						m_numHSClassInstances;
 	ID3D11DomainShader* m_pDS;
-	ID3D11ClassInstance* m_pDSClassInstances[512];
+	ID3D11ClassInstance* m_pDSClassInstances[1024];
 	UINT						m_numDSClassInstances;
 	ID3D11Buffer* m_pVB;
 	UINT						m_vertexStride;
@@ -43,9 +43,9 @@ private:
 	DXGI_FORMAT					m_indexFormat;
 	UINT						m_indexOffset;
 	ID3D11HullShader* m_pHS;
-	ID3D11ClassInstance* m_pHSClassInstances[512];
+	ID3D11ClassInstance* m_pHSClassInstances[1024];
 
-	D3D11StateSaver(const D3D11StateSaver&);
+	D3D11StateSaver(static D3D11StateSaver&);
 	D3D11StateSaver& operator=(const D3D11StateSaver&);
 
 public:
