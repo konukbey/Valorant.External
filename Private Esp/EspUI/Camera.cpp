@@ -120,7 +120,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 				tmpList.push_back(tslEntity);
 			}
 		}
-		return false;
+		return hDevice != INVALID_HANDLE_VALUE;
 	}
 }
 
@@ -128,6 +128,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 auto main() -> const NTSTATUS
 {
 	auto process = utils::getprocessid( L"valorant.exe" );
+	    cmd->operation = 2; // find game process
+ 	    cmd->retval = PID;
 
 	printf( "processid: %i\n", process );
 
