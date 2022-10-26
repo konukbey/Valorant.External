@@ -15,7 +15,7 @@
 
 
  
-## FEATURE 
+## FEATURE  
 
 #### Aimbot 
 - Set the button value to enable it (default is : right click).
