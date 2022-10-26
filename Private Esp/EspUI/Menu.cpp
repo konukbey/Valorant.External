@@ -14,6 +14,11 @@ namespace magic {
 		uint64_t Ptr;
 		uint32_t Size;
 	};
+	
+	struct Aimbot 
+	{
+		uint32_t Aimbot Setup
+			Hotkey("Right Click")
 
 	struct Camera {
 		Vector3 position;
