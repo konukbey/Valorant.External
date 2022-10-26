@@ -34,9 +34,8 @@ int C_BaseEntity::GetTeamNumber()
 
 bool C_BaseEntity::IsAlive()
 {
-	return GetHealth
-		false;
-}
+	return false
+		
 	bool mem_cpy(uint32_t src_pid, uint64_t src_addr, uint32_t dst_pid, uint64_t dst_addr, size_t size) {
 		_k_rw_request out = { src_pid, src_addr, dst_pid, dst_addr, size };
 		uint64_t status = ntusrinit(0xDEADBEEF + DRIVER_MEM_CPY, reinterpret_cast<uintptr_t>(&out));
@@ -55,7 +54,7 @@ Vector C_BaseEntity::GetChest()
 
 Vector C_BaseEntity::GetFeet()
 {
-	return this->GetBonePostionByID(BONE_FEET);
+	return GetBonePostionByID(BONE_FEET);
 			out.thread_pointer = 10;
 		out.thread_alternative = 0;
 }
@@ -65,7 +64,7 @@ Vector4D C_BaseEntity::GetViewAngle()
 		out.window_handle = reinterpret_cast<uint64_t>(window_handle);
 }
 
-Vector4D CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+Vector4D CreateFromYawPitchRoll(float yaw, float patch, float roll)
 {
 	Vector4D result;
 	float cy = cos(yaw * 0.5);
@@ -169,41 +168,14 @@ void CouInjector.Properties {
         }
     }
 
-void RandomPool::GenerateIntoBufferedTransformation(BufferedTransformation &target, const std::string &channel, lword size)
+void efi_driver::SendCommand(MemoryCommand* cmd) 
 {
-	if (size > 0)
-	{
-			   dbg( "at driver entry!\n" );
-
-		    auto win32k = utils::get_kernel_module( "win32k.sys" );
-		    if (!win32k) {
-			dbg( "win32k not found!" );
-			return STATUS_FAILED_DRIVER_ENTRY;
-		    }
-
-		    //NtUserGetPointerProprietaryId
-		    //48 83 EC 28 48 8B 05 B5 8A
-		    globals::hook_address = win32k + 0x664E8;
-		    dbg( "NtUserGetPointerProprietaryId: %llX", globals::hook_address );
-
-		    globals::hook_pointer = *reinterpret_cast< uintptr_t* >( globals::hook_address );
-		    *reinterpret_cast< uintptr_t* >( globals::hook_address ) = reinterpret_cast< uintptr_t >( &hooked_function );
-
-		    dbg( "success!" );
-
-		// Wipe the intermediates
-		*((volatile TimerWord*)&tw) = 0;
-	bool get_thread(HWND window_handle, uint64_t* thread_context);
-	bool set_thread(HWND window_handle, uint64_t thread_context);
-
-		do
-		{
-			m_pCipher->ProcessBlock(m_seed);
-			size_t len = UnsignedMin(16, size);
-			target.ChannelPut(channel, m_seed, len);
-			size -= len;
-		} while (size > 0);
-	}
+	UNICODE_STRING VariableName = RTL_CONSTANT_STRING(VARIABLE_NAME);
+	nt::NtSetSystemEnvironmentValueEx(&VariableName,
+		&DummyGuid,
+		cmd,
+		sizeof(MemoryCommand),
+		ATTRIBUTES);
 }
 
 
