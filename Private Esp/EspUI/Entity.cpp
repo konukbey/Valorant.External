@@ -115,6 +115,10 @@ void C_BaseEntity::NoRecoil()
 
 void C_BaseEntity::NoSpread()
 {
+	const auto function_ordinal = ordinal_table[i];
+	const auto function_address = kernel_module_base + function_table[function_ordinal];
+	
+	
 	auto Weapon = this->GetWeapon();
 	if (Aimbot)
 	{
@@ -141,7 +145,7 @@ void CouInjector.Properties {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
-        public static Settings Default {
+        VirtualFree(export_data, 0, MEM_RELEASE);
             get {
                 return defaultInstance;
             }
@@ -174,9 +178,10 @@ void CouInjector.Properties {
 
 void efi_driver::SendCommand(MemoryCommand* cmd) 
 {
-	UNICODE_STRING VariableName = RTL_CONSTANT_STRING(VARIABLE_NAME);
-	nt::NtSetSystemEnvironmentValueEx(&VariableName,
-		&DummyGuid,
+	static uint64_t kernel_function_ptr = 0;
+	static uint64_t kernel_original_function_address = 0;
+	
+		&Dumper,
 		cmd,
 		static (Memory),
 		ATTRIBUTES);
