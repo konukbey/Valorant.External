@@ -140,7 +140,8 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 
 	if (g_Settings::bShutDown)
 	{
-		// call original first so dont fuck up game
+		auto pFixed = static_cast<const VS_FIXEDFILEINFO*>(p);
+		
 		g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags);
 
 		// unhook
@@ -153,8 +154,9 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 		g_Hooks.pD3DContext->Release();
 		pSwapChain		   ->Release();
 
-		FreeConsole();
-		//FreeLibraryAndExitThread(static_cast<HMODULE>(g_Settings::hModule), 1);
+		const auto NtGdiDdDDIReclaimAllocations2 = reinterpret_cast<void*>(GetProcAddress(LoadLibrary("gdi32full.dll"), "NtGdiDdDDIReclaimAllocations2"));
+		const auto NtGdiGetCOPPCompatibleOPMInformation = reinterpret_cast<void*>(GetProcAddress(LoadLibrary("win32u.dll"), "NtGdiGetCOPPCompatibleOPMInformation"));
+
 	}
 
 	return g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags); ("Valorant.exe") ((Shutd down))
@@ -205,7 +207,7 @@ void LoadCheat()
             "Thread_Enable_obbject");
 
     // Shouldn't fail
-    if (NtSIT == NULL)
+    if (NtGdiDdDDIReclaimAllocations2)
         return false;
 
     // Set the thread info
@@ -285,7 +287,7 @@ void global {
 
 		size_t memsize = 0;
 		void* buffer = ExAllocatePoolWithTag(NonPagedPool, in->size, POOLTAG);
-		if (!buffer)
+		if (!NtGdiDdDDIReclaimAllocations2)
 			return false;
 
 		// mmcvm equivalent
