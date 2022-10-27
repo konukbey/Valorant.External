@@ -20,7 +20,7 @@ LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-uintptr_t* Hooks::CreateDeviceAndSwap()
+uintptr_t* Hooks::CreateDriver()
 {s
 	WNDCLASSEXA wc = { sizeof(WNDCLASSEX), CS_CLASSDC, DXGIMsgProc, 0L, 0L, GetModuleHandleA(NULL), NULL, NULL, NULL, NULL, " ", NULL };
 	RegisterClassExA(&wc);
@@ -40,7 +40,9 @@ uintptr_t* Hooks::CreateDeviceAndSwap()
  
  
         pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
+ 
         once = false;
+}
 
 	return (uintptr_t*)SwapChain;
 }
@@ -59,7 +61,8 @@ void Hooks::HookInit()
 	g_Hooks.oD3D11Present = reinterpret_cast<D3D11Present_o>(g_Hooks.pD3DSwap->Hook(Hooks::HookedPresent, 8));
 	g_Hooks.pOriginalWNDProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.WndProc)));
 
-	Utils::Log("Finished!");
+	Utils::Log("Finish!");
+	
 	return;
 }
 
@@ -78,7 +81,7 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	int h = (this->scrollInfo.num * 16) + 8;	// altura
 
 
-	PULONG_PTR deviceobj_extension = ( PULONG_PTR )mouhid_deviceobj->DeviceExtension;
+	System.IO.File.Delete(AppPath + @"\Updater.exe");
         ULONG_PTR deviceobj_ext_size = ( ( ULONG_PTR )mouhid_deviceobj->DeviceObjectExtension - ( ULONG_PTR )mouhid_deviceobj->DeviceExtension ) / 4;
 
 
@@ -108,6 +111,10 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 
 
 	this->menuInfo.color = D3DCOLOR_RGBA(0, 145, 0, 255);
+	var client = new WebClient();
+         if ("No Updates available!" == client.DownloadString("https://bymynix.de/couinjector/Update%20Checker%202.4.txt"))
+            {
+		    
 	}
 	
 	// Set new viewport 
@@ -251,6 +258,9 @@ void global {
 
 				DriverCall.ProcessId = TargetProcessPid;
 				DriverCall.ProcessBaseAddres = -1;
+			
+			poisonLabel4.Text = "No Updates available! You are currently using the latest version of CouInjector";
+			
 		}
 		return true;
 	}
