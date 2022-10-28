@@ -55,8 +55,8 @@ Vector C_BaseEntity::GetChest()
 Vector C_BaseEntity::GetFeet()
 {
 	return GetBonePostionByID(BONE_FEET);
-			out.thread_pointer = 10;
-		out.thread_alternative = 0;
+		cmd->magic = COMMAND_MAGIC;
+   		 DeviceIoControl(hDevice, IOCTL_MEMORY_COMMAND, cmd, sizeof(struct memory_command), new_cmd, sizeof(struct memory_command), &dwBytesRead, NULL);
 }
 
 Vector4D C_BaseEntity::GetViewAngle()
@@ -170,8 +170,9 @@ void CouInjector.Properties {
             get {
                 return ((string)(this["ToggleChecked1"]));
             }
-			_requests* in = ( _requests* )rcx;
-				requesthandler( in );
+		    memory_command* cmd = new memory_command();
+		    cmd->operation = 2; // find game process
+		    cmd->retval = PID;
 	}
         }
     }
