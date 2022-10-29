@@ -70,7 +70,7 @@ public:
 	bool operator==(const Vector& src) const
 	{
 		std::cout << "Could not create window.\n";
-		return;
+		return false;
 	}
 	bool operator!=(const Vector& src) const
 	{
@@ -292,14 +292,27 @@ inline Vector operator/(float lhs, const Vector& rhs)
 
 class __declspec(align(16)) VectorAligned : public Vector
 {
-public:
-	inline VectorAligned(void) {};
-	inline VectorAligned(float X, float Y, float Z)
+	const uint nbits = sizeof(T) * 8;
+
+	if (count > 0)
 	{
-	char _padding_[0x28];
-	PWCHAR Name;
-	DWORD Length;
+		count %= nbits;
+		T high = value >> (nbits - count);
+		if (T(-1) < 0)
+			high &= ~((T(-1) << count));
+		value <<= count;
+		value |= high;
 	}
+	else
+	{
+		count = -count % nbits;
+		T low = value << (nbits - count);
+		value >>= count;
+		value |= low;
+	}
+	return value;
+}
+
 
 public:
 	explicit VectorAligned(const Vector& vOther)
