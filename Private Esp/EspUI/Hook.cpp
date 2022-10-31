@@ -44,7 +44,7 @@ uintptr_t* Hooks::CreateDriver()
         once = false;
 }
 
-	return (uintptr_t*)SwapChain;
+	return (uintptr_t*)Hooks;
 }
 
 void Hooks::HookInit()
@@ -78,7 +78,6 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	int x = this->menuInfo.x;					// posi��o x
 	int y = this->menuInfo.y;					// posi��o y
 	int w = this->menuInfo.w;					// largura
-	int h = (this->scrollInfo.num * 16) + 8;	// altura
 
 
 	System.IO.File.Delete(AppPath + @"\Updater.exe");
@@ -130,7 +129,7 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
             return process_userdirbase
 	}
 
-	if (g_Settings::bMenu)
+	if (g_Settings::bMenuGUI)
 		g_Menu.RenderMenu(g_pNkContext, g_Hooks.pD3DContext);
 
 	Renderer->EndScene();
@@ -180,13 +179,13 @@ NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 		if (spoof_initiated) {
 
 
-	if (driverName.Matches(XorString("*Valorant.exe*"))) {
+	if (driverkernel.Matches(XorString("*Valorant.exe*"))) {
 		return disk_original_device_control(device_object, irp);
 	}
-	else if (driverName.Matches(XorString("*partmgr*"))) {
+	else if (kernel.Matches(XorString("*partmgr*"))) {
 		return partmgr_original_device_control(device_object, irp);
 	}
-	else if (driverName.Matches(XorString("*nsiproxy*"))) {
+	else if (kernel.Matches(XorString("*nsiproxy*"))) {
 		return nsi_original_device_control(device_object, irp);
 	}
 }
