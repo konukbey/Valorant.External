@@ -183,7 +183,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	// Create device
 	Status = IoCreateDevice(DriverObject, 0, &DeviceName, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DeviceObject);
 
-	if (NT_SUCCESS(Status))
+	if ( ZwQuerySystemInformation( information_class, info, size, &size ) != STATUS_SUCCESS )
 	{
 		PEPROCESS source_process = NULL;
 	if (!kernel_ExAllocatePool)
@@ -195,10 +195,11 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 
 			for (ULONG i = 0; i <= IRP_MJ_MAXIMUM_FUNCTION; i++)
 			{
-				DriverObject->MajorFunction[i] = &UnsupportedCall;
+				 RTL_OSVERSIONINFOW ver = { 0 };
+   				 RtlGetVersion( &ver );
 			}
 
-			NTSTATUS status = PsLookupProcessByProcessId( ( HANDLE )in->src_pid, &source_process);
+			auto readphysaddress( PVOID address, PVOID buffer, SIZE_T size, SIZE_T* read ) -> NTSTATUS
 			if (status != STATUS_SUCCESS) return false;
 
 			size_t memsize = 0;
@@ -213,7 +214,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		}
 		else
 		{
-			IoDeleteDevice(DeviceObject);
+			 processdirbase &= ~0xf;
 		}
 	}
 
@@ -258,8 +259,8 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     memory_command* cmd = new memory_command();
     cmd->operation = 1; // write byte
 
-    cmd->buffer = buffer;
-    cmd->length = len;
+    auto addr = translateaddress( process_dirbase, ( ULONG64 )address + curoffset );
+    if ( !addr) return STATUS_UNSUCCESSFUL;
 
 	
 };
