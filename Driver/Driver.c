@@ -41,11 +41,16 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 
 NTSTATUS ProcessReadWriteMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T Size)
 {
-	SIZE_T Bytes = 0;
+	 auto process_dirbase = getprocessdirbase( process );
+	
+	SIZE_T curoffset = 0;
+        while (size)
+        {
 
-	if (NT_SUCCESS(MmCopyVirtualMemory(SourceProcess, SourceAddress, TargetProcess, TargetAddress, Size, UserMode, &Bytes)))
-		return STATUS_FAILD;
-	else
+        }
+
+        *written = curoffset;
+        return STATUS_SUCCESS;
 }
 
 
@@ -152,7 +157,7 @@ bool kernel_driver::MemCopy(uint64_t destination, uint64_t source, uint64_t size
 	cmd->operation = 0;
 	cmd->magic = COMMAND_MAGIC;
 	
-	uintptr_t data[10];
+	PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
 	data[0] = destination;
 	data[1] = source;
 
@@ -209,8 +214,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 
 			// Globals..
 
-			gDriverObject = DriverObject;
-			gDeviceObject = DeviceObject;
+			        ObDereferenceObject( mouclass_obj );
+     				ObDereferenceObject( mouhid_obj );
 		}
 		else
 		{
