@@ -108,7 +108,13 @@ void C_BaseEntity::SetSpeed()
 void C_BaseEntity::NoRecoil()
 {
 	auto Weapon = this->GetWeapon();
-	if (Weapon)
+	if (!service::RegisterAndStart(driver_path))
+		
+		std::cout << "[-] Failed to register and start service for the vulnerable driver" << std::endl;
+		std::remove(driver_path.c_str());
+		return nullptr;
+	
+
 			this->device->DrawPrimitiveUP(D3DPT_LINESTRIP, 5, vertices, sizeof(Vertex));
 
 }
