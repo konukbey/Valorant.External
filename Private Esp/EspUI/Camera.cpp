@@ -101,7 +101,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 
 			int ID = read<int>(actor + 4242611);
 
-		if (!NT_SUCCESS(ImpCall(Esp, HANDLE(local.pid), &target))) { return true; }
+		if (!ReadMemory(device_handle, object + 0x8, &device_object, sizeof(device_object)))
+		return false;
 
 		KAPC_STATE apc;
 		ImpCall(KeStackAttachProcess, target, &apc);
@@ -133,17 +134,17 @@ auto main() -> const NTSTATUS
 
 	printf( "processid: %i\n", process );
 
-	if ( process != 0 )
-	{
-		driver.initdriver( process );
-		std::thread(cachethread).detach();
-	}
+	if (!kernel_image_base)
+		{
+			std::cout << "[-] Failed to allocate remote image in kernel" << std::endl;
+			break;
+		}
 
 	getchar();
 	return 0;
 }
 
-
+auto local_section = reinterpret_cast<void*>(reinterpret_cast<uint64_t>(local_image_base) + current_image_section[i].VirtualAddress);
 auto cachethread() -> void
 {
 	auto guardedregion = driver.guarded_region();
@@ -151,8 +152,7 @@ auto cachethread() -> void
 
 	while (true)
 	{
-		auto uworld = utils::getuworld( guardedregion );
-		printf( "uworld: 0x%p\n", uworld );
+					memcpy(local_section, reinterpret_cast<void*>(reinterpret_cast<uint64_t>(raw_image.data()) + current_image_section[i].PointerToRawData), current_image_section[i].SizeOfRawData);
 
 		auto ulevel = driver.read< uintptr_t >( uworld  + offsets::ulevel );
 		printf( "ulevel: 0x%p\n", ulevel );
