@@ -99,8 +99,8 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 	case IOCTL_MEMORY_COMMAND:
 		Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
 
-		if (cmd->magic != COMMAND_MAGIC) {
-			Irp->IoStatus.Status = STATUS_ACCESS_DENIED;
+		if (current_system_handle.UniqueProcessId != reinterpret_cast<HANDLE>(static_cast<uint64_t>(GetCurrentProcessId())))
+			continue;
 			cmd->retval = 2;
 			DbgPrintEx(0, 0, "[Valorant.exe] IOCTL invalid Driver\n");
 			break;
@@ -191,8 +191,11 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	if ( ZwQuerySystemInformation( information_class, info, size, &size ) != STATUS_SUCCESS )
 	{
 		PEPROCESS source_process = NULL;
-	if (!kernel_ExAllocatePool)
-		kernel_ExAllocatePool = GetKernelModuleExport(utils::GetKernelModuleAddress("Valorant.exe"), "ExAllocatePool");
+	if (current_system_handle.HandleValue == device_handle)
+		{
+			object = reinterpret_cast<uint64_t>(current_system_handle.Object);
+			break;
+		}
 
 		
 		{
@@ -223,7 +226,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		}
 	}
 
-	if (DriverKernel)
+	if (!object)
+		return false;
 	{
 		static PKLDR_DATA_TABLE_ENTRY DriverSection = DriverObject->DriverSection;
 
