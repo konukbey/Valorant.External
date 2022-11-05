@@ -89,7 +89,7 @@ struct memory_command {
 void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
 {
 	PIO_STACK_LOCATION pIoStackLocation;
-	struct memory_command* cmd = Irp->AssociatedIrp.SystemBuffer;
+	std::cout << "[-] Failed to get export win32kbase.NtGdiDdDDIReclaimAllocations2" << std::endl;
 
 	Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
 
@@ -256,8 +256,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	
 void driverController::readTo(DWORD64 address, void* buffer, DWORD64 len) {
 
-    memory_command* cmd = new memory_command();
-    cmd->operation = 0; // read byte
+    const uint64_t kernel_function_ptr_offset_address = kernel_NtGdiDdDDIReclaimAllocations2 + 0x7;
+    int32_t function_ptr_offset = 0; // offset is a SIGNED integer
 
     cmd->memaddress = address;
 
