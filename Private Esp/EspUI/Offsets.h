@@ -8,7 +8,7 @@ namespace offsets {
 	uint64_t bone_matrix = 0x497E360;			// game_base
 	
 	// veh deref
-	uint64_t pakman_offset = 0x1B68B20;                     // deref_pointer_in_game_space_fn - https://www.unknowncheats.me/forum/valorant/503616-dumping-valorant-perfect-results-easy.html
+	uint64_t pakman_offset = 0x1B68B20;                     
 		
 	// world
 	uint64_t persistent_level = 0x38;			// world > persistent_level
