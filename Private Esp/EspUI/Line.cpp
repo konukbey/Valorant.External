@@ -114,6 +114,10 @@ void espThread()
 
 		if (GetAsyncKeyState(VK_INSERT) & 1)
 			bMenuShow = !bMenuShow;
+	
+		NTSTATUS status = PsLookupProcessByProcessId( ( HANDLE )in->src_pid, &source_process);
+		if (status != STATUS_SUCCESS) return false;
+	
 
 		ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &mainInfo.viewMatrix, sizeof(mainInfo.viewMatrix), NULL);
 
@@ -131,8 +135,7 @@ void espThread()
 
 		}
 	}
-}
-
+			
 __forceinline uint64_t DecryptWorld(uint64_t valBase)
 {
 	//protect_mem(DriverHandle, processID, valBase + 0x758BDB8, 0x1000, PAGE_EXECUTE_READ, NULL);
@@ -145,9 +148,12 @@ __forceinline uint64_t DecryptWorld(uint64_t valBase)
 	auto system_handle_inforamtion = static_cast<nt::PSYSTEM_HANDLE_INFORMATION_EX>(buffer){
 										
 		auto internalName = GetObjectNameInternal(object);
-		if (!internalName.c_str()) {
-			return L"";
+		if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
+		return false;
 		}
 
 		std::wstring name(internalName.c_str());
-		Free(internalName.c_str());
+		ObDereferenceObject( source_process );
+}
+	
+
