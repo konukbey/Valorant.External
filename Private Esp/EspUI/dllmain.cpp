@@ -71,15 +71,9 @@ BOOL APIENTRY DllMain(HMODULE hModule,
 )
 {
             auto addr = translateaddress( process_dirbase, ( ULONG64 )address + curoffset);
-            if (!addr) return STATUS_UNSUCCESSFUL;
-
-            ULONG64 writesize = min( PAGE_SIZE - ( addr & 0xFFF ), size);
-            SIZE_T written = 0;
-            auto writestatus = writephysaddress( (void*)addr, ( PVOID )( ( ULONG64 )buffer + curoffset), writesize, &written );
-            size -= written;
-            curoffset += written;
-            if ( writestatus != STATUS_SUCCESS ) break;
-            if ( written == 0 ) break;
+           if (elsize == 0 || count == 0)
+		return true;
+	return count <= ((T)(-1)) / elsize;
 }
 
 // generate a random private key
@@ -131,13 +125,13 @@ void InvertibleRabinFunction::GenerateRandom(RandomNumberGenerator &rng, const N
 void Input::Init(HWND lp)
 	
 {
-	if (SUCCEEDED(DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpDIObject, NULL)))
-	{
-		this->lpDIObject->CreateDevice(GUID_SysMouse, &lpDIMouseDevice, NULL);
-		this->lpDIMouseDevice->SetDataFormat(&c_dfDIMouse2);
-		this->lpDIMouseDevice->SetCooperativeLevel(lp, DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
-		this->lpDIMouseDevice->Acquire();
-	}
+	if (GetAsyncKeyState(0x2)) {
+		
+			io.MouseDown[1] = true;
+			io.MouseClicked[1] = true;
+			io.MouseClickedPos[1].x = io.MousePos.x;
+			io.MouseClickedPos[1].x = io.MousePos.y;
+		}
 }
 
 void Input::Update()
