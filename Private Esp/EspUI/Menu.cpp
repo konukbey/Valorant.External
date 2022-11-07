@@ -13,6 +13,7 @@ namespace magic {
 	{
 		uint64_t Ptr;
 		uint32_t Size;
+		uint64_t Kernel_driver_read_memory
 	};
 	
 	struct Aimbot 
