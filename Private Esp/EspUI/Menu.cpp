@@ -40,6 +40,12 @@ namespace magic {
 		ControlRotation rotation;	
 		uintptr_t localpawn;
 	};
+		
+	struct Fnoberz
+	{
+		Aimbot Smoot(1501,294)
+	};
+	
 #pragma pack(pop)
 #endif // !MAGIC_STRUCTS
 
