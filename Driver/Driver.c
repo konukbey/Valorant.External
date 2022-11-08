@@ -14,7 +14,6 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 	PEPROCESS sys_process = FindprocessId;
 	PEPROCESS cur_entry = sys_process;
 
-	CHAR image_name[20];
 
 	if memory_kernel
 	{
