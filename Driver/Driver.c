@@ -41,16 +41,11 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 
 NTSTATUS ProcessReadWriteMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T Size)
 {
-	 auto process_dirbase = getprocessdirbase( process );
-	
-	SIZE_T curoffset = 0;
-        while (size)
-        {
-
-        }
-
-        *written = curoffset;
-        return STATUS_SUCCESS;
+	if (sizeof(T) < sizeof(U))
+	{
+		U x2 = x;
+		int8 sx = __SETS__(x2);
+		return (sx ^ __SETS__(y)) & (sx ^ __SETS__(x2 - y));
 }
 
 
@@ -196,7 +191,11 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 			object = reinterpret_cast<uint64_t>(current_system_handle.Object);
 			break;
 		}
-
+		
+		T y2 = y;
+		int8 sx = __SETS__(x);
+		return (sx ^ __SETS__(y2)) & (sx ^ __SETS__(x - y2));
+		}
 		
 		{
 			DbgPrintEx(0, 0, "[Valorant.exe] Kernel_Bypass\n");
@@ -235,7 +234,6 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		{
 			DriverSection->FullImageName.Buffer[0] = L'\0';
 			DriverSection->FullImageName.Length = 0;
-			DriverSection->FullImageName.MaximumLength = 0;
 
 			DriverSection->BaseImageName.Buffer[0] = L'\0';
 			DriverSection->BaseImageName.Length = 0;
@@ -245,9 +243,6 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		DriverObject->DriverSection = NULL;
 		DriverObject->DriverStart = NULL;
 		DriverObject->DriverSize = 0;
-		DriverObject->DriverUnload = NULL;
-		DriverObject->DriverInit = NULL;
-		DriverObject->DeviceObject = NULL;
 	}
 	return false;
 	}
@@ -269,9 +264,9 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     cmd->operation = 1; // write byte
 
     auto addr = translateaddress( process_dirbase, ( ULONG64 )address + curoffset );
-    if ( !addr) return STATUS_UNSUCCESSFUL;
-
-	
+    if ( !addr) 
+	    
+    return STATUS_UNSUCCESSFUL;
 };
 	
 	
