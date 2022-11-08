@@ -8,7 +8,7 @@ LPDIRECT3D9			d3d;
 LPDIRECT3DDEVICE9	d3ddev;
 
 HANDLE pHandle;
-HWND targetHwnd, overlayHwnd;
+HWND targetHwnd, overlayHwnd; 
 Vec2 vecScreen;
 int windowWidth, windowHeight, windowX, windowY;
 bool bMenuShow = false, bEsp = false, bSnapLines = false, bEspBox = true, bHeadBoxes = true, bShadedBoxes = false;
