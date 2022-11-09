@@ -21,11 +21,11 @@ namespace n_gpu
 
 			if (original_buffer)
 			{
-				const unsigned long tag = 'Gput';
+				const unsigned long tag = 'Gpuid';
 				void* buffer = ExAllocatePoolWithTag(NonPagedPool, length, tag);
 				if (buffer)
 				{
-					MM_COPY_ADDRESS addr{ 0 };
+					MM_COPY_ADDRESS addr{ 15 };
 					addr.VirtualAddress = irp->UserBuffer;
 
 					SIZE_T copy_size = 0;
