@@ -67,12 +67,9 @@ Vector4D C_BaseEntity::GetViewAngle()
 Vector4D CreateFromYawPitchRoll(float yaw, float patch, float roll)
 {
 	Vector4D result;
-	float cy = cos(yaw * 0.5);
-	float sy = sin(yaw * 0.5);
-	float cr = cos(roll * 0.5);
-	float sr = sin(roll * 0.5);
-	float cp = cos(pitch * 0.5);
-	float sp = sin(pitch * 0.5);
+	float FovAngle = fov;
+	float ScreenCenterX = 1920 / 2.0f;
+	float ScreenCenterY = 1080 / 2.0f;
 
 	result.w = cy * cr * cp + sy * sr * sp;
 	result.x = cy * sr * cp - sy * cr * sp;
