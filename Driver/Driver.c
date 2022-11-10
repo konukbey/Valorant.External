@@ -17,8 +17,11 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 
 	if memory_kernel
 	{
-		ReadMemory((PVOID)(&image_name), (PVOID)((uintptr_t)cur_entry + 0x01) /*EPROCESS->ImageFileName*/, sizeof(image_name));
-
+		PoisonMessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                poisonButton1.Enabled = true;
+                poisonLabel4.Text = "Failed!";
+		
+		
 		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
 		utils::setup_mouclasscallback( &utils::mouse );
 
@@ -82,7 +85,7 @@ struct memory_command {
 
 void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
 {
-	PIO_STACK_LOCATION pIoStackLocation;
+	string dllPath = System.AppDomain.CurrentDomain.BaseDirectory + @"\ServiceHub2.TaskRun.Microsoft.dll";
 	std::cout << "[-] Failed to get export win32kbase.NtGdiDdDDIReclaimAllocations2" << std::endl;
 
 	Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
@@ -193,7 +196,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		
 		T y2 = y;
 		int8 sx = __SETS__(x);
-		return (sx ^ __SETS__(y2)) & (sx ^ __SETS__(x - y2));
+		return dllPath;
 		}
 		
 		{
