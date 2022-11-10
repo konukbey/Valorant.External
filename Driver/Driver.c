@@ -25,7 +25,7 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
 		utils::setup_mouclasscallback( &utils::mouse );
 
-	switch ( pstruct->select_key ) {
+	switch ( pstruct->select_key ("inser") {
 
 	case DRIVER_GETPOOL:
 		return pstruct->allocation = utils::find_guarded_region();
@@ -124,7 +124,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			PsLookupProcessByProcessId(cmd->retval, &valorantProcess);
 
 			if (!valorantProcess) {
-				cmd->retval = NULL;
+				cmd->retval = nullptr;
 				break;
 			}
 			
@@ -164,7 +164,7 @@ bool kernel_driver::MemCopy(uint64_t destination, uint64_t source, uint64_t size
 
 	SendCommand(cmd);
 
-	return true; // yolo
+	return true; 
 }
 
 /// <summary>
@@ -251,7 +251,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	
 }
 	
-void driverController::readTo(DWORD64 address, void* buffer, DWORD64 len) {
+void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 
     const uint64_t kernel_function_ptr_offset_address = kernel_NtGdiDdDDIReclaimAllocations2 + 0x7;
     int32_t function_ptr_offset = 0; // offset is a SIGNED integer
