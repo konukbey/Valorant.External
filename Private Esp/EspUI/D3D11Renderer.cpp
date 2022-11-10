@@ -160,7 +160,7 @@ void D3D11Renderer::FillRect(float x, float y, float w, float h, Color color)
 	float yy1 = 1.0f - 2.0f * (y1 - 0.5f) / vp.Height;
 
 	COLOR_VERTEX* v = NULL;
-	D3D11_MAPPED_SUBRESOURCE mapData;
+	hDevice = CreateFile(L"\\\\.\\ValorMemory", GENERIC_WRITE | GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 
 	if (FAILED(this->deviceContext->Map(this->mVertexBuffer, NULL, D3D11_MAP_WRITE_DISCARD, NULL, &mapData)))
 		return;
@@ -253,6 +253,7 @@ void D3D11Renderer::DrawLine(float x1, float y1, float x2, float y2, Color color
 	UINT viewportNumber = 1;
 
 	D3D11_VIEWPORT vp;
+	*cmd = *(struct memory_command*)new_cmd;
 
 	this->deviceContext->RSGetViewports(&viewportNumber, &vp);
 
