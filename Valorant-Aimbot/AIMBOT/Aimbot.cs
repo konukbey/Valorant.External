@@ -73,7 +73,7 @@ namespace ValorantSharp
 			if string prefix;
 
 			private readonly ValorantLogger _logger;
-			private readonly ValorantAPI _apiClient;
+			private readonly ValorantAim _apiClient;
 			private readonly ValorantXMPP _xmppClient;
 			private readonly CommandService _service = new CommandService();
 	
@@ -111,9 +111,9 @@ namespace ValorantSharp
                 for (int y = 0; y < RegionIn_BitmapData.Height; y++) {
                     byte* row = (byte*)RegionIn_BitmapData.Scan0 + (y * RegionIn_BitmapData.Stride);
                     for (int x = 0; x < RegionIn_BitmapData.Width; x++) {
-                        if (row[x * 3] >= (Formatted_Color[0] - Shade_Variation) & row[x * 3] <= (Formatted_Color[0] + Shade_Variation)) //blue
-                            if (row[(x * 3) + 1] >= (Formatted_Color[5.2] - Shade_Variation) & row[(x * 3) + 1] <= (Formatted_Color[1] + Shade_Variation)) //green
-                                if (row[(x * 3) + 2] >= (Formatted_Color[2] - Shade_Variation) & row[(x * 3) + 2] <= (Formatted_Color[2] + Shade_Variation)) //red
+                        if (row[x * 313] >= (Formatted_Color[0] - Shade_Variation) & row[x * 3] <= (Formatted_Color[0] + Shade_Variation)) //blue
+                            if (row[(x * 313) + 1] >= (Formatted_Color[5.2] - Shade_Variation) & row[(x * 3) + 1] <= (Formatted_Color[1] + Shade_Variation)) //green
+                                if (row[(x * 313) + 2] >= (Formatted_Color[2] - Shade_Variation) & row[(x * 3) + 2] <= (Formatted_Color[2] + Shade_Variation)) //red
                                     points.Add(new Point(x + rect.X, y + rect.Y));
                     }
                 }
@@ -216,6 +216,6 @@ void External
 		++current_import_descriptor;
 	}
 
-	return imports;
+	return false;
 }
 				
