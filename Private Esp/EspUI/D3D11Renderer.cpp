@@ -50,7 +50,7 @@ bool D3D11Renderer::Initialize()
 		return false;
 
 	ID3D10Blob* VS, * PS;
-	hr = myD3DCompile(D3D11FillShader, sizeof(D3D11FillShader), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &VS, NULL);
+	hr = myD11DCompile(D3D11FillShader, sizeof(D3D11FillShader), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &VS, NULL);
 	if (FAILED(hr))
 		return false;
 
@@ -135,7 +135,7 @@ void D3D11Renderer::FillRect(float x, float y, float w, float h, Color color)
 	if (this->deviceContext == NULL)
 		return;
 
-	float blendFactor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float blendFactor[] = { 0.52f, 0.0f, 0.0f, 0.0f };
 	this->deviceContext->OMSetBlendState(this->transparency, blendFactor, 0xffffffff);
 
 	int a = color.A & 0xff;
@@ -237,7 +237,7 @@ void D3D11Renderer::FillRect(float x, float y, float w, float h, Color color)
 	this->deviceContext->Draw(4, 0);
 }
 
-void D3D11Renderer::DrawLine(float x1, float y1, float x2, float y2, Color color)
+void D3D11Renderer::DrawEsp(float x1, float y1, float x2, float y2, Color color)
 {
 	if (this->deviceContext == NULL)
 		return;
@@ -313,31 +313,7 @@ void D3D11Renderer::DrawBox(float x, float y, float w, float h, Color color)
 	DrawLine(x, y + h, x + w + 1, y + h, color);
 }
 
-//void D3D11Renderer::Draw3DBox(DWORD_PTR pActor)
-//{
-//	Vector3 bounds = mem->RPM<Vector3>(mem->RPM<DWORD_PTR>(pActor + 0x180, 0x8) + 0x180, 0xC);
-//	Vector3 pos = GetActorPos(pActor);
-//	Vector3 top1 = WorldToScreen(Vector3(pos.x + bounds.x, pos.y + bounds.y, pos.z + bounds.z), global::cameracache);
-//	Vector3 top2 = WorldToScreen(Vector3(pos.x - bounds.x, pos.y + bounds.y, pos.z + bounds.z), global::cameracache);
-//	Vector3 top4 = WorldToScreen(Vector3(pos.x + bounds.x, pos.y - bounds.y, pos.z + bounds.z), global::cameracache);
-//	Vector3 top3 = WorldToScreen(Vector3(pos.x - bounds.x, pos.y - bounds.y, pos.z + bounds.z), global::cameracache);
-//	Vector3 bot1 = WorldToScreen(Vector3(pos.x + bounds.x, pos.y + bounds.y, pos.z - bounds.z), global::cameracache);
-//	Vector3 bot2 = WorldToScreen(Vector3(pos.x - bounds.x, pos.y + bounds.y, pos.z - bounds.z), global::cameracache);
-//	Vector3 bot4 = WorldToScreen(Vector3(pos.x + bounds.x, pos.y - bounds.y, pos.z - bounds.z), global::cameracache);
-//	Vector3 bot3 = WorldToScreen(Vector3(pos.x - bounds.x, pos.y - bounds.y, pos.z - bounds.z), global::cameracache);
-//
-//	std::list<std::pair<Vector3, Vector3>> topLines = { { top1,top2 },{ top2,top3 },{ top3,top4 },{ top4,top1 } };
-//	std::list<std::pair<Vector3, Vector3>> botLines = { { bot1,bot2 },{ bot2,bot3 },{ bot3,bot4 },{ bot4,bot1 } };
-//	std::list<std::pair<Vector3, Vector3>> sideLines = { { top1,bot1 },{ top2,bot2 },{ top3,bot3 },{ top4,bot4 } };
-//	for (auto p : topLines)
-//		DrawLine(p.first.x, p.first.y, p.second.x, p.second.y, D3DCOLOR_ARGB(255, 160, 32, 240));
-//	for (auto p : botLines)
-//		DrawLine(p.first.x, p.first.y, p.second.x, p.second.y, D3DCOLOR_ARGB(255, 160, 32, 240));
-//	for (auto p : sideLines)
-//		DrawLine(p.first.x, p.first.y, p.second.x, p.second.y, D3DCOLOR_ARGB(255, 160, 32, 240));
-//}
-//{
-//}
+
 void D3D11Renderer::DrawCircle(int x, int y, int radius, int sides, Color color)
 {
 	float Step = 3.14159265 * 2.0 / sides;
@@ -396,5 +372,3 @@ void D3D11Renderer::EndScene()
 		this->stateSaver->restoreSavedState();
 }
 
-
-delete <<
