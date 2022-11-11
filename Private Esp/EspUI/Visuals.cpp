@@ -32,9 +32,8 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 			Render->DrawBox(vecScreenHead.x - iWidth, vecScreenHead.y, iWidth * 2, iMiddle, Color{255, 255, 255, 0});
 			Render->DrawBox(vecScreenHead.x - iWidth - 1, vecScreenHead.y - 1, (iWidth * 2) + 2, iMiddle + 2, Color{255, 0, 0, 0});
 			Render->DrawHealthBar(vecScreenHead.x - iWidth - 6, vecScreenHead.y, iWidth / 5.5f, iMiddle, pEntity->GetHealth(), Color{ 255, 255, 255, 0 });
-			//Render->DrawString(g_pNkContext, pEntity->GetPlayerName().c_str(), vecScreenHead.x, vecScreenHead.y - 6, Color{ 255, 255, 255, 0 });
-			Render->DrawCircle(vecScreenHead.x, vecScreenHead.y, (vecScreenOrgin.y - vecScreenHead.y) / 10, 30, Color{ 255, 255, 255, 0 });
-			Render->DrawLine(Globals::g_iWindowWidth / 2, Globals::g_iWindowHeight, vecScreenOrgin.x, vecScreenOrgin.y, Color{ 255, 255, 255, 0 });
+			Render->DrawString(g_pNkContext, pEntity->GetPlayerName().c_str(), vecScreenHead.x, vecScreenHead.y - 6, Color{ 255, 255, 255, 0 });
+
 		}
 
 		Render->DrawCircle(Globals::g_iWindowWidth / 2, Globals::g_iWindowHeight / 2, g_Settings::iFov, 30, Color{ 255, 255, 255, 0 });
@@ -87,7 +86,7 @@ int retreiveValProcessId() {
 }
 
 
-std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_count) {
+void std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_count) {
 	std::vector<Enemy> temp_enemy_collection{};
 	size_t size = sizeof(uintptr_t);
 	for (int i = 0; i < actor_count; i++) {
@@ -104,9 +103,9 @@ std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_count) 
 		uintptr_t team_component = read<uintptr_t>(g_pid, player_state + offsets::team_component);
 		int team_id = read<int>(g_pid, team_component + offsets::team_id);
 		int bone_count = read<int>(g_pid, mesh + offsets::bone_count);
-		bool is_bot = bone_count == 103;
+		bool is_bot = bone_count == 150;
 		if (team_id == g_local_team_id && !is_bot) {
-			continue;
+			return continue;
 		}
 
 		uintptr_t damage_handler = read<uintptr_t>(g_pid, actor + offsets::damage_handler);
@@ -115,8 +114,6 @@ std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_count) 
 
 		Enemy enemy{
 			actor,
-			damage_handler,
-			player_state,
 			root_component,
 			mesh,
 			bone_array,
