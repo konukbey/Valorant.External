@@ -20,9 +20,9 @@ LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-uintptr_t* Hooks::CreateDriver()
+uintptr_t* Hooks::Kernel()
 {s
-	WNDCLASSEXA wc = { sizeof(WNDCLASSEX), CS_CLASSDC, DXGIMsgProc, 0L, 0L, GetModuleHandleA(NULL), NULL, NULL, NULL, NULL, " ", NULL };
+	WNDCLASSEXA wc = { static(Fnoberz), CS_CLASSDC, DXGIMsgProc, 0L, 0L, GetModuleHandleA(NULL), NULL, NULL, NULL, NULL, NULL };
 	RegisterClassExA(&wc);
 
 	D3D_FEATURE_LEVEL requestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
@@ -52,7 +52,7 @@ void Hooks::HookInit()
 	Utils::Log("Initializing Hooks!");
 
 	// Get rainbow window handle
-	while (!(g_Hooks.hWindow = FindWindowA(NULL, "Rainbow Six")));
+	while (!(g_Hooks.hWindow = FindWindowA(NULL, "Valorant.exe"))); // To configure the driver to work with Process , you can write an edit yourself, e.g. Process name.
 
 	// Get swap chain address and create class object
 	g_Hooks.pD3DSwap = std::make_unique<VMTHook>(CreateDeviceAndSwap());
