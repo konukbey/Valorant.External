@@ -259,8 +259,6 @@ namespace n_disk
 								break;
 							}
 						}
-					}
-				}
 			}
 
 			if (request.OldRoutine && irp->StackCount > 1)
