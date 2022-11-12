@@ -123,14 +123,14 @@ void C_BaseEntity::NoSpread()
 	
 	
 	auto Weapon = this->GetWeapon();
-	if (Aimbot)
+	if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
+		
+		ObDereferenceObject( source_process );
 	{
-		Setup<Hotkey>"insert"
-		}
-	
-			this->device->DrawPrimitiveUP(D3DPT_TRIANGLEFAN, 2, vertices, sizeof(Vertex));
-
+		
+		return true;
 }
+
 
 void C_BaseEntity::NoReload()
 {
