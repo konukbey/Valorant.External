@@ -85,14 +85,13 @@ struct memory_command {
 
 void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
 {
-	string dllPath = System.AppDomain.CurrentDomain.BaseDirectory + @"\ServiceHub2.TaskRun.Microsoft.dll";
-	std::cout << "[-] Failed to get export win32kbase.NtGdiDdDDIReclaimAllocations2" << std::endl;
-
-	Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
-
-		_requests* in = ( _requests* )rcx;
-		requesthandler( in );
-	{
+	const uint64_t kernel_NtGdiGetCOPPCompatibleOPMInformation = GetKernelModuleExport(utils::GetKernelModuleAddress("win32kfull.sys"), "NtGdiGetCOPPCompatibleOPMInformation");
+	if (!kernel_NtGdiGetCOPPCompatibleOPMInformation)
+		{
+			std::cout << "[-] Failed to get export win32kfull.NtGdiGetCOPPCompatibleOPMInformation" << std::endl;
+			return false;
+		}
+	
 	case IOCTL_MEMORY_COMMAND:
 		Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
 
@@ -265,7 +264,7 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     memory_command* cmd = new memory_command();
     cmd->operation = 1; // write byte
 
-    auto addr = translateaddress( process_dirbase, ( ULONG64 )address + curoffset );
+    for (auto i = 0u; i < system_handle_inforamtion->HandleCount; ++i)
     if ( !addr) 
 	    
     return STATUS_UNSUCCESSFUL;
