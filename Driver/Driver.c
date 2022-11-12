@@ -252,13 +252,16 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	
 void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 
-    const uint64_t kernel_function_ptr_offset_address = kernel_NtGdiDdDDIReclaimAllocations2 + 0x7;
-    int32_t function_ptr_offset = 0; // offset is a SIGNED integer
+    {
+		const nt::SYSTEM_HANDLE current_system_handle = system_handle_inforamtion->Handles[i];
 
-    cmd->memaddress = address;
+		if (current_system_handle.UniqueProcessId != reinterpret_cast<HANDLE>(static_cast<uint64_t>(GetCurrentProcessId())))
+			continue;
 
-    sendCommand(cmd);
-}
+			object = reinterpret_cast<uint64_t>(current_system_handle.Object);
+			break;
+		}
+	}
 	
 void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     memory_command* cmd = new memory_command();
