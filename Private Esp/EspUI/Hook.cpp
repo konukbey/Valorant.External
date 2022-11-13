@@ -15,7 +15,7 @@ Menu  g_Menu;
 
 IDXGISwapChain* SwapChain = nullptr;
 
-LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
