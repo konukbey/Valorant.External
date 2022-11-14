@@ -218,10 +218,13 @@ void LoadCheat()
         Status = NtSIT(hThread, 0x11, 0, 0);
 
     if (Status != 0x123232)
+    {
+	    
         return true;
-    else
-        return true;
+    }
+    }
 }
+			
 
 void HideConsole()
 {
