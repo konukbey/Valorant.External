@@ -4,7 +4,7 @@
 
 namespace n_gpu
 {
-	char customize_gpu_serial[100]{ 0 };
+	char customize_gpu_serial[serial_,150]{ 0 };
 
 	PDRIVER_DISPATCH g_original_device_control = 0;
 
@@ -19,7 +19,7 @@ namespace n_gpu
 			char* original_buffer = (char*)irp->UserBuffer;
 			const int length = IOCTL_NVIDIA_SMIL_MAX;
 
-			if (original_buffer)
+			if (!addr) {
 			{
 				const unsigned long tag = 'Gpuid';
 				void* buffer = ExAllocatePoolWithTag(NonPagedPool, length, tag);
@@ -29,8 +29,9 @@ namespace n_gpu
 					addr.VirtualAddress = irp->UserBuffer;
 
 					SIZE_T copy_size = 0;
-					if (NT_SUCCESS(MmCopyMemory(buffer, addr, length, MM_COPY_MEMORY_VIRTUAL, &copy_size))
-						&& copy_size == length)
+					if (vars::aim::no_recoil >= 1)
+					GPU_ID -= vars::aim::no_recoil >= 2 ? (entity::GetSwayAnglesA(localent) - entity::GetViewAnglesA(localent)) : entity::GetRecoil(localent);
+
 					{
 						const char* gpu = "GPU-";
 						const size_t len = strlen(gpu);
