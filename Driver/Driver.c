@@ -9,7 +9,7 @@ namespace Kernel
 }
 
 
-NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") process, int range)
+NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
 {
 	PEPROCESS sys_process = FindprocessId;
 	PEPROCESS cur_entry = sys_process;
@@ -37,7 +37,7 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe") 
 		return move_mouse x,y,z ( pstruct ); // The position can be customized by yourself.
 	}
 
-	return true;
+	return false;
 
 // IOCTL handler for memory commands
 
@@ -45,9 +45,9 @@ NTSTATUS ProcessReadWriteMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PE
 {
 	if (sizeof(T) < sizeof(U))
 	{
-		U x2 = x;
+		U x2 = x; y; z;
 		int8 sx = __SETS__(x2);
-		return (sx ^ __SETS__(y)) & (sx ^ __SETS__(x2 - y));
+		return (sx ^ __SETS__(y)) & (sx ^ __SETS__(x2 - y)); 
 }
 
 
@@ -128,7 +128,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			cmd->retval = (DWORD64)PsGetProcessSectionBaseAddress(valorantProcess);
 
 			break;
-		case 62:
+		case 150:
 			// just crash windows idk
 			Unload(gDeviceObject);
 			break;
