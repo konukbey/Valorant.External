@@ -70,12 +70,10 @@ struct memory_command {
 	INT operation;
 
 	DWORD64 magic;
-	
 	DWORD64 retval;
-
 	DWORD64 memaddress;
-	
 	DWORD64 length;
+	
 	PVOID buffer;
 	{
 		return false;
@@ -147,7 +145,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 	return STATUS_SUCCESS;
 }
 
-bool kernel_driver::MemCopy(uint64_t destination, uint64_t source, uint64_t size)
+bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t size)
 {
 	MemoryCommand* cmd = new MemoryCommand();
 	cmd->operation = 0;
@@ -169,7 +167,7 @@ bool kernel_driver::MemCopy(uint64_t destination, uint64_t source, uint64_t size
 /// <summary>
 NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
-	DbgPrintEx(0, 0, "[Valorant.exe] Select " __FUNCTION__ ".\n");
+	DbgPrintEx(150, 65, "[Valorant.exe] Select " __FUNCTION__ ".\n");
 
 	NTSTATUS			Status;
 	UNICODE_STRING		DeviceName;
