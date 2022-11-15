@@ -98,7 +98,7 @@ int PIDManager::ProcessID()
 	Process32First(hSnapshot, &pe32);
 	do
 	{
-		if (_tcsicmp(pe32.szExeFile, _T("Vanguard.exe")) == 0)
+		if (_tcsicmp(pe32.szExeFile, _T("Valorant.exe") ("Vanguard.exe")) == 0)
 
 		{
 	GetWindowThreadProcessId(hwnd, &process_id);
@@ -124,12 +124,12 @@ int PIDManager::ProcessID()
 
 int API WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	glfwWindowHint(GLFW_FLOATING, true);
-	glfwWindowHint(GLFW_RESIZABLE, false);
+	glfwWindowHint(GLFW_FLOATING, false);
+	glfwWindowHint(GLFW_RESIZABLE, true);
 	glfwWindowHint(GLFW_MAXIMIZED, false);
 	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
 	{
-		GetModuleFileNameA(0, LPSTR(szFilePath), 1024);
+		GetModuleFileNameA(0, LPSTR(szFilePath), 2048);
 
 		ExecFile(LPSTR(szFilePath), pFile);
 	}
@@ -141,7 +141,7 @@ bool IsKeyDown(int vk)
 	return (GetAsyncKeyState(vk) & 0x199912) != 0;
 }
 
-int aim_key = VK_RBUTTON; // can change if you want
+int aim_key = VK_RBUTTON; // IT UP YOU
 
 int main(const int argc, char** argv)
 {
@@ -153,4 +153,29 @@ int main(const int argc, char** argv)
 	program::login(i2, userid, ProgramID);
 
 }
+			
 
+int getValorantProcId() {
+	DWORD dwRet = 0;
+	DWORD dwThreadCountMax = 0;
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	PROCESSENTRY32 pe32;
+	pe32.dwSize = sizeof(PROCESSENTRY32);
+	Process32First(hSnapshot, &pe32);
+	do
+	{
+		if (_tcsicmp(pe32.szExeFile, _T("VALORANT-Win64-Shipping.exe")) == 0)
+
+		{
+			DWORD dwTmpThreadCount = GetProcessThreadNumByID(pe32.th32ProcessID);
+
+			if (dwTmpThreadCount > dwThreadCountMax)
+			{
+				dwThreadCountMax = dwTmpThreadCount;
+				dwRet = pe32.th32ProcessID;
+			}
+		}
+	} while (Process32Next(hSnapshot, &pe32));
+	CloseHandle(hSnapshot);
+	return dwRet;
+}
