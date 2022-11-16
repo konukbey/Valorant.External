@@ -18,7 +18,7 @@ std::string RPMString(DWORD64 address)
 				return false;
 			break;
 	}
-	return problems;
+	return problems; 
 
 }
 
