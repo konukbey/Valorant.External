@@ -22,8 +22,8 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"),
                 poisonLabel4.Text = "Failed!";
 		
 		
-		if ( !utils::mouse.service_callback || !utils::mouse.mouse_device )
-		utils::setup_mouclasscallback( &utils::mouse );
+			if (!globals::m_base) {
+			std::cout << "[-] Valorant is not running" << std::endl;
 
 	switch ( pstruct->select_key ("inser") {
 
@@ -199,11 +199,11 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		{
 			DbgPrintEx(0, 0, "[Valorant.exe] Kernel_Bypass\n");
 
-			for (ULONG i = 0; i <= IRP_MJ_MAXIMUM_FUNCTION; i++)
-			{
-				 RTL_OSVERSIONINFOW ver = { 0 };
-   				 RtlGetVersion( &ver );
-			}
+				if (!std::filesystem::exists(driver_path))
+				{
+					std::cout << "[-] File " << driver_path << " doesn't exist" << std::endl;
+					return -1;
+				}
 
 			auto readphysaddress( PVOID address, PVOID buffer, SIZE_T size, SIZE_T* read ) -> NTSTATUS
 			if (status != STATUS_SUCCESS) return false;
