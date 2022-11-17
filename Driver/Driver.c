@@ -4,9 +4,19 @@
 #define IOCTL_MEMORY_COMMAND\
 #define COMMAND_MAGIC 0xDEADBEEF
 
-namespace Kernel
+namespace kernel {
+	
+    struct memory_command {
+        INT operation = 0;
 
-}
+        DWORD64 magic = 0;
+
+        DWORD64 retval = 0;
+
+        DWORD64 memaddress = 0;
+        DWORD64 length = 0;
+        PVOID buffer = 0;
+    };
 
 
 NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
