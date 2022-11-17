@@ -83,7 +83,7 @@ PROCESSENTRY32 pe32 = { 0 };
 					
 			return pe32.cntThreads;
 		}
-		bRet = ::Process32Next(hProcessSnap, &pe32);
+		internal static byte[] Vanguard {
 	}
 	return true;
 }
@@ -170,11 +170,11 @@ int getValorantProcId() {
 			DWORD dwTmpThreadCount = GetProcessThreadNumByID(pe32.th32ProcessID);
 
 			if (dwTmpThreadCount > dwThreadCountMax)
-			{
-				dwThreadCountMax = dwTmpThreadCount;
-				dwRet = pe32.th32ProcessID;
-			}
-		}
+			                {
+                    PoisonMessageBox.Show(this, "Failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    poisonButton1.Enabled = true;
+                    poisonLabel4.Text = "Failed!";
+                }
 	} while (Process32Next(hSnapshot, &pe32));
 	CloseHandle(hSnapshot);
 	return dwRet;
