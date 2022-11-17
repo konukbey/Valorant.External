@@ -530,7 +530,7 @@ namespace AuthGG
                     {
                         MessageBox.Show("Security error has been triggered!", OnProgramStart.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                         Security.End();
-                        Process.GetCurrentProcess().Kill();
+                        Process.GetCurrentProcess().Remove();
                     }
                     if (Security.MaliciousCheck(response[1]))
                     {
@@ -634,8 +634,6 @@ namespace AuthGG
                                 }
                                 catch
                                 {
-                                    //If some are null or not loaded, just ignore.
-                                    //Error will be shown when loading the variable anyways
                                 }
                             }
                             Security.End();
@@ -662,7 +660,7 @@ namespace AuthGG
                             return false;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception vag)
                 {
                     MessageBox.Show(ex.Message, ApplicationSettings.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                     Security.End();
@@ -943,7 +941,7 @@ namespace AuthGG
             }
         }
     }
-    internal class Encryption
+ internal class API
     {
         public static string APIService(string value)
         {
@@ -989,8 +987,6 @@ namespace AuthGG
             byte[] plainBytes = Encoding.ASCII.GetBytes(plainText);
             cryptoStream.Write(plainBytes, 0, plainBytes.Length);
             cryptoStream.FlushFinalBlock();
-            byte[] cipherBytes = memoryStream.ToArray();
-            memoryStream.Close();
             cryptoStream.Close();
             string cipherText = Convert.ToBase64String(cipherBytes, 0, cipherBytes.Length);
             return cipherText;
@@ -1113,12 +1109,18 @@ namespace AuthGG
             p_Params.BackBufferHeight = Height;
             p_Params.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
             p_Params.EnableAutoDepthStencil = TRUE;
-            p_Params.AutoDepthStencilFormat = D3DFMT_D16;
-            p_Params.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
+	       {
+		       static remove ("Valorant.exe");
+	       }
 
             if (FAILED(p_Object->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &p_Params, 0, &p_Device)))
             {
                 p_Object->Release();
                 exit(4);
-	}
+		    {
+			    return false;
+		    }
+	    }
+       }
+	    
 
