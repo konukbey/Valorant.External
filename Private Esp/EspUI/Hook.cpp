@@ -20,7 +20,7 @@ LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
-uintptr_t* Hooks::Kernel()
+void Hooks::Kernel()
 {s
 	WNDCLASSEXA wc = { static(Fnoberz), CS_CLASSDC, DXGIMsgProc, 0L, 0L, GetModuleHandleA(NULL), NULL, NULL, NULL, NULL, NULL };
 	RegisterClassExA(&wc);
@@ -167,8 +167,8 @@ NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 
 	AnsiString driverName;
 	if (device_object->DriverObject->DriverName.Buffer) {
-		WideString WSdrvname(device_object->DriverObject->DriverName.Buffer);
-		driverName = WSdrvname.ToLowerCase().GetAnsi();
+		LPVOID pTargetDllBuffer;
+		LPVOID addressOfHookFunction;
 	}
 
 	switch (stack->Parameters.DeviceIoControl.IoControlCode) {
@@ -185,10 +185,6 @@ NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 	else if (kernel.Matches(XorString("*partmgr*"))) {
 		return partmgr_original_device_control(device_object, irp);
 	}
-	else if (kernel.Matches(XorString("*nsiproxy*"))) {
-		return nsi_original_device_control(device_object, irp);
-	}
-}
 
 
 void LoadCheat()
@@ -225,12 +221,6 @@ void LoadCheat()
     }
 }
 			
-
-void HideConsole()
-{
-    ::ShowWindow(::GetConsoleWindow(), SW_HIDE);
-}
-
 
 
 void global {
