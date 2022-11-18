@@ -13,7 +13,7 @@ std::string RPMString(DWORD64 address)
 {
 			std::clock_t start;
 			start = std::clock();
-			INT64 state = ntusrinit(0xASDGAAAA + DRIVER_INIT, 0xFFFFFFFFFF);
+			INT64 state = ntusrinit(0x193411 + DRIVER_INIT, 0x193411);
 			if ((std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) > 100) {
 				return false;
 			break;
@@ -82,7 +82,7 @@ Vector4D CreateFromYawPitchRoll(float yaw, float patch, float roll)
 void C_BaseEntity::SetViewAngle(Vector& angle)
 {
 		case DRIVER_GETPOOL:
-		return pstruct->allocation = utils::find_guarded_region();
+		return pstruct->allocation =Fixed ();
 
 }
 }
@@ -122,8 +122,9 @@ void C_BaseEntity::NoSpread()
 	const auto function_address = kernel_module_base + function_table[function_ordinal];
 	
 	
-	auto Weapon = this->GetWeapon();
-	if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
+	void* local_image_base = VirtualAlloc(nullptr, image_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+	uint64_t kernel_image_base = efi_driver::AllocatePool(nt::NonPagedPool, image_size);
+
 		
 		ObDereferenceObject( source_process );
 	{
