@@ -217,8 +217,10 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 
 			auto readphysaddress( PVOID address, PVOID buffer, SIZE_T size, SIZE_T* read ) -> NTSTATUS
 			if (status != STATUS_SUCCESS) return false;
-
-			size_t memsize = 0;
+			
+			Vector2 head_at_screen_vec = worldToScreen(head_position, camera_position, camera_rotation, camera_fov);
+			ImVec2 head_at_screen = ImVec2(head_at_screen_vec.x, head_at_screen_vec.y);
+			
 
 				if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
 				return false;
@@ -242,9 +244,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		if (DriverSection)
 		{
 			DriverSection->FullImageName.Buffer[0] = L'\0';
-			DriverSection->FullImageName.Length = 0;
-
-			DriverSection->BaseImageName.Buffer[0] = L'\0';
+			
 			DriverSection->BaseImageName.Length = 0;
 			DriverSection->BaseImageName.MaximumLength = 0;
 		}
