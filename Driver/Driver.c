@@ -147,10 +147,15 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 		return;
 	}
 
-	// Finish the I/O operation by simply completing the packet and returning
-	// the same status as in the packet itself.
-	Irp->IoStatus.Information = sizeof(struct memory_command);
-	IoCompleteRequest(Irp, IO_NO_INCREMENT);
+		if (g_esp_dormantcheck) {
+			float last_render_time = read<float>(g_pid, enemy.mesh_ptr + offsets::last_render_time);
+			float last_submit_time = read<float>(g_pid, enemy.mesh_ptr + offsets::last_submit_time);
+			bool is_visible = last_render_time + 0.06F >= last_submit_time;
+			bool dormant = read<bool>(g_pid, enemy.actor_ptr + offsets::dormant);
+			if (!dormant || !is_visible) {
+				continue;
+			}
+		}
 
 	return STATUS_SUCCESS;
 }
@@ -241,9 +246,9 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	{
 		static PKLDR_DATA_TABLE_ENTRY DriverSection = DriverObject->DriverSection;
 
-		if (DriverSection)
-		{
-			DriverSection->FullImageName.Buffer[0] = L'\0';
+
+		if (g_boneesp) {
+			renderBones(enemy, camera_position, camera_rotation, camera_fov);
 			
 			DriverSection->BaseImageName.Length = 0;
 			DriverSection->BaseImageName.MaximumLength = 0;
