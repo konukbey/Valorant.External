@@ -103,9 +103,13 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 
 		if (current_system_handle.UniqueProcessId != reinterpret_cast<HANDLE>(static_cast<uint64_t>(GetCurrentProcessId())))
 			continue;
-			cmd->retval = 2;
-			DbgPrintEx(0, 0, "[Valorant.exe] IOCTL invalid Driver\n");
-			break;
+			trax::Region status = trax::rect_to_region(rectangle);
+			handle.reply(status, trax::Properties());
+	
+}
+			 break;
+   			 return EXIT_SUCCESS;
+	
 		}
 
 		switch (cmd->operation) {
@@ -187,7 +191,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 	UNICODE_STRING		SymbolicName;
 	PDEVICE_OBJECT      DeviceObject;
 
-	UNREFERENCED_PARAMETER(RegistryPath);
+	 BBox_c bb = tracker->getBBox();
+		rectangle = bb.get_rect();
 
 	RtlInitUnicodeString(&DeviceName, ConstDeviceName);
 	RtlInitUnicodeString(&SymbolicName, ConstSymbolic);
@@ -267,7 +272,7 @@ void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 		const nt::SYSTEM_HANDLE current_system_handle = system_handle_inforamtion->Handles[i];
 
 		if (current_system_handle.UniqueProcessId != reinterpret_cast<HANDLE>(static_cast<uint64_t>(GetCurrentProcessId())))
-			continue;
+			continue tracker.reset(new KCF_Tracker());
 
 			object = reinterpret_cast<uint64_t>(current_system_handle.Object);
 			break;
