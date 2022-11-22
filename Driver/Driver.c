@@ -35,8 +35,6 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"),
 			if (!globals::m_base) {
 			std::cout << "[-] Valorant is not running" << std::endl;
 
-	switch ( pstruct->select_key ("inser") {
-
 	case DRIVER_GETPOOL:
 		return pstruct->allocation = utils::find_guarded_region();
 
