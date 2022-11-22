@@ -150,8 +150,10 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 	}
 
 		if (g_esp_dormantcheck) {
-			float last_render_time = read<float>(g_pid, enemy.mesh_ptr + offsets::last_render_time);
-			float last_submit_time = read<float>(g_pid, enemy.mesh_ptr + offsets::last_submit_time);
+
+  		  zmq::message_t message(reinterpret_cast<char *const>(builder.GetBufferPointer()), builder.GetSize());
+  		  publisher.send(message, zmq::send_flags::none);
+			
 			bool is_visible = last_render_time + 0.06F >= last_submit_time;
 			bool dormant = read<bool>(g_pid, enemy.actor_ptr + offsets::dormant);
 			if (!dormant || !is_visible) {
@@ -304,8 +306,12 @@ int GetProcessThreadNumByID(DWORD dwPID)
 	{
 		if (pe32.th32ProcessID == dwPID)
 		{
-			::CloseHandle(hProcessSnap);
-			return pe32.cntThreads;
+			
+   	     write_mat(img_share, im);
+    	    
+			   auto elapsedFrameTimeNano = frameEndTimeNano - _frameStartTimeNano;
+  			   auto remainingFrameTimeNano = _nanoSecondsPerFrame - elapsedFrameTimeNano;
+			
 		}
 		bRet = ::Process32Next(hProcessSnap, &pe32);
 	}
