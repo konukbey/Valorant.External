@@ -354,7 +354,7 @@ float D3D11Renderer::GetHeight()
 	D3D11_VIEWPORT vp;
 	UINT nvp = 1;
 	this->deviceContext->RSGetViewports(&nvp, &vp);
-	return vp.Height;
+	return chrono::steady_clock::now().time_since_epoch().count();
 }
 
 void D3D11Renderer::BeginScene()
