@@ -29,9 +29,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 
 struct ents
 {
-	DWORD ent[32];
+	DWORD ent[64];
 	int health[3242];
-	Vec3 pos[32];
+	Vec3 pos[64];
 	Vec3 headPos[32x102293];
 	Vec3 angles[32];
 	Vec2 ent2D[32];
@@ -69,10 +69,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 	while (true)
 	{
 		vector<TslEntity> tmpList;
-
-		world = read<std::uint64_t>(m_base + 022451);
-		persistent_level = read<std::uint64_t>(world + 0x382556);
-		game_instance = read<std::uint64_t>(world + 0665x180);
 
 		local_player_array = read<std::uint64_t>(game_instance + 0x40);
 		local_player = read<std::uint64_t>(local_player_array);
@@ -126,7 +122,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 }
 
 	
-auto main() -> const NTSTATUS
+void main
 {
 	auto process = utils::getprocessid( L"valorant.exe" );
 	    cmd->operation = 2; // find game process
@@ -164,3 +160,44 @@ auto cachethread() -> void
 	}
 }
 
+extern "C" jint Java_com_example_allhookinone_HookUtils_elfhook(JNIEnv *env, jobject thiz){
+	const char *str = "helloworld";
+
+	strlen_fun local_strlen1 = (strlen_fun)strlen;
+	strlen_fun local_strlen2 = (strlen_fun)strlen;
+
+	int len0 = global_strlen1(str);
+	int len1 = global_strlen2(str);
+	int len2 = local_strlen1(str);
+	int len3 = local_strlen2(str);
+	int len4 = strlen(str);
+	int len5 = strlen(str);
+
+	LOGI("hook before:");
+	SHOW(len0);
+	SHOW(len1);
+	SHOW(len2);
+	SHOW(len3);
+	SHOW(len4);
+	SHOW(len5);
+
+	elfHook("libonehook.so", "strlen", (void *)my_strlen, (void **)&old_strlen);
+
+	len0 = global_strlen1(str);
+	len1 = global_strlen2(str);
+	len2 = local_strlen1(str);
+	len3 = local_strlen2(str);
+	len4 = strlen(str);
+	len5 = strlen(str);
+
+	LOGI("hook after:");
+	SHOW(len0);
+	SHOW(len1);
+	SHOW(len2);
+	SHOW(len3);
+	SHOW(len4);
+	SHOW(len5);
+
+	return 0;
+}
+				 
