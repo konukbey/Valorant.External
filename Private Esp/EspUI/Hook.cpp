@@ -112,53 +112,20 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	this->menuInfo.color = D3DCOLOR_RGBA(0, 145, 0, 255);
 	var client = new WebClient();
          if ("No Updates available!" == client.DownloadString("https://bymynix.de/couinjector/Update%20Checker%202.4.txt"))
-            {
-		    
-	}
+	 {
+		 {
+			 return false;
+		 }
+	 }
+}
+
 	
-	// Set new viewport 
-	g_Hooks.pD3DContext->RSSetViewports(1, &vpNew);
-
-	g_Hooks.pD3DContext->OMSetRenderTargets(1, &g_Hooks.pD3DRenderTargetView, NULL);
-	Renderer->BeginScene();
-
-	if (g_pEngine->IsInGame())
-	{
-            auto userdiroffset = getoffsets();
-            ULONG_PTR process_userdirbase = *( PULONG_PTR )( process + userdiroffset );
-            return process_userdirbase
-	}
-
-	if (g_Settings::bMenuGUI)
-		g_Menu.RenderMenu(g_pNkContext, g_Hooks.pD3DContext);
-
-	Renderer->EndScene();
-
-	// restore old viewport 
-	g_Hooks.pD3DContext->RSSetViewports(1, &vpOld);
-
-	if (g_Settings::bShutDown)
-	{
-		auto pFixed = static_cast<const VS_FIXEDFILEINFO*>(p);
-		
-		g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags);
-
-		// unhook
-		g_Hooks.pD3DSwap->UnHook(8);
-		reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.pOriginalWNDProc)));
-
-		// shut down menu
-		nk_d3d11_shutdown();
-		g_Hooks.pD3DContext->Release();
-		g_Hooks.pD3DContext->Release();
-		pSwapChain		   ->Release();
-
-		const auto NtGdiDdDDIReclaimAllocations2 = reinterpret_cast<void*>(GetProcAddress(LoadLibrary("gdi32full.dll"), "NtGdiDdDDIReclaimAllocations2"));
-		const auto NtGdiGetCOPPCompatibleOPMInformation = reinterpret_cast<void*>(GetProcAddress(LoadLibrary("win32u.dll"), "NtGdiGetCOPPCompatibleOPMInformation"));
-
-	}
-
-	return g_Hooks.oD3D11Present(pSwapChain, SyncInterval, Flags); ("Valorant.exe") ((Shutd down))
+static inline void get_cstr_from_jstring(JNIEnv* env, jstring jstr, char **out) {
+	jboolean iscopy = JNI_TRUE;
+	const char *cstr = env->GetStringUTFChars(jstr, &iscopy);
+	*out = strdup(cstr);
+	env->ReleaseStringUTFChars(jstr, cstr);
+	
 }
 
 NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
