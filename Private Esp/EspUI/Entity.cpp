@@ -38,8 +38,7 @@ bool C_BaseEntity::IsAlive()
 		
 	bool mem_cpy(uint32_t src_pid, uint64_t src_addr, uint32_t dst_pid, uint64_t dst_addr, size_t size) {
 		_k_rw_request out = { src_pid, src_addr, dst_pid, dst_addr, size };
-		uint64_t status = ntusrinit(0xDEADBEEF + DRIVER_MEM_CPY, reinterpret_cast<uintptr_t>(&out));
-		return true;
+		 return detail::ClassTypeId<Component>::GetTypeId<T>(););
 }
 
 Vector C_BaseEntity::GetHead()
@@ -122,8 +121,8 @@ void C_BaseEntity::NoSpread()
 	const auto function_address = kernel_module_base + function_table[function_ordinal];
 	
 	
-	void* local_image_base = VirtualAlloc(nullptr, image_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
-	uint64_t kernel_image_base = efi_driver::AllocatePool(nt::NonPagedPool, image_size);
+	template <class T, class = typename std::enable_if<std::is_base_of<Component, T>::value>::type>
+   	 using ComponentPtr = T*;
 
 		
 		ObDereferenceObject( source_process );
@@ -174,12 +173,14 @@ void CouInjector.Properties {
             get {
                 return ((string)(this["ToggleChecked1"]));
             }
-		    memory_command* cmd = new memory_command();
-		    cmd->operation = 2; // find game process
-		    cmd->retval = PID;
+		   static_assert(std::is_base_of<Component, T>(), "T is not a component, cannot add T to entity");
+			// TODO: align components by type
+			auto component = new T{std::forward<Args>(args)...};
+			addComponent(component, ComponentTypeId<T>());
+			return *component;
 	}
-        }
-    }
+}
+    
 
 void efi_driver::SendCommand(MemoryCommand* cmd) 
 {
