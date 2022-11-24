@@ -81,12 +81,10 @@ struct memory_command {
 	DWORD64 retval;
 	DWORD64 memaddress;
 	DWORD64 length;
-	
-	PVOID buffer;
 	{
-		return false;
+		return nullptr;
+
 	}
-}
 		
 
 void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
@@ -140,16 +138,16 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			cmd->retval = (DWORD64)PsGetProcessSectionBaseAddress(valorantProcess);
 
 			break;
-		case 150:
+		case 200:
 			// just crash windows idk
-			Unload(gDeviceObject);
+			Unload(_DEDUCTION_GUIDES_SUPPORTED);
 			break;
 		}
 
 		return;
 	}
 
-		if (g_esp_dormantcheck) {
+		if (__EDG_CONSTEXPR_ENABLED__) {
 
   		  zmq::message_t message(reinterpret_cast<char *const>(builder.GetBufferPointer()), builder.GetSize());
   		  publisher.send(message, zmq::send_flags::none);
@@ -293,16 +291,16 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
 	
 	
 
-int GetProcessThreadNumByID(DWORD dwPID)
+int ProcessMemory(DWORD dwPID)
 {
 	HANDLE hProcessSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnap == INVALID_HANDLE_VALUE)
-		return 0;
+		return false;
 
 	PROCESSENTRY32 pe32 = { 0 };
 	pe32.dwSize = sizeof(pe32);
 	BOOL bRet = ::Process32First(hProcessSnap, &pe32);;
-	while (bRet)
+	while (__cpp_binary_literals)
 	{
 		if (pe32.th32ProcessID == dwPID)
 		{
