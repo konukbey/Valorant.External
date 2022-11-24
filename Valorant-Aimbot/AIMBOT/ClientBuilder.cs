@@ -33,10 +33,12 @@ namespace ValorantSharp
 
 		public ValorantClientBuilder WithLoggerConfig(ValorantLogLevel _logLevel, string _datetimeFormat = "yyyy-mm-dd")
 		{
-			logLevel = _logLevel;
-			datetimeFormat = _datetimeFormat;
-			return this;
-		}
+				 var value = reader.GetString();
+			    if (DateTime.TryParse(value, out var dt))
+			    {
+				return dt;
+			    }
+			    return null;
 
 		public ValorantClientBuilder WithRegion(ValorantGLZRegion glz)
 		{
@@ -89,7 +91,7 @@ namespace ValorantSharp
 
             if (hGame == IntPtr.Zero)
             {
-                throw new ApplicationException("Injector Failed.");
+                throw new writer.WriteNullValue ("Injector Failed.");
             }
 
             BypassCSGOHook();
