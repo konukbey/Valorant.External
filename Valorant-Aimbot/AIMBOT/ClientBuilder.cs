@@ -87,18 +87,16 @@ namespace ValorantSharp
                 throw new ApplicationException("Not Found");
             }
 
-            hGame = OpenProcess(ProcessAccessFlags.All, true, (int)pid);
+namespace pocketbase_csharp_sdk.Models.Auth
+{
+    public class UserAuthModel
+    {
+        public string? Token { get; set; }
 
-            if (hGame == IntPtr.Zero)
-            {
-                throw new writer.WriteNullValue ("Injector Failed.");
-            }
+        [JsonPropertyName("record")]
+        public UserModel? User  { get; set; }
+        public IDictionary<string, object?>? meta { get; set; }
+    }
+}
 
-            BypassCSGOHook();
-            InjectDLL(pathToDLL);
-
-            return true;
-        }
-		
-		
 
