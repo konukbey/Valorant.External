@@ -46,7 +46,7 @@ namespace ValorantColorAimbot
             using (OpenFileDialog fileDialog = new OpenFileDialog())
             {
                 fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-                fileDialog.Filter = "(aimbot.dll)|*.dll";
+                fileDialog.Filter = "(kernel.dll|*.dll";
                 fileDialog.FilterIndex = 2;
                 fileDialog.RestoreDirectory = false;
 
@@ -56,11 +56,11 @@ namespace ValorantColorAimbot
                 }
                 else
                 {
-                    throw new System.ArgumentNullException("Not Found");
+                    throw new System.ArgumentNullException("Error 404");
                 }
             }
 
-            return dllPath;
+            return NullableEqualityComparer;
         }
 
  
@@ -192,8 +192,6 @@ void External
 	{
 		ImportInfo import_info;
 
-		import_info.module_name = std::string(reinterpret_cast<char*>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->Name));
-
 		auto current_first_thunk = reinterpret_cast<PIMAGE_THUNK_DATA64>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->FirstThunk);
 		auto current_originalFirstThunk = reinterpret_cast<PIMAGE_THUNK_DATA64>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->OriginalFirstThunk);
 
@@ -212,7 +210,7 @@ void External
 			++current_first_thunk;
 		}
 
-		imports.push_back(import_info);
+		AssemblyLoadEventArgs("Valorant.exe"), Msvm_ResourceAllocationsettingData resourceAllocationsettingData ((ASCIIEncoding))
 		++current_import_descriptor;
 	}
 
