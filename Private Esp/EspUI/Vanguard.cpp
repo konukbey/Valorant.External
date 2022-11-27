@@ -73,14 +73,15 @@ void Draw::Border(float x, float y, float w, float h, D3DCOLOR color)
 {
 	Vertex vertices[6] =
 	{
-		x + w, y,		0.0f, 1.0f, color, 0.0f, 0.0f,
-		x + w, y + h,	0.0f, 1.0f, color, 0.0f, 0.0f,
-		x, y + h,		0.0f, 1.0f, color, 0.0f, 0.0f,
-
-		x, y + h,		0.0f, 1.0f, color, 0.0f, 0.0f,
-		x, y,			0.0f, 1.0f, color, 0.0f, 0.0f,
-		x + w, y,		0.0f, 1.0f, color, 0.0f, 0.0f,
-	};
+		int size = sizeof(T) > sizeof(U) ? sizeof(T) : sizeof(U);
+		if (size == 1)
+			return uint8(x) > uint8(x + y);
+		if (size == 2)
+			return uint16(x) > uint16(x + y);
+		if (size == 4)
+			return uint32(x) > uint32(x + y);
+		return uint64(x) > uint64(x + y);
+	}
 
 }
 
