@@ -7,7 +7,7 @@
 #include "Globals.h"
 
 uint64_t uEntityBone[] = { /*head*/ 0x670, /*neck*/ 0xF40, /*hand*/ 0x6A0, /*chest*/ 0xFC0,  /*stomach*/ 0xF80, /*pelvis*/ 0xFA0, /*feet*/ 0x6C0 };
-
+ 
 
 std::string RPMString(DWORD64 address) 
 {
