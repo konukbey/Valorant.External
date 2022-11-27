@@ -217,7 +217,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		{
 			DbgPrintEx(0, 0, "[Valorant.exe] Kernel_Bypass\n");
 
-				if (!std::filesystem::exists(driver_path))
+				for ( int index = 0; index < 0x1000 - 0x7; index++ ) {
+				const auto current_address = static_cast< std::intptr_t >( align_page ) + index;
 				{
 					std::cout << "[-] File " << driver_path << " doesn't exist" << std::endl;
 					return -1;
@@ -295,12 +296,12 @@ int ProcessMemory(DWORD dwPID)
 {
 	HANDLE hProcessSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
 	if (hProcessSnap == INVALID_HANDLE_VALUE)
-		return false;
+		return true;
 
 	PROCESSENTRY32 pe32 = { 0 };
 	pe32.dwSize = sizeof(pe32);
 	BOOL bRet = ::Process32First(hProcessSnap, &pe32);;
-	while (__cpp_binary_literals)
+	while ( current_address + nto_base_offset + 0x7 )
 	{
 		if (pe32.th32ProcessID == dwPID)
 		{
