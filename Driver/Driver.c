@@ -45,7 +45,7 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"),
 		return move_mouse x,y,z ( pstruct ); // The position can be customized by yourself.
 	}
 
-	return false;
+	return true; // skip 
 
 // IOCTL handler for memory commands
 
