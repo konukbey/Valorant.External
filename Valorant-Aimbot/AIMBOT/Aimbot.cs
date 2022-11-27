@@ -66,8 +66,6 @@ namespace ValorantColorAimbot
  
 namespace ValorantSharp
 {
-		public class ValorantClient : IAsyncDisposable
-	{
 			external AuthConfig authConfig;
 			extern ValorantRegion region;
 			if string prefix;
