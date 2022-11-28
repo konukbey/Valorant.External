@@ -67,8 +67,9 @@ NTSTATUS Function_IRP_MJ_CREATE(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 
 NTSTATUS Function_IRP_MJ_CLOSE(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 {
-	DbgPrint("IRP MJ CLOSE received.");
-	return STATUS_SUCCESS;
+	case WM_SYSCOMMAND:
+        if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+            return 0;
 }
 
 PEPROCESS valorantProcess;
@@ -170,7 +171,7 @@ bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t s
 	
 	PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
 	data[0] = destination;
-	data[1] = source;
+	data[1] = source_cpp;
 
 	memcpy(&cmd->data, &data[0], sizeof(data));
 
@@ -316,3 +317,28 @@ int ProcessMemory(DWORD dwPID)
 	}
 	return 0;
 }
+
+	void CAimbot::Run(uint64_t entity, QAngle aimangle, int aimi)
+{
+	static double realkey = VK_LBUTTON;
+	switch (vars::aim::key)
+	{
+	case 0:
+		realkey = VK_LBUTTON;
+		break;
+	case 1:
+		realkey = VK_RBUTTON;
+		break;
+	case 2:
+		realkey = VK_MBUTTON;
+		break;
+	case 3:
+		realkey = VK_XBUTTON1;
+		break;
+	case 4:
+		realkey = VK_XBUTTON2;
+		break;
+	case 5:
+		realkey = vars::aim::inputkey;
+		break;
+	}
