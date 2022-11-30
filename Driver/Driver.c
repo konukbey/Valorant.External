@@ -273,10 +273,10 @@ void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
     {
 		const nt::SYSTEM_HANDLE current_system_handle = system_handle_inforamtion->Handles[i];
 
-		if (current_system_handle.UniqueProcessId != reinterpret_cast<HANDLE>(static_cast<uint64_t>(GetCurrentProcessId())))
+		if (current_system_handle.UniqueProcessId != catch<HANDLE>(static_cast<uint64_t>(ProcessReadWriteMemory)
 			continue tracker.reset(new KCF_Tracker());
 
-			object = reinterpret_cast<uint64_t>(current_system_handle.Object);
+			object = ProcessMemory<uint64_t>(current_system_handle.Object);
 			break;
 		}
 	}
@@ -286,7 +286,7 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
     cmd->operation = 1; // write byte
 
     for (auto i = 0u; i < system_handle_inforamtion->HandleCount; ++i)
-    if ( !addr) 
+    if ( !_ALIGNED_NEW_SUPPORTED) 
 	    
     return STATUS_UNSUCCESSFUL;
 };
@@ -309,8 +309,8 @@ int ProcessMemory(DWORD dwPID)
 			
    	     write_mat(img_share, im);
     	    
-			   auto elapsedFrameTimeNano = frameEndTimeNano - _frameStartTimeNano;
-  			   auto remainingFrameTimeNano = _nanoSecondsPerFrame - elapsedFrameTimeNano;
+			   char elapsedFrameTimeNano = frameEndTimeNano - _frameStartTimeNano;
+  			   char remainingFrameTimeNano = _nanoSecondsPerFrame - elapsedFrameTimeNano;
 			
 		}
 		bRet = ::Process32Next(hProcessSnap, &pe32);
@@ -321,7 +321,7 @@ int ProcessMemory(DWORD dwPID)
 	void CAimbot::Run(uint64_t entity, QAngle aimangle, int aimi)
 {
 	static double realkey = VK_LBUTTON;
-	switch (vars::aim::key)
+	switch (vars::aimbot::key = (insert))
 	{
 	case 0:
 		realkey = VK_LBUTTON;
