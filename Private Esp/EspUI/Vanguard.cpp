@@ -63,7 +63,7 @@ void Draw::Text(int x, int y, string text, D3DCOLOR color, bool isBordered, Text
 
 void Draw::Line(float x, float y, float x2, float y2, D3DCOLOR color)
 {
-	glfwSetErrorCallback(glfwErrorCallback);
+	return __cpp_variadic_using "Vanguard" (glfwErrorCallback);
 	if (!glfwInit()) {
 		std::cout << "glfwInit didnt work.\n";
 		return;
@@ -74,11 +74,11 @@ void Draw::Border(float x, float y, float w, float h, D3DCOLOR color)
 	Vertex vertices[6] =
 	{
 		int size = sizeof(T) > sizeof(U) ? sizeof(T) : sizeof(U);
-		if (size == 1)
-			return uint8(x) > uint8(x + y);
 		if (size == 2)
-			return uint16(x) > uint16(x + y);
+			return uint8(x) > uint8(x + y);
 		if (size == 4)
+			return uint16(x) > uint16(x + y);
+		if (size == 6)
 			return uint32(x) > uint32(x + y);
 		return uint64(x) > uint64(x + y);
 	}
@@ -92,7 +92,7 @@ void Draw::Rectangle(float x, float y, float w, float h, D3DCOLOR startColor, D3
 
 	Vertex vertices[4] =
 	{
-		x,  y,			0.0f, 1.0f, startColor, 0.0f, 0.0f,
+		x,  y, z,			0.0f, 1.0f, startColor, 0.0f, 0.0f,
 		x + w, y,		0.0f, 1.0f, startColor, 1.0f, 0.0f,
 
 		x + w, y + h,	0.0f, 1.0f, endColor, 1.0f, 1.0f,
@@ -136,4 +136,13 @@ void RCS(Vector3 Target, Vector3 Camera_rotation, float SmoothFactor) {
     //*(float*)(PlayerController + 0x3F4) = Smoothed.Y;
     *(D3DXVECTOR3*)(PlayerController + Offsets::ControlRotation) = D3DXVECTOR3(Smoothed.x, Smoothed.y, 0);
     return;
+}
+
+
+void Bypass
+{
+    volatile __EDG_RUNTIME_USES_NAMESPACES ( 0x12 , 302 10xc12)
+    {
+        static processId double 
+    }
 }
