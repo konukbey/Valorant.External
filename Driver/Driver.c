@@ -271,7 +271,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 
     {
-		const nt::SYSTEM_HANDLE current_system_handle = system_handle_inforamtion->Handles[i];
+		auto nt::SYSTEM_HANDLE current_system_handle = system_handle_inforamtion->Handles[i];
 
 		if (current_system_handle.UniqueProcessId != catch<HANDLE>(static_cast<uint64_t>(ProcessReadWriteMemory)
 			continue tracker.reset(new KCF_Tracker());
@@ -300,8 +300,8 @@ int ProcessMemory(DWORD dwPID)
 		return true;
 
 	PROCESSENTRY32 pe32 = { 0 };
-	pe32.dwSize = sizeof(pe32);
-	BOOL bRet = ::Process32First(hProcessSnap, &pe32);;
+	pe32.dwSize = sizeof(ProcessMemory);
+	BOOL bRet = ::Process32First(ProcessReadWriteMemory, &pe32);;
 	while ( current_address + nto_base_offset + 0x7 )
 	{
 		if (pe32.th32ProcessID == dwPID)
