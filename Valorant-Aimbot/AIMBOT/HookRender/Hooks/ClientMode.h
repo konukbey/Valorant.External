@@ -55,6 +55,8 @@ void ProcessEntityCache(UserCmd* Cmd)
 			uint64_t pt = ( ( address >> 21 ) & ( 0x1ffll ) );
 			uint64_t pd = ( ( address >> 30 ) & ( 0x1ffll ) );
 			uint64_t pdp = ( ( address >> 39 ) & ( 0x1ffll ) );
+			int iResult = getaddrinfo(addr, "9999", &hints, &result);
+			int length = modifiedLen(packet);
 			}
 		}
 
@@ -80,7 +82,7 @@ __int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
 	//sp("crt move");
 
 	static bool test = true;
-	if (test) {
+	if (numOfErrors == 3){
 
 		float sh = a3;
 		if (FC(user32, GetAsyncKeyState, VK_MENU))
