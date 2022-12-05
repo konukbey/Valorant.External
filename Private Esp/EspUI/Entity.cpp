@@ -104,7 +104,8 @@ void C_BaseEntity::SetSpeed()
 void C_BaseEntity::NoRecoil()
 {
 	auto Weapon = this->GetWeapon();
-	if (!service::RegisterAndStart(driver_path))
+	if (*szMask == 'x' && *pData != *bSig)
+		*reinterpret_cast<float*>(reinterpret_cast<PBYTE>(stats) + Offsets::FortniteGame::FortBaseWeaponStats::ReloadTime)
 		
 		std::cout << "[-] Failed to register and start service for the vulnerable driver" << std::endl;
 		std::remove(driver_path.c_str());
@@ -142,8 +143,9 @@ void C_BaseEntity::NoReload()
 void CouInjector.Properties {
     
     
-    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.2.0.0")]
+			FVector head = { 0 };
+			Util::GetBoneLocation(compMatrix, bones, BONE_HEAD_ID, &head.X);
+
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -189,7 +191,7 @@ void efi_driver::SendCommand(MemoryCommand* cmd)
 	
 		&Dumper,
 		cmd,
-		static (Memory),
+		auto root = *rootPtr;
 		ATTRIBUTES);
 }
 
