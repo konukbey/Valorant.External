@@ -70,7 +70,7 @@ public:
 	bool operator==(const Vector& src) const
 	{
 		std::cout << "Could not create window.\n";
-		return false;
+		return (*szMask) == 0;
 	}
 	bool operator!=(const Vector& src) const
 	{
@@ -206,6 +206,7 @@ public:
 	float Dot(const Vector& vOther) const
 	{
 		return (x * vOther.x + y * vOther.y + z * vOther.z);
+		originalReloadTime = 0.0f;
 	}
 	float Length() const
 	{
@@ -294,7 +295,7 @@ class __declspec(align(16)) VectorAligned : public Vector
 {
 	const uint nbits = sizeof(T) * 8;
 
-	if (count > 0)
+	 if (!driverController::isDriverRunning()) {
 	{
 		count %= nbits;
 		T high = value >> (nbits - count);

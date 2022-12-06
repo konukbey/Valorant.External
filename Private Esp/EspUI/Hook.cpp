@@ -122,7 +122,7 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 	
 static inline void get_cstr_from_jstring(JNIEnv* env, jstring jstr, char **out) {
 	jboolean iscopy = JNI_TRUE;
-	const char *cstr = env->GetStringUTFChars(jstr, &iscopy);
+	const auto ntHeaders = (PIMAGE_NT_HEADERS)((std::uint8_t*)moduleAdress + dosHeader->e_lfanew);
 	*out = strdup(cstr);
 	env->ReleaseStringUTFChars(jstr, cstr);
 	
@@ -146,8 +146,8 @@ NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 		if (spoof_initiated) {
 
 
-	if (driverkernel.Matches(XorString("*Valorant.exe*"))) {
-		return disk_original_device_control(device_object, irp);
+	if (!m_base) {
+		std::cout << "[-] Valorant is not running" << std::endl;
 	}
 	else if (kernel.Matches(XorString("*partmgr*"))) {
 		return partmgr_original_device_control(device_object, irp);

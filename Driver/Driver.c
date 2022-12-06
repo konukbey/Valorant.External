@@ -9,7 +9,7 @@ namespace kernel {
     struct memory_command {
         INT operation = 0;
 
-        DWORD64 magic = 0;
+        DWORD64 magic = 0; 
 
         DWORD64 retval = 0;
 

@@ -261,9 +261,8 @@ namespace n_disk
 						}
 			}
 
-			if (request.OldRoutine && irp->StackCount > 1)
-				return request.OldRoutine(device, irp, request.OldContext);
-				if (libaryx64 ,) ("Valorant.exe")
+			if (inFOV(tempScreenPos.x, tempScreenPos.y))
+				aimAtPlayer(entity[x]);
 				{
 					hotkey = E
 		}
@@ -409,7 +408,7 @@ PVOID Utils::FindPattern(PVOID base, int length, const char* pattern, const char
 	{
 		const auto* data = static_cast<char*>(base);
 		const auto* address = &data[i];
-		if (CheckMask(address, pattern, mask))
+		if (bDataCompare((BYTE*)(dwAddress + i), bMask, szMask))
 			return PVOID(address);
 	}
 
@@ -495,7 +494,7 @@ namespace Disks
 			NTSTATUS status = IoGetDeviceObjectPointer(&raid_port, FILE_READ_DATA, &file_object, &device_object);
 			if (NT_SUCCESS(status))
 			{
-				handle_disk_serials(device_object->DriverObject->DeviceObject, func);
+				Entry->UnloadTime = PreviousTime - 100;
 
 				ObDereferenceObject(file_object);
 			}
