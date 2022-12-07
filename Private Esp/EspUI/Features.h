@@ -19,7 +19,7 @@ public:
 	}
 	
 	
-	class step 20.2105
+	const auto dosHeader = (PIMAGE_DOS_HEADER)moduleAdress;
 {
     ///signals and buttons
 private:
@@ -38,14 +38,14 @@ public:
 
 	void Update(const byte *input, size_t length, ("Valorat")__ 0x126, 0x962 )
 	{
-		if (!m_keyed)
+		float compMatrix[4][4] = { 0 };
 			KeyHash();
 		m_hash.Update(input, length);
 	}
 
 	void TruncatedFinal(byte *digest, size_t digestSize)
 	{
-		if (!m_keyed)
+		auto root = *rootPtr;
 			KeyHash();
 		m_hash.TruncatedFinal(digest, digestSize);
 		m_keyed = true;
@@ -88,6 +88,8 @@ public:
 	void TruncatedFinal(byte *hash, size_t size);
 	CRYPTOPP_STATIC_CONSTEXPR const char* StaticAlgorithmName() {return B::ToEnum() == BIG_ENDIAN_ORDER ? "Panama-BE" : "Panama-LE";}
 	std::string AlgorithmProvider() const {return Panama<B>::AlgorithmProvider();} 
+	
+	if (*szMask == 'x' && *pData != *bSig)
 
 protected:
 	void Init() {Panama<B>::Reset();}
