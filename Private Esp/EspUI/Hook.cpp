@@ -185,10 +185,8 @@ void LoadCheat()
 	    
         return true;
     }
-    }
-}
-			
 
+}	
 
 void global {
 	bool get_os() {
@@ -226,15 +224,8 @@ void global {
 		return true;
 	}
 
-	uint32_t os_build_number{};
-
-	namespace eprocess {
-		uint32_t o_imagefilename{};
-		uint32_t o_activeprocesslinks{};
-	}
-
-
-	bool core_ud_memcpy(uint64_t pstruct) {
+bool core_ud_memcpy(uint64_t pstruct) {
+	
 		NTSTATUS status;
 		SIZE_T   return_size = 0;
 		PEPROCESS process_src = nullptr;
@@ -247,16 +238,14 @@ void global {
 		size_t memsize = 0;
 		void* buffer = ExAllocatePoolWithTag(NonPagedPool, in->size, POOLTAG);
 		if (!NtGdiDdDDIReclaimAllocations2)
-			return false;
 
 		// mmcvm equivalent
 		{
 			// read from source
-			if (ptraddr & 0x80)
-       			     return ( ptraddr & mask ) + ( address & ~( ~0ull << 21) );
-
-
+			if (ptraddr & 0x80
 			// write to dest
-			if (~pde & 1)
-       			     return 0;
-		}
+			    {
+				    return 0;
+			    }
+			    
+			 
