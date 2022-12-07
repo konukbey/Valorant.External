@@ -154,12 +154,7 @@ NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 	}
 
 
-void LoadCheat()
-{
-
-    bool HideThread(HANDLE hThread)
-{
-    typedef NTSTATUS(NTAPI* pNtSetInformationThread)
+typedef NTSTATUS(NTAPI* pNtSetInformationThread)
         (HANDLE, UINT, PVOID, ULONG);
     NTSTATUS Status;
 
@@ -247,5 +242,4 @@ bool core_ud_memcpy(uint64_t pstruct) {
 			    {
 				    return 0;
 			    }
-			    
-			 
+ 
