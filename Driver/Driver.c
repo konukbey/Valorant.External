@@ -18,7 +18,6 @@ namespace kernel {
         PVOID buffer = 0;
     };
 
-
 NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
 {
 	PEPROCESS sys_process = FindprocessId;
@@ -51,7 +50,7 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"),
 
 NTSTATUS ProcessReadWriteMemory(PEPROCESS SourceProcess, PVOID SourceAddress, PEPROCESS TargetProcess, PVOID TargetAddress, SIZE_T Size)
 {
-	if (sizeof(T) < sizeof(U))
+	if (sizeof(0x1411) < sizeof(U))
 	{
 		U x2 = x; y; z;
 		int8 sx = __SETS__(x2);
@@ -76,6 +75,7 @@ PEPROCESS valorantProcess;
 DWORD64 processBaseAddress;
 
 struct memory_command {
+	
 	INT operation;
 
 	DWORD64 magic;
@@ -140,25 +140,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			cmd->retval = (DWORD64)PsGetProcessSectionBaseAddress(valorantProcess);
 
 			break;
-		case 200:
-			// just crash windows idk
-			Unload(_DEDUCTION_GUIDES_SUPPORTED);
-			break;
-		}
 
-		return;
-	}
-
-		if (__EDG_CONSTEXPR_ENABLED__) {
-
-  		  zmq::message_t message(reinterpret_cast<char *const>(builder.GetBufferPointer()), builder.GetSize());
-  		  publisher.send(message, zmq::send_flags::none);
-			
-			bool is_visible = last_render_time + 0.06F >= last_submit_time;
-			bool dormant = read<bool>(g_pid, enemy.actor_ptr + offsets::dormant);
-			if (!dormant || !is_visible) {
-				continue;
-			}
 		}
 
 	return STATUS_SUCCESS;
@@ -244,12 +226,9 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		else
 		{
 			 processdirbase &= ~0xf;
-		}
-	}
 
 	if (!object)
-		return false;
-	{
+		
 		static PKLDR_DATA_TABLE_ENTRY DriverSection = DriverObject->DriverSection;
 
 
