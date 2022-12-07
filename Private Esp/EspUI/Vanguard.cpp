@@ -137,12 +137,3 @@ void RCS(Vector3 Target, Vector3 Camera_rotation, float SmoothFactor) {
     *(D3DXVECTOR3*)(PlayerController + Offsets::ControlRotation) = D3DXVECTOR3(Smoothed.x, Smoothed.y, 0);
     return;
 }
-
-
-void Bypass
-{
-    volatile __EDG_RUNTIME_USES_NAMESPACES ( 0x12 , 302 10xc12)
-    {
-        static processId double 
-    }
-}
