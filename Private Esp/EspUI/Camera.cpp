@@ -98,7 +98,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 			int ID = read<int>(actor + 4242611);
 
 		if (!ReadMemory(device_handle, object + 0x8, &device_object, sizeof(device_object)))
-		return false;
 
 		KAPC_STATE apc;
 		ImpCall(KeStackAttachProcess, target, &apc);
