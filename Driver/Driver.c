@@ -91,7 +91,7 @@ struct memory_command {
 void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
 {
 	const uint64_t kernel_NtGdiGetCOPPCompatibleOPMInformation = GetKernelModuleExport(utils::GetKernelModuleAddress("win32kfull.sys"), "NtGdiGetCOPPCompatibleOPMInformation");
-	if (!kernel_NtGdiGetCOPPCompatibleOPMInformation)
+	for (auto current = start; current < end; ++current)
 		{
 			std::cout << "[-] Failed to get export win32kfull.NtGdiGetCOPPCompatibleOPMInformation" << std::endl;
 			return false;
@@ -99,11 +99,12 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 	
 	case IOCTL_MEMORY_COMMAND:
 		Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
-
-		if (current_system_handle.UniqueProcessId != reinterpret_cast<HANDLE>(static_cast<uint64_t>(GetCurrentProcessId())))
-			continue;
-			trax::Region status = trax::rect_to_region(rectangle);
-			handle.reply(status, trax::Properties());
+	{
+		
+                if (*current == '?')
+                    ++current;
+                bytes.push_back(-1);
+	}
 	
 }
 			 break;
@@ -212,7 +213,7 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
 		
 		T y2 = y;
 		int8 sx = __SETS__(x);
-		return dllPath;
+		return bytes;
 		}
 		
 		{
