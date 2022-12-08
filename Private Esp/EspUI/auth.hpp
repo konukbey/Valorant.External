@@ -16,19 +16,14 @@ namespace KeyAuth {
 				// Check if process ID is valid
 				if (this->process_id == 0) {
 				    LOG_R("Had issue grabbing RustClient.exe ProcessID.\n");
-				    return;
-		void setvar(std::string var, std::string vardata);
-		std::string getvar(std::string var);
-		bool checkblack();
-		void upgrade(std::string username, std::string key);
-		void login(std::string username, std::string password);
-		void web_login();
-		void button(std::string value);
-		std::vector<unsigned char> download(std::string fileid);
-		void regstr(std::string username, std::string password, std::string key);
+					{
+						return false;
+					}
+					
+		
 
-		class data_class {
-		public:
+class data_class {
+public:
 			// app data
 			std::string numUsers;
 			std::string numOnlineUsers;
@@ -50,4 +45,3 @@ namespace KeyAuth {
 	private:
        		 LOG_G("Grabbed ProcessID from RustClient.exe. %d\n", this->process_id);
 	};
-}
