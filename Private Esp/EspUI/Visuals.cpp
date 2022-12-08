@@ -76,8 +76,6 @@ int retreiveValProcessId() {
 	entry.dwSize = sizeof(entry);
 
 	if (!Process32First(snapshot, &entry)) {
-		return 0;
-	}
 
     Enum e;
 	std::vector<Enemy> local_enemy_collection = enemy_collection;
@@ -105,9 +103,8 @@ void std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_co
 		int bone_count = read<int>(g_pid, mesh + offsets::bone_count);
 		bool is_bot = bone_count == 150;
 		if (team_id == g_local_team_id && !is_bot) {
-			return continue;
-		}
-
+			 continue;
+		
 		uintptr_t damage_handler = read<uintptr_t>(g_pid, actor + offsets::damage_handler);
 		uintptr_t root_component = read<uintptr_t>(g_pid, actor + offsets::root_component);
 		uintptr_t bone_array = read<uintptr_t>(g_pid, mesh + offsets::bone_array);
