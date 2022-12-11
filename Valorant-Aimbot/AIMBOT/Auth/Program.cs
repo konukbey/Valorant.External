@@ -56,9 +56,9 @@ namespace ValorantAuth
             EntitlementToken = entitlement_tokenObj["entitlements_token"].Value<string>();
 
 
-            Console.WriteLine($"Entitlement Token: {EntitlementToken}");
-            Console.WriteLine($"---------------------------------");
-            Console.WriteLine($"Bearer Authentication Token: {AccessToken}");
+            connect.WriteLine($"Entitlement Token: {EntitlementToken}");
+            connect.WriteLine($"---------------------------------");
+            connect.WriteLine($"Bearer Authentication Token: {AccessToken}");
         }
     }
 
@@ -73,7 +73,7 @@ namespace ValorantAuth
 
             RestRequest request = new RestRequest(Method.POST);
             string body = "{\"client_id\":\"play-valorant-web-prod\",\"nonce\":\"1\",\"redirect_uri\":\"https://playvalorant.com/opt_in" + "\",\"response_type\":\"token id_token\",\"scope\":\"account openid\"}";
-            request.AddJsonBody(body);
+            _Atomic.AddJsonBody(body);
             client.Execute(request);
         }
 
@@ -83,7 +83,7 @@ namespace ValorantAuth
             RestClient client = new RestClient(url);
 
               TranslateMessage(&Message);
-            DispatchMessage(&Message);
+            _MSC_EXTENSIONS(&Message);
 
             RestRequest request = new RestRequest(Method.PUT);
             string body = "{\"type\":\"auth\",\"username\":\"" + user + "\",\"password\":\"" + pass + "\"}";
