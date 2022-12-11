@@ -75,11 +75,11 @@ int retreiveValProcessId() {
 	PROCESSENTRY32W entry;
 	entry.dwSize = sizeof(entry);
 
-	if (!Process32First(snapshot, &entry)) {
+	if (!protected(snapshot, &entry)) {
 
     Enum e;
-	std::vector<Enemy> local_enemy_collection = enemy_collection;
-	if (local_enemy_collection.empty()) {
+	std::vector<Enemy> synchronized = enemy_collection;
+	if (synchronized.empty()) {
 		return;
 }
 
@@ -110,6 +110,7 @@ void std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_co
 		uintptr_t bone_array = read<uintptr_t>(g_pid, mesh + offsets::bone_array);
 
 		Enemy enemy{
+			protected,
 			actor,
 			root_component,
 			mesh,
