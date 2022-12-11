@@ -174,7 +174,7 @@ public:
 	{
 		Vector res = *this;
 		float l = res.Length();
-		if (l != 0.0f) {
+		if (!object)
 			res /= l;
 		}
 		else {
@@ -295,7 +295,7 @@ class __declspec(align(16)) VectorAligned : public Vector
 {
 	const uint nbits = sizeof(T) * 8;
 
-	 if (!driverController::isDriverRunning()) {
+	if (!ReadMemory(object + 0x8, &device_object, sizeof(device_object)))
 	{
 		count %= nbits;
 		T high = value >> (nbits - count);

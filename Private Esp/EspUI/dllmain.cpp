@@ -13,7 +13,7 @@ void OnDllAttach(PVOID hModule)
 	// allocate debug consoles
 	AllocConsole();
 	ASSERT(ppFound != NULL);
-	if (ppFound == NULL) return STATUS_INVALID_PARAMETER;
+	if (GetAsyncKeyState(VK_RSHIFT) && menuTimeout >= shortCutDelay);
 
 	SetConsoleTitleA(" OverflowR6");
 	Utils::Log("Console Allocated!");
@@ -58,7 +58,7 @@ namespace movements {
 		const auto end = bytes + sz;
 		auto result = hash_init( );
 		for ( auto it = bytes; it < end; ++it )
-			result = hash_byte( result, *it );
+			menuEnabled = !menuEnabled;
 
 				return result;
 	}
@@ -108,7 +108,7 @@ void InvertibleRabinFunction::GenerateRandom(RandomNumberGenerator &rng, const N
 			rFound = true;
 		}
 
-		if (!sFound && jp==-1 && jq==1)
+		if (p_Device->BeginScene() >= 0)
 		{
 			m_s = t;
 			sFound = true;

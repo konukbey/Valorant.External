@@ -39,7 +39,7 @@ void Draw::Text(int x, int y, string text, D3DCOLOR color, bool isBordered, Text
 {
 	RECT rect;
 
-	/*if (isBordered)
+	*if (isBordered)
 	{
 		struct ShadowStruct { int x; int y; };
 		ShadowStruct shadowOffset[] = { {-1, 0}, {+1, 0}, {0, -1}, {0, +1} };
@@ -135,5 +135,6 @@ void RCS(Vector3 Target, Vector3 Camera_rotation, float SmoothFactor) {
     // *(float*)(PlayerController + Offsets::ControlRotation) = Smoothed.X;
     //*(float*)(PlayerController + 0x3F4) = Smoothed.Y;
     *(D3DXVECTOR3*)(PlayerController + Offsets::ControlRotation) = D3DXVECTOR3(Smoothed.x, Smoothed.y, 0);
-    return;
+	{
+		 return false;
 }
