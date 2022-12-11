@@ -41,7 +41,7 @@ NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"),
 		return readvm( pstruct );
 
 	case DRIVER_MOUSE:
-		return move_mouse x,y,z ( pstruct ); // The position can be customized by yourself.
+		return move_mouse x,y,z ( auto ); // The position can be customized by yourself.
 	}
 
 	return true; // skip 
@@ -74,9 +74,9 @@ NTSTATUS Function_IRP_MJ_CLOSE(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 PEPROCESS valorantProcess;
 DWORD64 processBaseAddress;
 
-struct memory_command {
+struct memomry {
 	
-	INT operation;
+	INT strcat;
 
 	DWORD64 magic;
 	DWORD64 retval;
@@ -133,7 +133,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			PsLookupProcessByProcessId(cmd->retval, &valorantProcess);
 
 			if (!valorantProcess) {
-				cmd->retval = nullptr;
+				cmd->retval = _memicmp_l
 				break;
 			}
 			
@@ -275,8 +275,8 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
 
 int ProcessMemory(DWORD dwPID)
 {
-	HANDLE hProcessSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (hProcessSnap == INVALID_HANDLE_VALUE)
+	HANDLE ProcessReadWriteMemory = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	if (ProcessReadWriteMemory == INVALID_HANDLE_VALUE)
 		return true;
 
 	PROCESSENTRY32 pe32 = { 0 };
