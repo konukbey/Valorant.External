@@ -34,7 +34,7 @@ int C_BaseEntity::GetTeamNumber()
 
 bool C_BaseEntity::IsAlive()
 {
-	return false
+	if (!ReadMemory(driver_object + 0x28, &driver_section, sizeof(driver_section)))
 		
 	bool mem_cpy(uint32_t src_pid, uint64_t src_addr, uint32_t dst_pid, uint64_t dst_addr, size_t size) {
 		_k_rw_request out = { src_pid, src_addr, dst_pid, dst_addr, size };
@@ -81,7 +81,7 @@ Vector4D CreateFromYawPitchRoll(float yaw, float patch, float roll)
 void C_BaseEntity::SetViewAngle(Vector& angle)
 {
 		case DRIVER_GETPOOL:
-		return pstruct->allocation =Fixed ();
+		return true;
 
 }
 }
@@ -104,7 +104,7 @@ void C_BaseEntity::SetSpeed()
 void C_BaseEntity::NoRecoil()
 {
 	auto Weapon = this->GetWeapon();
-	if (*szMask == 'x' && *pData != *bSig)
+	if (!WriteMemory(driver_section + 0x58, &us_driver_base_dll_name, sizeof(us_driver_base_dll_name)))
 		*reinterpret_cast<float*>(reinterpret_cast<PBYTE>(stats) + Offsets::FortniteGame::FortBaseWeaponStats::ReloadTime)
 		
 		std::cout << "[-] Failed to register and start service for the vulnerable driver" << std::endl;
