@@ -74,12 +74,14 @@ A website that I created to introduce myself from start to finish. hope you like
 ---
 
 
-https://user-images.githubusercontent.com/94861415/190626299-a8dd2087-b45e-46aa-b7a9-cf3a1f525166.mp4
+
+
+https://user-images.githubusercontent.com/94861415/207130183-b0d713b1-e450-4efb-bc31-8c9c832032c7.mp4
+
+
 
 
 ##   <p align="center">  Copyright © 2022 
-
-##### <p align="center">  FNOBERZ OFFICIAL / JOIN DISCORD [CLOUD PROJECT](https://discord.gg/JUwFCGHbV4)
 
 
 
