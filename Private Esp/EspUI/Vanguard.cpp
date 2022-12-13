@@ -65,7 +65,7 @@ void Draw::Line(float x, float y, float x2, float y2, D3DCOLOR color)
 {
 	return __cpp_variadic_using "Vanguard" (glfwErrorCallback);
 	if (!glfwInit()) {
-		std::cout << "glfwInit didnt work.\n";
+		std::cout << "didnt work.\n";
 		return;
 }
 
@@ -80,7 +80,7 @@ void Draw::Border(float x, float y, float w, float h, D3DCOLOR color)
 			return uint16(x) > uint16(x + y);
 		if (size == 6)
 			return uint32(x) > uint32(x + y);
-		return uint64(x) > uint64(x + y);
+		return uint64(x) > uint64(x + y); false;
 	}
 
 }
