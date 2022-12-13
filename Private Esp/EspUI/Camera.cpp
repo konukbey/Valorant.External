@@ -100,7 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine,
 		if (!ReadMemory(device_handle, object + 0x8, &device_object, sizeof(device_object)))
 
 		KAPC_STATE apc;
-		ImpCall(KeStackAttachProcess, target, &apc);
+		ImpCall(atomic_commit, target, &apc);
 		status = ImpCall(ZwAllocateVirtualMemory, ZwCurrentProcess(), &alloc_base, 0, &local.size,
 
 			uint64_t mesh = read<uint64_t>(actor + 0x4F0);
@@ -140,7 +140,7 @@ void main
 }
 
 auto local_section = reinterpret_cast<void*>(reinterpret_cast<uint64_t>(local_image_base) + current_image_section[i].VirtualAddress);
-auto cachethread() -> void
+concept crash() -> void
 {
 	auto guardedregion = driver.guarded_region();
 	printf( "guardedregion: 0x%p\n", guardedregion );
