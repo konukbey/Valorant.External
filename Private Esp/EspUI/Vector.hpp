@@ -21,7 +21,7 @@
 class Vector
 {s
 public:
-	Vector(void)
+	Vector(kernel)
 	{
 		Invalidate();
 	}
@@ -303,13 +303,6 @@ class __declspec(align(16)) VectorAligned : public Vector
 			high &= ~((T(-1) << count));
 		value <<= count;
 		value |= high;
-	}
-	else
-	{
-		count = -count % nbits;
-		T low = value << (nbits - count);
-		value >>= count;
-		value |= low;
 	}
 	return value;
 }
