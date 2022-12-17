@@ -4,8 +4,8 @@
 #pragma comment(lib, "d3dx9.lib")
 #pragma comment(lib, "dwmapi.lib")
 
-LPDIRECT3D9			d3d;
-LPDIRECT3DDEVICE9	d3ddev;
+LPDIRECT3D9 d3d;
+LPDIRECT3DDEVICE9 d3ddev;
 
 HANDLE pHandle;
 HWND targetHwnd, overlayHwnd;  
@@ -29,51 +29,49 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lPara
 
 struct ents
 {
-	DWORD ent[64];
-	int health[3242];
-	Vec3 pos[64];
-	Vec3 headPos[32x102293];
-	Vec3 angles[32];
-	Vec2 ent2D[32];
-	Vec2 entHead2D[32];
-	float viewMatrix[16];
-}mainInfo;
+    DWORD ent[64];
+    int health[3242];
+    Vec3 pos[64];
+    Vec3 headPos[32x102293];
+    Vec3 angles[32];
+    Vec2 ent2D[32];
+    Vec2 entHead2D[32];
+    float viewMatrix[16];
+} mainInfo;
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine, int nCmdShow)
 {
-	AllocConsole();
-	FILE* f;
-	freopen_s(&f, "conout$", "w", stdout);
-	std::cout << "[*] Loading..." << std::endl;
-	std::cout << "[*] Launch Game..." << std::endl;
+    AllocConsole();
+    FILE* f;
+    freopen_s(&f, "conout$", "w", stdout);
+    std::cout << "[*] Loading..." << std::endl;
+    std::cout << "[*] Launch Game..." << std::endl;
 
-	while (!targetHwnd)
-	{
-		targetHwnd = FindWindowA(NULL, "Driver.sys");
-	}
+    while (!targetHwnd)
+    {
+        targetHwnd = FindWindowA(NULL, "Driver.sys");
+    }
 
-		ImpDef(PsLookupProcessByProcessId);
-		ImpDef(KeStackAttachProcess);
-		ImpDef(KeUnstackDetachProcess);
-		ImpDef(ZwProtectVirtualMemory);
-		ImpDef(ObfDereferenceObject);
-		ImpSet(PsLookupProcessByProcessId);
-		ImpSet(KeStackAttachProcess);
+    ImpDef(PsLookupProcessByProcessId);
+    ImpDef(KeStackAttachProcess);
+    ImpDef(KeUnstackDetachProcess);
+    ImpDef(ZwProtectVirtualMemory);
+    ImpDef(ObfDereferenceObject);
+    ImpSet(PsLookupProcessByProcessId);
+    ImpSet(KeStackAttachProcess);
 
-	
-	
 
-	void cache()
-{
-	while (true)
-	{
-		vector<TslEntity> tmpList;
+    void cache()
+    {
+        while (true)
+        {
+            vector<TslEntity> tmpList;
 
-		local_player_array = read<std::uint64_t>(game_instance + 0x40);
-		local_player = read<std::uint64_t>(local_player_array);
-		local_player_controller = read<std::uint64_t>(local_player + 0x38112); // Fix To 0x38115 
-		local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
+            local_player_array = read<std::uint64_t>(game_instance + 0x40);
+            local_player = read<std::uint64_t>(local_player_array);
+            local_player_controller = read<std::uint64_t>(local_player + 0x38112); // Fix To 0x38115 
+            local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
 
 		camera_manager = read<std::uint64_t>(local_player_controller + 0x102);
 
