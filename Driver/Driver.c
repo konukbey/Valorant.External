@@ -168,85 +168,73 @@ bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t s
 /// <summary>
 NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
 {
-	DbgPrintEx(150, 65, "[Valorant.exe] Select " __FUNCTION__ ".\n");
+    NTSTATUS Status;
+    UNICODE_STRING DeviceName;
+    UNICODE_STRING SymbolicName;
+    PDEVICE_OBJECT DeviceObject;
 
-	NTSTATUS			Status;
-	UNICODE_STRING		DeviceName;
-	UNICODE_STRING		SymbolicName;
-	PDEVICE_OBJECT      DeviceObject;
+    // Initialize the driver's name and symbolic name
+    RtlInitUnicodeString(&DeviceName, ConstDeviceName);
+    RtlInitUnicodeString(&SymbolicName, ConstSymbolic);
 
-	 BBox_c bb = tracker->getBBox();
-		rectangle = bb.get_rect();
+    // Create the device object
+    Status = IoCreateDevice(DriverObject, 0, &DeviceName, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DeviceObject);
+    if (!NT_SUCCESS(Status))
+    {
+        // Failed to create the device object
+        DbgPrintEx(0, 0, "[Valorant.exe] Failed to create device object: 0x%08X\n", Status);
+        return Status;
+    }
 
-	RtlInitUnicodeString(&DeviceName, ConstDeviceName);
-	RtlInitUnicodeString(&SymbolicName, ConstSymbolic);
+    // Query system information
+    ULONG size = 0;
+    Status = ZwQuerySystemInformation(information_class, info, size, &size);
+    if (Status != STATUS_SUCCESS)
+    {
+        // Failed to query system information
+        DbgPrintEx(0, 0, "[Valorant.exe] Failed to query system information: 0x%08X\n", Status);
+        return Status;
+    }
 
-	// Create device
-	Status = IoCreateDevice(DriverObject, 0, &DeviceName, FILE_DEVICE_UNKNOWN, FILE_DEVICE_SECURE_OPEN, FALSE, &DeviceObject);
+    // Check the system handle value and object
+    PEPROCESS source_process = NULL;
+    if (current_system_handle.HandleValue == device_handle)
+    {
+        object = reinterpret_cast<uint64_t>(current_system_handle.Object);
+    }
 
-	if ( ZwQuerySystemInformation( information_class, info, size, &size ) != STATUS_SUCCESS )
-	{
-		PEPROCESS source_process = NULL;
-	if (current_system_handle.HandleValue == device_handle)
-		{
-			object = reinterpret_cast<uint64_t>(current_system_handle.Object);
-			break;
-		}
-		
-		T y2 = y;
-		int8 sx = __SETS__(x);
-		return bytes;
-		}
-		
-		{
-			DbgPrintEx(0, 0, "[Valorant.exe] Kernel_Bypass\n");
+    // Call the __SETS__ function
+    int8 sx = __SETS__(x);
 
-				for ( int index = 0; index < 0x1000 - 0x7; index++ ) {
-				const auto current_address = static_cast< std::intptr_t >( align_page ) + index;
-				{
-					std::cout << "[-] File " << driver_path << " doesn't exist" << std::endl;
-					return -1;
-				}
+    // Read physical memory
+    PVOID buffer = NULL;
+    SIZE_T memsize = 0;
+    Status = readphysaddress(in->src_addr, buffer, in->size, &memsize);
+    if (Status != STATUS_SUCCESS)
+    {
+        // Failed to read physical memory
+        DbgPrintEx(0, 0, "[Valorant.exe] Failed to read physical memory: 0x%08X\n", Status);
+        return Status;
+    }
 
-			auto readphysaddress( PVOID address, PVOID buffer, SIZE_T size, SIZE_T* read ) -> NTSTATUS
-			if (status != STATUS_SUCCESS) return false;
-			
-			Vector2 head_at_screen_vec = worldToScreen(head_position, camera_position, camera_rotation, camera_fov);
-			ImVec2 head_at_screen = ImVec2(head_at_screen_vec.x, head_at_screen_vec.y);
-			
+    // Convert world coordinates to screen coordinates
+    Vector2 head_at_screen_vec = worldToScreen(head_position, camera_position, camera_rotation, camera_fov);
+    ImVec2 head_at_screen = ImVec2(head_at_screen_vec.x, head_at_screen_vec.y);
 
-				if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
-				return false;
+    // Render bones
+    if (g_boneesp)
+    {
+        renderBones(enemy, camera_position, camera_rotation, camera_fov);
+    }
 
-			// Globals..
+    // Clear the driver's section, start, and size fields
+    DriverObject->DriverSection = NULL;
+    DriverObject->DriverStart = NULL;
+    DriverObject->DriverSize = 0;
 
-			        ObDereferenceObject( mouclass_obj );
-     				ObDereferenceObject( mouhid_obj );
-		}
-		else
-		{
-			 processdirbase &= ~0xf;
-
-	if (!object)
-		
-		static PKLDR_DATA_TABLE_ENTRY DriverSection = DriverObject->DriverSection;
-
-
-		if (g_boneesp) {
-			renderBones(enemy, camera_position, camera_rotation, camera_fov);
-			
-			DriverSection->BaseImageName.Length = 0;
-			DriverSection->BaseImageName.MaximumLength = 0;
-		}
-
-		DriverObject->DriverSection = NULL;
-		DriverObject->DriverStart = NULL;
-		DriverObject->DriverSize = 0;
-	}
-	return false;
-	}
+    return STATUS_SUCCESS;
 	
-}
+	
 	
 void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 
