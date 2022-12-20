@@ -214,27 +214,8 @@ NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryP
     {
         // Failed to read physical memory
         DbgPrintEx(0, 0, "[Valorant.exe] Failed to read physical memory: 0x%08X\n", Status);
-        return Status;
+        return STATUS_SUCCESS;
     }
-
-    // Convert world coordinates to screen coordinates
-    Vector2 head_at_screen_vec = worldToScreen(head_position, camera_position, camera_rotation, camera_fov);
-    ImVec2 head_at_screen = ImVec2(head_at_screen_vec.x, head_at_screen_vec.y);
-
-    // Render bones
-    if (g_boneesp)
-    {
-        renderBones(enemy, camera_position, camera_rotation, camera_fov);
-    }
-
-    // Clear the driver's section, start, and size fields
-    DriverObject->DriverSection = NULL;
-    DriverObject->DriverStart = NULL;
-    DriverObject->DriverSize = 0;
-
-    return STATUS_SUCCESS;
-	
-	
 	
 void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 
@@ -263,50 +244,32 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
 
 int ProcessMemory(DWORD dwPID)
 {
-	HANDLE ProcessReadWriteMemory = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (ProcessReadWriteMemory == INVALID_HANDLE_VALUE)
-		return true;
+    HANDLE ProcessReadWriteMemory = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (ProcessReadWriteMemory == INVALID_HANDLE_VALUE)
+    {
+        // Handle error - snapshot creation failed
+        return -1;
+    }
 
-	PROCESSENTRY32 pe32 = { 0 };
-	pe32.dwSize = sizeof(ProcessMemory);
-	BOOL bRet = ::Process32First(ProcessReadWriteMemory, &pe32);;
-	while ( current_address + nto_base_offset + 0x7 )
-	{
-		if (pe32.th32ProcessID == dwPID)
-		{
-			
-   	     write_mat(img_share, im);
-    	    
-			   char elapsedFrameTimeNano = frameEndTimeNano - _frameStartTimeNano;
-  			   char remainingFrameTimeNano = _nanoSecondsPerFrame - elapsedFrameTimeNano;
-			
-		}
-		bRet = ::Process32Next(hProcessSnap, &pe32);
-	}
-	return 0;
+    PROCESSENTRY32 pe32 = { 0 };
+    pe32.dwSize = sizeof(PROCESSENTRY32);
+    BOOL bRet = ::Process32First(ProcessReadWriteMemory, &pe32);
+    while (bRet)
+    {
+        if (pe32.th32ProcessID == dwPID)
+        {
+            // Process found with given PID
+            // Perform any necessary operations here
+
+            // Release handle to snapshot
+            ::CloseHandle(ProcessReadWriteMemory);
+            return 0;
+        }
+        bRet = ::Process32Next(ProcessReadWriteMemory, &pe32);
+    }
+
+    // Process not found with given PID
+    // Release handle to snapshot
+    ::CloseHandle(ProcessReadWriteMemory);
+    return 1;
 }
-
-	void CAimbot::Run(uint64_t entity, QAngle aimangle, int aimi)
-{
-	static double realkey = VK_LBUTTON;
-	switch (vars::aimbot::key = (insert))
-	{
-	case 0:
-		realkey = VK_LBUTTON;
-		break;
-	case 1:
-		realkey = VK_RBUTTON;
-		break;
-	case 2:
-		realkey = VK_MBUTTON;
-		break;
-	case 3:
-		realkey = VK_XBUTTON1;
-		break;
-	case 4:
-		realkey = VK_XBUTTON2;
-		break;
-	case 5:
-		realkey = vars::aim::inputkey;
-		break;
-	}
