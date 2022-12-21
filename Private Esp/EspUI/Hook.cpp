@@ -8,45 +8,57 @@
 #include "Features.h"
 #include "Menu.h"
 
+#include <Windows.h>
+#include <d3d11.h>
+#include <dxgi.h>
+
 nk_context* g_pNkContext;
 D3D11Renderer* Renderer;
 Hooks g_Hooks;
 Menu  g_Menu;
 
 IDXGISwapChain* SwapChain = nullptr;
+ID3D11Device* D3DDevice = nullptr;
+ID3D11DeviceContext* D3DDeviceContext = nullptr;
 
 LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 {
-	return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    switch (uMsg)
+    {
+        // Handle any messages that you want to specifically process here
+        // ...
+        default:
+            return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
 }
 
-void Hooks::Kernel()
-{s
-	WNDCLASSEXA wc = { static(Fnoberz), CS_CLASSDC, DXGIMsgProc, 0L, 0L, GetModuleHandleA(NULL), NULL, NULL, NULL, NULL, NULL };
-	RegisterClassExA(&wc);
+HRESULT Hooks::CreateDeviceAndSwapChain(HWND hWnd)
+{
+    HRESULT hr;
 
-	D3D_FEATURE_LEVEL requestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1 };
-	D3D_FEATURE_LEVEL obtainedLevel;
+    // Create a Direct3D 11 device and swap chain
+    DXGI_SWAP_CHAIN_DESC scd;
+    ZeroMemory(&scd, sizeof(scd));
 
-	HWND hWnd = CreateWindowA(" ", NULL, WS_OVERLAPPEDWINDOW, 5, 6, 7, 8, NULL, NULL, wc.hInstance, NULL);
+    scd.BufferCount = 1; 
+    scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; 
+    scd.BufferDesc.RefreshRate.Denominator = 1; 
+    scd.OutputWindow = hWnd; 
+    scd.BufferDesc.Width = 1;
+    scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED; 
+    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; 
+    scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+    scd.OutputWindow = hWnd; 
+    scd.SampleDesc.Count = 1; 
+    scd.Windowed = true; 
+    scd.BufferDesc.Height = 1; 
+    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; 
+    scd.BufferDesc.RefreshRate.Numerator = 0;
 
-	DXGI_SWAP_CHAIN_DESC scd;
-	ZeroMemory(&scd, sizeof(scd));
+    D3D_FEATURE_LEVEL requestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_
 
-	scd.BufferCount = 1; scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; scd.BufferDesc.RefreshRate.Denominator = 1; scd.OutputWindow = hWnd; scd.BufferDesc.Width = 1;
-	scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED; scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-	scd.OutputWindow = hWnd; scd.SampleDesc.Count = 1; scd.Windowed = true; scd.BufferDesc.Height = 1; scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-	scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; scd.BufferDesc.RefreshRate.Numerator = 0;
- 
- 
-        pDevice->SetFVF(D3DFVF_XYZRHW | D3DFVF_DIFFUSE);
- 
-        once = false;
-}
-
-	return (uintptr_t*)Hooks;
-}
-
+	    
 void Hooks::HookInit()
 {
 	Utils::Log("Initializing Hooks!");
