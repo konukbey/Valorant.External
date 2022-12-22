@@ -13,7 +13,7 @@ namespace kernel {
 
         DWORD64 retval = 0;
 
-        DWORD64 memaddress = 0;
+        DWORD64 memaddress = 0; 
         DWORD64 length = 0;
         PVOID buffer = 0;
     };
