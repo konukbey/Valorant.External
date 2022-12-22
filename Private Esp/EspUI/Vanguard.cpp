@@ -1,38 +1,49 @@
-#include "Engine.h"
-#include "Utils.h"
-#include "Globals.h"
-#include "Vector.hpp"
-#include "Vector2D.hpp"s
+#include <string>
+#include <cstring>
+#include <cmath>
 
-constexpr float r2d = 57.2957795131f;
-constexpr float d2r = 0.01745329251f;
-#define M_PI		3.14159265358979323846f
-#define M_RADPI		57.295779513082f
-#define M_PI_F		((float)(M_PI))	// Shouldn't collide with anything.
-#define RAD2DEG( x )  ( (float)(x) * (float)(180.f / M_PI_F) )
-#define DEG2RAD( x )  ( (float)(x) * (float)(M_PI_F / 180.f) )
+#include "Font.h"
 
-Draw draw;
+// Forward declaration for the font object
+class Font;
 
-INT Fps = 0;
-FLOAT LastTickCount = 0.0f;
-FLOAT CurrentTickCount;
-void Draw::FPSCheck(std::string& str)
+// Function that calculates the width of a given string of text when drawn to the screen
+int Draw::TextWidth(const std::string& text, const Font& font)
 {
-	CurrentTickCount = clock() * 0.001f;
-	Fps++;
+    // Initialize variables
+    int width = 0;
+    int current_line_width = 0;
+    int current_line_start = 0;
 
-	if ((CurrentTickCount - LastTickCount) > 1.0f)
-	{
-		LastTickCount = CurrentTickCount;
-		str = std::to_string(Fps);
-		Fps = 0;
-	}
+    // Iterate through each character in the string
+    for (size_t i = 0; i < text.length(); i++)
+    {
+        // Get the current character
+        char c = text[i];
+
+        // Check if the character is a newline
+        if (c == '\n')
+        {
+            // Update the width to be the maximum of the current width and the current line width
+            width = std::max(width, current_line_width);
+
+            // Reset the current line width and start position
+            current_line_width = 0;
+            current_line_start = i + 1;
+        }
+        else
+        {
+            // Get the glyph for the current character
+            Glyph glyph = font.GetGlyph(c);
+
+            // Update the current line width
+            current_line_width += glyph.advance;
+        }
+    }
+
+    // Return the maximum of the overall width and the final line width
+    return std::max(width, current_line_width);
 }
-
-int Draw::TextWidth(string Text)
-{
-
 
 
 void Draw::Text(int x, int y, string text, D3DCOLOR color, bool isBordered, TextAlignment eAlignment)
