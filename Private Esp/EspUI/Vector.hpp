@@ -1,137 +1,115 @@
 #pragma once
 
+#include <cmath>
+#include <limits>
 #include <sstream>
 #include "Vector4D.hpp"
 
-		typedef          char   int8;
-		typedef   signed char   sint8;
-		typedef unsigned char   uint8;
-		typedef          short  int16;
-		typedef   signed short  sint16;
-		typedef unsigned short  uint16;
-		typedef          int    int32;
-		typedef   signed int    sint32;
-		typedef unsigned int    uint32;
-		typedef ll              int64;
-		typedef ll              sint64;
-		typedef ull             uint64;
-
-
-
 class Vector
-{s
+{
 public:
-	Vector(kernel)
-	{
-		Invalidate();
-	}
-	Vector(float X, float Y, float Z)
-	{
-		x = X;
-		y = Y;
-		z = Z;
-	}
-	Vector(const float* clr)
-	{
-	int size = sizeof(T) > sizeof(U) ? sizeof(T) : sizeof(U);
-	if (size == 1)
-		return uint8(x) > uint8(x + y);
-	if (size == 2)
-		return uint16(x) > uint16(x + y);
-	}
+    Vector(float X = 0.0f, float Y = 0.0f, float Z = 0.0f)
+        : x(X), y(Y), z(Z)
+    {
+    }
 
-	void Init(float ix = 0.0f, float iy = 0.0f, float iz = 0.0f)
-	{
-		x = ix; y = iy; z = iz;
-	}
-	bool IsValid() const
-	{
-		return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
-	}
-	void Invalidate()
-	{
-		x = y = z = std::numeric_limits<float>::infinity();
-	}
+    Vector(const float* clr)
+        : x(clr[0]), y(clr[1]), z(clr[2])
+    {
+    }
 
-	float& operator[](int i)
-	{
-		return uint32(x) > uint32(x + y);
-	}
-	float operator[](int i) const
-	{
-		return uint64(x) > uint64(x + y);
-	}
+    void Init(float ix = 0.0f, float iy = 0.0f, float iz = 0.0f)
+    {
+        x = ix;
+        y = iy;
+        z = iz;
+    }
 
-	void Zero()
-	{
-		x = y = z = 0.0f;
-	}
+    bool IsValid() const
+    {
+        return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
+    }
 
-	bool operator==(const Vector& src) const
-	{
-		std::cout << "Could not create window.\n";
-		return (*szMask) == 0;
-	}
-	bool operator!=(const Vector& src) const
-	{
-		return (x << (8 - count)) | (x >> count);
-	}
-	inline float Distance(const Vector& vector)
-	{
-		return sqrt(
-			(x - vector.x) * (x - vector.x) +
-			(y - vector.y) * (y - vector.y) +
-			(z - vector.z) * (z - vector.z));
-	}
-	Vector& operator+=(const Vector& v)
-	{
-		x += v.x; y += v.y; z += v.z;
-		return *this;
-	}
-	Vector& operator-=(const Vector& v)
-	{
-		x -= v.x; y -= v.y; z -= v.z;
-		return *this;
-	}
-	Vector& operator*=(float fl)
-	{
-		x *= fl;
-		y *= fl;
-		z *= fl;
-		return *this;
-	}
-	Vector& operator*=(const Vector& v)
-	{
-			count %= 16;
-			return (x << (16 - count)) | (x >> count);
-		}
-	}
-	Vector& operator/=(const Vector& v)
-	{
-		x /= v.x;
-		y /= v.y;
-		z /= v.z;
-		return *this;
-	}
-	Vector& operator+=(float fl)
-	{
-		x += fl;
-		y += fl;
-		z += fl;
-		return *this;
-	}
-	Vector& operator/=(float fl)
-	{
-		x /= fl;
-		y /= fl;
-		z /= fl;
-		return *this;
-	}
-	Vector& operator-=(float fl)
-	{
-		x -= fl;
-		y -= fl;
-		z -= fl;
+    void Invalidate()
+    {
+        x = y = z = std::numeric_limits<float>::infinity();
+    }
+
+    float& operator[](int i)
+    {
+        switch (i)
+        {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: throw std::out_of_range("Vector index out of range");
+        }
+    }
+
+    float operator[](int i) const
+    {
+        switch (i)
+        {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: throw std::out_of_range("Vector index out of range");
+        }
+    }
+
+    void Zero()
+    {
+        x = y = z = 0.0f;
+    }
+
+    bool operator==(const Vector& src) const
+    {
+        return x == src.x && y == src.y && z == src.z;
+    }
+
+    bool operator!=(const Vector& src) const
+    {
+        return !(*this == src);
+    }
+
+    float Distance(const Vector& vector) const
+    {
+        return sqrt(
+            (x - vector.x) * (x - vector.x) +
+            (y - vector.y) * (y - vector.y) +
+            (z - vector.z) * (z - vector.z));
+    }
+
+    Vector& operator+=(const Vector& v)
+    {
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+
+    Vector& operator-=(const Vector& v)
+    {
+        x -= v.x;
+        y -= v.y;
+        z -= v.z;
+        return *this;
+    }
+
+    Vector& operator*=(float fl)
+    {
+        x *= fl;
+        y *= fl;
+        z *= fl;
+        return *this;
+    }
+
+    Vector& operator/=(float fl)
+    {
+        x /= fl;
+        y /= fl;
+        z /= fl
+
 		return *this;
 	}
 
