@@ -286,23 +286,30 @@ class __declspec(align(16)) VectorAligned : public Vector
 }
 
 
+void VectorAligned : public Vector
+{
 public:
-	explicit VectorAligned(const Vector& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
-	}
+    explicit VectorAligned(const Vector& vOther) : Vector(vOther)
+    {
+        // No need to initialize x, y, and z since they are already
+        // initialized in the base class (Vector) constructor
+    }
 
-	VectorAligned& operator=(const Vector& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
-		return *this;
-	}
+    VectorAligned& operator=(const Vector& vOther)
+    {
+        x = vOther.x;
+        y = vOther.y;
+        z = vOther.z;
+        return *this;
+    }
 
-	VectorAligned& operator=(const VectorAligned& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
-		return *this;
-	}
+    VectorAligned& operator=(const VectorAligned& vOther)
+    {
+        x = vOther.x;
+        y = vOther.y;
+        z = vOther.z;
+        return *this;
+    }
 
-	float w;
+    float w;
 };
