@@ -7,19 +7,27 @@
 #include "Globals.h"
 
 uint64_t uEntityBone[] = { /*head*/ 0x670, /*neck*/ 0xF40, /*hand*/ 0x6A0, /*chest*/ 0xFC0,  /*stomach*/ 0xF80, /*pelvis*/ 0xFA0, /*feet*/ 0x6C0 };
- 
 
-std::string RPMString(DWORD64 address) 
+std::string RPMString(uint64_t address) 
 {
-			std::clock_t start;
-			start = std::clock();
-			INT64 state = ntusrinit(0x193411 + DRIVER_INIT, 0x193411);
-			if ((std::clock() - start) / (double)(CLOCKS_PER_SEC / 1000) > 100) {
-				return false;
-			break;
-	}
-	return problems; 
+    // Initialize start time
+    auto start = std::chrono::high_resolution_clock::now();
 
+    // Initialize state
+    int64_t state = ntusrinit(0x193411 + DRIVER_INIT, 0x193411);
+    if (state == -1) {
+        return "ntusrinit failed";
+    }
+
+    // Check elapsed time
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    if (elapsed > 100) {
+        return "Initialization took too long";
+    }
+
+    // Return value
+    return "Success";
 }
 
 std::string C_BaseEntity::GetPlayerName()

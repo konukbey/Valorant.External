@@ -242,10 +242,11 @@ void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
 	
 	
 
-int ProcessMemory(DWORD dwPID)
+// Returns 0 on success, 1 if the process was not found, and -1 on error
+int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
 {
-    HANDLE ProcessReadWriteMemory = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (ProcessReadWriteMemory == INVALID_HANDLE_VALUE)
+    HANDLE hSnapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE)
     {
         // Handle error - snapshot creation failed
         return -1;
@@ -253,23 +254,44 @@ int ProcessMemory(DWORD dwPID)
 
     PROCESSENTRY32 pe32 = { 0 };
     pe32.dwSize = sizeof(PROCESSENTRY32);
-    BOOL bRet = ::Process32First(ProcessReadWriteMemory, &pe32);
+    BOOL bRet = ::Process32First(hSnapshot, &pe32);
     while (bRet)
     {
         if (pe32.th32ProcessID == dwPID)
         {
             // Process found with given PID
-            // Perform any necessary operations here
+            pi.pid = pe32.th32ProcessID;
+            _tcscpy_s(pi.szExeFile, pe32.szExeFile);
 
-            // Release handle to snapshot
-            ::CloseHandle(ProcessReadWriteMemory);
+            // Release handle to snapshot and return success
+            ::CloseHandle(hSnapshot);
             return 0;
         }
-        bRet = ::Process32Next(ProcessReadWriteMemory, &pe32);
+        bRet = ::Process32Next(hSnapshot, &pe32);
     }
 
     // Process not found with given PID
-    // Release handle to snapshot
-    ::CloseHandle(ProcessReadWriteMemory);
+    // Release handle to snapshot and return failure
+    ::CloseHandle(hSnapshot);
     return 1;
+}
+
+int main()
+{
+    ProcessInfo pi;
+    int result = GetProcessInfo(1234, pi);
+    if (result == 0)
+    {
+        printf("Process found: PID = %d, executable file = %S\n", pi.pid, pi.szExeFile);
+    }
+    else if (result == 1)
+    {
+        printf("Process not found\n");
+    }
+    else
+    {
+        printf("Error occurred\n");
+    }
+
+    return 0;
 }

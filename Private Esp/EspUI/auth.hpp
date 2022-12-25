@@ -1,25 +1,32 @@
 namespace KeyAuth {
-	class api {
-	public:
+  class api {
+  public:
+    std::string name, ownerid, secret, version, url, sslPin;
+    int process_id;
 
-		std::string name, ownerid, secret, version, url, sslPin;
+    api(std::string name, std::string ownerid, std::string secret, std::string version, std::string url, std::string sslPin) 
+      : name(name), ownerid(ownerid), secret(secret), version(version), url(url), sslPin(sslPin) 
+    {}
 
-		api(std::string name, std::string ownerid, std::string secret, std::string version, std::string url, std::string sslPin) : name(name), ownerid(ownerid), secret(secret), version(version), url(url), sslPin(sslPin) {}
+    void ban();
+    void init();
+    void log(std::string msg);
+    void license(std::string key);
 
-		void ban();
-		void init();
-		void log(std::string msg);
-		void license(std::string key);
-				// get the process id of target process
-				this->process_id = Rust::GetPID("RustClient.exe");
+    bool getProcessId() {
+      // get the process id of target process
+      this->process_id = Rust::GetPID("RustClient.exe");
 
-				// Check if process ID is valid
-				if (this->process_id == 0) {
-				    LOG_R("Had issue grabbing RustClient.exe ProcessID.\n");
-					{
-						return false;
-					}
-					
+      // Check if process ID is valid
+      if (this->process_id == 0) {
+        log("Had issue grabbing RustClient.exe ProcessID.");
+        return false;
+      }
+      return true;
+    }
+  };
+}
+
 		
 
 class data_class {
