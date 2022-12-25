@@ -17,16 +17,25 @@ public:
 	typedef HRESULT(__stdcall* D3D11Present_o)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 
 private:
-	D3D11Present_o			 oD3D11Present			 = nullptr;
-	WNDPROC				     pOriginalWNDProc		 = nullptr;
+  // Function pointer for the original IDXGISwapChain::Present function
+  D3D11Present_o oD3D11Present = nullptr;
 
-	HWND hWindow									 = nullptr;
-	std::unique_ptr<VMTHook> pD3DSwap				 = nullptr;
-	s
-	ID3D11Device*			 pD3DDevice				 = nullptr;
-	ID3D11DeviceContext*	 pD3DContext			 = nullptr;
-	ID3D11Texture2D*		 pD3DRenderTargetTexture = nullptr;
-	ID3D11RenderTargetView*  pD3DRenderTargetView    = nullptr;
+  // Function pointer for the original window procedure
+  WNDPROC pOriginalWNDProc = nullptr;
+
+  // Handle to the window that the Direct3D rendering is being done in
+  HWND hWindow = nullptr;
+
+  // Smart pointer to a VMTHook object for intercepting virtual member function calls
+  std::unique_ptr<VMTHook> pD3DSwap = nullptr;
+
+  // Direct3D 11 device and device context
+  ID3D11Device* pD3DDevice = nullptr;
+  ID3D11DeviceContext* pD3DContext = nullptr;
+
+  // Texture and render target view for rendering to a 2D texture
+  ID3D11Texture2D* pD3DRenderTargetTexture = nullptr;
+  ID3D11RenderTargetView* pD3DRenderTargetView = nullptr;
 };
 
 class VMTHook
