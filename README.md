@@ -6,17 +6,24 @@
 ![Go](https://img.shields.io/badge/-Go-05122A?style=for-the-badge&logo=Go)&nbsp; 
       
       
-## ⚙ How to Setup
- 1) **Create**  [Drver Kernel](https://www.youtube.com/watch?v=xh5cCUuQfL8&t=1090s&ab_channel=EthanEDITS)
- 2) It's time for fun / use it at your own risk 
- 3) [Discord Server](https://discord.gg/MBTkVcJefp)
+## ⚙ Setup
+
+- Build a kernel driver to make it work because
+- When it's done, combine it with the file.
+- and run it as admin
+- Finish & `START GAME`
 
 
-###### ❌ You cannot use public drivers like mapper because they are old versions. I recommend you to create your own will be the best. 
-- We set Source to not re-use the driver. That's why we let you create it yourself.
-    
+###### ❌ Use it at your own risk.
      
-   
+     
+## Important
+
+- I'm not responsible if you get banned. because this is public version
+
+
+---
+
 ## FEATURE     
 
 #### Aimbot 
@@ -39,17 +46,20 @@
 
 ---
 
+https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-a31b-f35f746189a9.mp4
+
+---
+
+
   <p align="center">
-    <a href="https://discord.com/users/943374631644045363">
-        <img title="Fnoberz server discord" alt="Fnoberz's discord" src="https://discord.c99.nl/widget/theme-4/943374631644045363.png"/>
+    <a href="https://discord.gg/MBTkVcJefp">
+        <img title="Slackes server discord" alt="Slackes discord" src="https://discordapp.com/api/guilds/880135738077896764/widget.png?style=banner2"/>
     </a>
 </p> 
  
-### 💬 ・HELP & SUPPORT | [Discord](https://discord.gg/MBTkVcJefp) 
+## 💬 ・[Discord](https://discord.gg/MBTkVcJefp) 
 
-
- ### 🛒〢 `PRIVATE CHEAT`
- More Here [Information](https://github.com/Club-CC/Detail)
+ ### 🛒〢 `PRODUCT`
  
 <table>
 <tr>
@@ -59,27 +69,22 @@
 </table>
 
   
-### 🎯 〢 Product Cheat
+### 🥊 〢 Private Cheat
 
-- Lifetime + Update Free
+- Lifetime 
+- Free Updates 
+- Undetected
 - Custom Feature if you want `(Example: Aimbot + Esp + Skin Changers)`
-- Undetected and can be played on the main account.
 
+### ⚓〢 Warranty
 
-### 💯〢 Warranty Product.
-
-- Support 24 Hr + Update Free
-- IF Banned = REFUND
+- Support 24 Hr
+- Update Free
+- If banned = `REFUND`
 
 A website that I created to introduce myself from start to finish. hope you like it [Slackes.me](http://slackes.me/)
 
 ---
-
-
-
-
-https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-a31b-f35f746189a9.mp4
-
 
 
 
