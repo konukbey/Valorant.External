@@ -7,9 +7,11 @@
       
       
 ## ⚙ How to Setup
-- You need to **create** a [Drver Kernel](https://www.youtube.com/watch?v=xh5cCUuQfL8&t=1090s&ab_channel=EthanEDITS) and when it's done you put the Source in the Driver folder.
-- It's time for fun / use it at your own risk 
-- Other question & help / [Discord Server](https://discord.gg/MBTkVcJefp)
+ 1) **Create**  [Drver Kernel](https://www.youtube.com/watch?v=xh5cCUuQfL8&t=1090s&ab_channel=EthanEDITS)
+ 2) It's time for fun / use it at your own risk 
+ 3) [Discord Server](https://discord.gg/MBTkVcJefp)
+
+
 ###### ❌ You cannot use public drivers like mapper because they are old versions. I recommend you to create your own will be the best. 
 - We set Source to not re-use the driver. That's why we let you create it yourself.
     
@@ -70,12 +72,13 @@
 - IF Banned = REFUND
 
 A website that I created to introduce myself from start to finish. hope you like it [Slackes.me](http://slackes.me/)
+
 ---
 
 
 
 
-https://user-images.githubusercontent.com/94861415/207130183-b0d713b1-e450-4efb-bc31-8c9c832032c7.mp4
+https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-a31b-f35f746189a9.mp4
 
 
 
