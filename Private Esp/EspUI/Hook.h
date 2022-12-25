@@ -31,27 +31,43 @@ private:
 
 class VMTHook
 {
+private:
+    uintptr_t** ppBaseTable;
+    uintptr_t* pOriginalVMT;
+    uintptr_t* pNewVMT;
+
 public:
-	VMTHook(void* Instance) : ppBaseTable(reinterpret_cast<uintptr_t**>(Instance)) { this->pOriginalVMT = *ppBaseTable; }
+    VMTHook(void* Instance) : ppBaseTable(reinterpret_cast<uintptr_t**>(Instance))
+    {
+        // Allocate a new VMT and copy the original functions into it
+        size_t VMTMethodCount = 0;
+        while (reinterpret_cast<uintptr_t*>(*ppBaseTable)[VMTMethodCount])
+            ++VMTMethodCount;
 
-	uintptr_t Hook(void* NewFunc, const std::size_t Index)
-	{
-		// save orignal function address
-		this->pOrgVFunc = (uintptr_t*)this->pOriginalVMT[Index];
+        pNewVMT = new uintptr_t[VMTMethodCount];
+        memcpy(pNewVMT, *ppBaseTable, VMTMethodCount * sizeof(uintptr_t));
 
-		 if (address > 0x7FFFFFFFFFFF || address < 1) return 0;
-   		 WriteProcessMemory(GetCurrentProcess(), (LPVOID)address, buffer, sizeh, 0);
-		return (uintptr_t)this->pOrgVFunc;
-	}
+        // Replace the original VMT with the new one
+        pOriginalVMT = *ppBaseTable;
+        *ppBaseTable = pNewVMT;
+    }
 
-	void UnHook(const std::size_t Index) { this->pOriginalVMT[Index] = (uintptr_t)this->pOrgVFunc; };
+    ~VMTHook()
+    {
+        // Restore the original VMT
+        *ppBaseTable = pOriginalVMT;
+    }
 
-	const auto address = module.image_base;
+    void Hook(void* NewFunc, const std::size_t Index)
+    {
+        pNewVMT[Index] = reinterpret_cast<uintptr_t>(NewFunc);
+    }
 
-                ExFreePool( info );
-
-                return reinterpret_cast< uintptr_t > ( address );
-	};
+    void UnHook(const std::size_t Index)
+    {
+        pNewVMT[Index] = pOriginalVMT[Index];
+    }
+};
 
 private: 
 	 if (key != insert) // You can set it to any button you want.
