@@ -1,80 +1,59 @@
-namespace offsets {
-	// global
-	uint64_t uworld_state = 0x8FDF540; 			// game_base (Pointer: 0x60)
-	uint64_t uworld_key = 0x8FDF578;			// game_base
-	uint64_t g_object_state = 0x8E4D700;			// game_base
-	uint64_t g_object_key = 0x8E4D738;			// game_base
-	uint64_t line_of_sight = 0x50e6550;			// game_base
-	uint64_t bone_matrix = 0x498F1E0;			// game_base
-	uint64_t find_object = 0x3347E30;			// game_base
-	uint64_t process_event = 0x3306FA0;			// game_base
-	uint64_t skin_changer_decryption = 0x23D3C20;	 	// game_base
-	
-	// veh deref
-	uint64_t pakman_offset = 0x1B67F90;                     // deref_pointer_in_game_space_fn - https://www.unknowncheats.me/forum/valorant/503616-dumping-valorant-perfect-results-easy.html
-		
-	// world
-	uint64_t persistent_level = 0x38;			// world > persistent_level
-	uint64_t game_instance = 0x1A0;				// world > game_instance
-
-	// player
-	uint64_t localplayers_array = 0x40;			// world > game_instance > localplayers_array
-	uint64_t localplayer = 0x40;				// world > game_instance > localplayers_array[0]
-	uint64_t player_controller = 0x38;			// world > game_instance > localplayers_array[0] > playercontroller
-	uint64_t apawn = 0x460;					// world > game_instance > localplayers_array[0] > playercontroller > apawn									// aactor > apawn
-
-	// vector
-	uint64_t root_component = 0x230;			// world > game_instance > localplayers_array[0] > playercontroller > apawn > root_component				// aactor > root_component
-	uint64_t root_position = 0x164;				// world > game_instance > localplayers_array[0] > playercontroller > apawn > root_component > root_position		// aactor > root_component > position
-	
-	// controllers
-	uint64_t damage_handler = 0x9A8;			// world > game_instance > localplayers_array[0] > playercontroller > apawn > damage_handler			// aactor > damage_controller
-	uint64_t camera_controller = 0x440;			// world > game_instance > localplayers_array[0] > playercontroller > camera_controller
-
-	// camera
-	uint64_t camera_position = 0x1260;			// world > game_instance > localplayers_array[0] > playercontroller > camera_controller > camera_position
-	uint64_t camera_rotation = 0x126C;			// world > game_instance > localplayers_array[0] > playercontroller > camera_controller > camera_rotation
-	uint64_t camera_fov = 0x1278;				// world > game_instance > localplayers_array[0] > playercontroller > camera_controller > camera_fov
-	uint64_t camera_manager = 0x478;			// world > game_instance > localplayers_array[0] > playercontroller > camera_manager
-
-
-	// level > actors
-	uint64_t actor_array = 0xA0;				// world > persistent_level > actor_array
-	uint64_t actors_count = 0xB8;				// world > persistent_level > actors_count
-
-	// level > actors info
-	uint64_t actor_id = 0x18;				// world > persistent_level > aactor > actor_id
-	uint64_t unique_id = 0x38;				// world > persistent_level > aactor > unique_id
-	uint64_t team_component = 0x628;			// world > persistent_level > aactor > player_state > team_component
-	uint64_t team_id = 0xF8;				// world > persistent_level > aactor > team_component > team_id
-	uint64_t health = 0x1B0;				// world > persistent_level > aactor > damage_controller > health
-	uint64_t dormant = 0x100;				// world > persistent_level > aactor > dormant
-	uint64_t player_state = 0x3F0;				// world > persistent_level > aactor > player_state
-
-	// mesh
-	uint64_t mesh = 0x430;					// world > persistent_level > aactor > mesh
-	uint64_t component_to_world = 0x250;			// world > persistent_level > aactor > mesh > component_to_world
-	uint64_t bone_array = 0x5C0;				// world > persistent_level > aactor > mesh > bone_array
-	uint64_t bone_count = 0x5C8;				// world > persistent_level > aactor > mesh > bone_array + (index * bone_count)
-	uint64_t last_submit_time = 0x378;			// world > persistent_level > aactor -> mesh -> last_submit_time
-	uint64_t last_render_time = 0x37C;			// world > persistent_level > aactor -> mesh -> last_render_time
-	
-	// chams / glow chams : method1 - BlackMax97
-	uint64_t outline_mode = 0x330;				// mesh > outline_mode
-	uint64_t attach_children = 0x110;			// mesh > attach_children
-	uint64_t attach_children_count = 0x118;			// mesh > attach_children + 0x8
-	
-	// chams / glow chams : method2 - unknownjunks
-	uint64_t outline_component = 0x10d8;			// actor > outline_component3p
-	uint64_t outline_mode = 0x2B1;				// outline_component3p > outline_mode
-	
-	// chams / glow chams colors
-	uint64_t outline_ally_color = 0x8EFA150;		// game_base
-	uint64_t outline_enemy_color = 0x8EFA7E0;		// game_base
-	
-	// minimap
-	uint64_t portrait_minimap_component = 0x10B0;		// actor > portrait_minimap_component
-	uint64_t character_minimap_component = 0x10B8;		// actor > character_minimap_component
-	uint64_t local_observer = 0x530;			// minimap_component > local_observer
-	uint64_t is_visible = 0x501;				// minimap_component > is_visible
-}
+ uintptr_t DefuseProgress = 0x500;
+             uintptr_t CurrentDefuseSection = 0x514;
+             uintptr_t TimeRemainingToExplode = 0x4d4;
+             uintptr_t BombHasBeenDefused = 0x4DD;
+             uintptr_t BombHasExploded = 0x4b0;
+            
+             uintptr_t uworld_state = 0x9005C00;
+             uintptr_t uworld_key = uworld_state + 0x38;
+ 
+             uintptr_t game_instance = 0x1A0; // world + game_instance // TYPE=uintptr_t
+             uintptr_t persistent_level = 0x38; // world + persistent_level // TYPE=uintptr_t
+ 
+             uintptr_t local_player_array = 0x40; // game_instance + local_player_array // TYPE=uintptr_t
+             uintptr_t local_player_controller = 0x38; // local_player + local_player_controller // TYPE=uintptr_t
+             uintptr_t local_player_pawn = 0x460; // local_player_controller + local_player_pawn // TYPE=uintptr_t (=actor)
+             uintptr_t control_rotation = 0x440; // local_player_controller + control_rotation // TYPE=Vector3
+ 
+             uintptr_t camera_manager = 0x478; // local_player_controller + camera_manager // TYPE=uintptr_t
+             uintptr_t camera_position = 0x1260; // camera_manager + camera_position // TYPE=Vector3
+             uintptr_t camera_rotation = 0x126C;  // camera_manager + camera_rotation // TYPE=Vector3
+             uintptr_t camera_fov = 0x1278;  // camera_manager + camera_fov // TYPE=float
+ 
+             uintptr_t actor_array = 0xA0; // persistent_level + actor_array // TYPE=uintptr_t
+             uintptr_t actor_count = 0xB8; // persistent_level + actor_count // TYPE=int
+ 
+             uintptr_t unique_id = 0x38;  // actor + actor_id // TYPE=uintptr_t
+             uintptr_t mesh_component = 0x430; // actor + mesh_component // TYPE=uintptr_t
+             uintptr_t last_submit_time = 0x374 + 0x4; // mesh_component + last_submit_time // TYPE=float
+             uintptr_t last_render_time = last_submit_time + 0x4; // mesh_component + last_render_time // TYPE=float
+             uintptr_t bone_array = 0x5C0; // mesh_component + bone_array // TYPE=uintptr_t
+             uintptr_t bone_array_Cached = bone_array + 0x10; // mesh_component + bone_array // TYPE=uintptr_t
+             uintptr_t bone_count = bone_array + 0x8; // actor + bone_count // TYPE=uintptr_t
+             uintptr_t component_to_world = 0x250; // mesh_component + component_to_world // TYPE=uintptr_t
+             uintptr_t root_component = 0x230; // actor + root_component // TYPE=uintptr_t
+             uintptr_t RelativeLocation = 0x164;//ok
+             uintptr_t root_position = 0x164; // root_component + root_position // TYPE=Vector3
+             uintptr_t damage_handler = 0x9a8; // actor/local_player_pawn + damage_handler // TYPE=uintptr_t
+             uintptr_t health = 0x1B0; // damage_handler + health // TYPE=float
+             uintptr_t dormant = 0x100; // actor + dormant // TYPE=bool
+             uintptr_t player_state = 0x3F0; // actor/local_player_pawn + player_state // TYPE=uintptr_t
+             uintptr_t team_component = 0x628; // player_state + team_component // TYPE=uintptr_t
+             uintptr_t team_id = 0xF8; // team_component + team_id
+ 
+            //inventory
+             uintptr_t inventory = 0x948;    
+             uintptr_t current_equipable = 0x238;
+             uintptr_t ammo_info = 0xfb0;
+             uintptr_t max_ammo = 0x120;
+             uintptr_t current_ammo = 0x11C;
+             uintptr_t ObjID = 0x18;
+            //fresnel
+             uintptr_t fresnel_intensity = 0x6b8;
+            //
+             uintptr_t viewangle = 0x170;
+ 
+            //map
+             uintptr_t GameState = 0x140;
+             uintptr_t    MapLoadModel = 0x140;
+             uintptr_t ClientGameInstance = 0x678;
