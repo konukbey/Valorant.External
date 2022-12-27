@@ -132,11 +132,40 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 }
 
 	
-static inline void get_cstr_from_jstring(JNIEnv* env, jstring jstr, char **out) {
-	jboolean iscopy = JNI_TRUE;
-	const auto ntHeaders = (PIMAGE_NT_HEADERS)((std::uint8_t*)moduleAdress + dosHeader->e_lfanew);
-	*out = strdup(cstr);
-	env->ReleaseStringUTFChars(jstr, cstr);
+static void DeleteHookEntry(UINT pos)
+{
+    // Check if the position is valid.
+    if (pos >= g_hooks.size)
+    {
+        // Handle error.
+        return;
+    }
+
+    // If the entry being deleted is not the last entry in the list,
+    // replace it with the last entry.
+    if (pos < g_hooks.size - 1)
+    {
+        g_hooks.pItems[pos] = g_hooks.pItems[g_hooks.size - 1];
+    }
+
+    // Decrement the size of the list.
+    g_hooks.size--;
+
+    // Check if the capacity of the list should be reduced.
+    if (g_hooks.capacity / 2 >= INITIAL_HOOK_CAPACITY && g_hooks.capacity / 2 >= g_hooks.size)
+    {
+        // Reallocate the memory for the list, reducing its capacity by half.
+        HOOK_ENTRY* p = (HOOK_ENTRY*)HeapReAlloc(
+            g_hHeap, 0, g_hooks.pItems, (g_hooks.capacity / 2) * sizeof(HOOK_ENTRY));
+        if (p == NULL)
+        {
+            // Handle error.
+            return;
+        }
+
+        // Update the capacity of the list.
+        g_hooks.capacity /= 2;
+    }
 	
 }
 
