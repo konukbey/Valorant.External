@@ -149,3 +149,25 @@ void RCS(Vector3 Target, Vector3 Camera_rotation, float SmoothFactor) {
 	{
 		 return false;
 }
+
+void activateValorantWindow() {
+	SetForegroundWindow(valorant_window);
+	mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+	mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+}
+	
+	
+void handleKeyPresses() {
+	// Toggle overlay
+	if (GetAsyncKeyState(VK_INSERT) & 1) {
+		g_overlay_visible = !g_overlay_visible;
+		glfwSetWindowAttrib(g_window, GLFW_MOUSE_PASSTHROUGH, !g_overlay_visible);
+		if (g_overlay_visible) {
+			HWND overlay_window = glfwGetWin32Window(g_window);
+			SetForegroundWindow(overlay_window);
+		}
+		else {
+			activateValorantWindow();
+		}
+	}
+}
