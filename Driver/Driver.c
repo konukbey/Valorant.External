@@ -295,3 +295,120 @@ int main()
 
     return 0;
 }
+									   
+									   
+								
+NTSTATUS create_shared_memory()
+{
+	DbgPrint("Creating Memory.\n");
+	NTSTATUS Status = STATUS_UNSUCCESSFUL;
+
+	Status = RtlCreateSecurityDescriptor(&SecDescriptor, SECURITY_DESCRIPTOR_REVISION);
+	if (!NT_SUCCESS(Status))
+	{
+		DbgPrintEx(0, 0, "RtlCreateSecurityDescriptor failed: %p\n", Status);
+		return Status;
+	}
+
+	DaclLength = sizeof(ACL) + sizeof(ACCESS_ALLOWED_ACE) * 3 + RtlLengthSid(SeExports->SeLocalSystemSid) + RtlLengthSid(SeExports->SeAliasAdminsSid) +
+		RtlLengthSid(SeExports->SeWorldSid);
+	Dacl = ExAllocatePoolWithTag(PagedPool, DaclLength, 'lcaD');
+
+	if (Dacl == NULL)
+	{
+		return STATUS_INSUFFICIENT_RESOURCES;
+		DbgPrintEx(0, 0, "ExAllocatePoolWithTag failed: %p\n", Status);
+	}
+
+	Status = RtlCreateAcl(Dacl, DaclLength, ACL_REVISION);
+
+	if (!NT_SUCCESS(Status))
+	{
+		ExFreePool(Dacl);
+		DbgPrintEx(0, 0, "RtlCreateAcl failed: %p\n", Status);
+		return Status;
+	}
+
+	Status = RtlAddAccessAllowedAce(Dacl, ACL_REVISION, FILE_ALL_ACCESS, SeExports->SeWorldSid);
+
+	if (!NT_SUCCESS(Status))
+	{
+		ExFreePool(Dacl);
+		DbgPrintEx(0, 0, "RtlAddAccessAllowedAce SeWorldSid failed: %p\n", Status);
+		return Status;
+	}
+
+	Status = RtlAddAccessAllowedAce(Dacl,
+		ACL_REVISION,
+		FILE_ALL_ACCESS,
+		SeExports->SeAliasAdminsSid);
+
+	if (!NT_SUCCESS(Status))
+	{
+		ExFreePool(Dacl);
+		DbgPrintEx(0, 0, "RtlAddAccessAllowedAce SeAliasAdminsSid failed  : %p\n", Status);
+		return Status;
+	}
+
+	Status = RtlAddAccessAllowedAce(Dacl,
+		ACL_REVISION,
+		FILE_ALL_ACCESS,
+		SeExports->SeLocalSystemSid);
+
+	if (!NT_SUCCESS(Status))
+	{
+		ExFreePool(Dacl);
+		DbgPrintEx(0, 0, "RtlAddAccessAllowedAce SeLocalSystemSid failed  : %p\n", Status);
+		return Status;
+	}
+
+	Status = RtlSetDaclSecurityDescriptor(&SecDescriptor,
+		TRUE,
+		Dacl,
+		FALSE);
+
+	if (!NT_SUCCESS(Status))
+	{
+		ExFreePool(Dacl);
+		DbgPrintEx(0, 0, "RtlSetDaclSecurityDescriptor failed  : %p\n", Status);
+		return Status;
+	}
+
+	UNICODE_STRING SectionName = { 0 };
+	RtlInitUnicodeString(&SectionName, g_SharedSectionName);
+
+	OBJECT_ATTRIBUTES ObjAttributes = { 0 };
+	InitializeObjectAttributes(&ObjAttributes, &SectionName, OBJ_CASE_INSENSITIVE, NULL, &SecDescriptor);
+
+	LARGE_INTEGER lMaxSize = { 0 };
+	lMaxSize.HighPart = 0;
+	lMaxSize.LowPart = 1044 * 10;
+
+	/* Begin Mapping */
+	Status = ZwCreateSection(&g_Section, SECTION_ALL_ACCESS, &ObjAttributes, &lMaxSize, PAGE_READWRITE, SEC_COMMIT, NULL);
+	if (!NT_SUCCESS(Status))
+	{
+		DbgPrintEx(0, 0, "Create Section Failed. Status: %p\n", Status);
+		return Status;
+	}
+
+	//-----------------------------------------------------------------------------	
+	//	 ZwMapViewOfSection
+	//	-lMaxSize is the ammount of 'Room' the MapViewOfSection will look at
+	//	-ViewSize is how much of the 'Room' will be mapped (if 0 then starts at beggining)
+	//-----------------------------------------------------------------------------	
+
+	SIZE_T ulViewSize = 0;
+	Status = ZwMapViewOfSection(g_Section, NtCurrentProcess(), &shared_section, 0, lMaxSize.LowPart, NULL, &ulViewSize, ViewShare, 0, PAGE_READWRITE | PAGE_NOCACHE);
+	if (!NT_SUCCESS(Status))
+	{
+		DbgPrintEx(0, 0, "Map View Section Failed. Status: %p\n", Status);
+		ZwClose(g_Section); //Close Handle
+		return Status;
+	}
+
+	DbgPrintEx(0, 0, "Shared Memory Created.\n\n");
+	ExFreePool(Dacl);
+
+	return Status;
+}
