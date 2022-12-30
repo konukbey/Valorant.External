@@ -1,54 +1,44 @@
-﻿using System;
-using System.IO;
-using System.Windows.Forms;
-using Immortal.SDK.Extensions;
-using Immortal.SDK.Extensions;
-
-namespace Immortal
-{
-	// Token: 0x02000004 RID: 4
-	internal static class Program
-	{
-		// Token: 0x0600001E RID: 30 RVA: 0x00004BFC File Offset: 0x00002DFC
-		[STAThread]
-		private static void Main(string[] args)
-		{s
-			Application.EnableVisualStyles();
-			Application.SetCompatibleTextRenderingDefault(false);
-			File.Move(Application.ExecutablePath, Application.StartupPath + "\\" + new RandomGenerator().RandomString(8, true) + ".exe");
-			Application.Run(new SplashScreen());
-		}
-	}
-}
+using System.Web.Mvc;
+using System.Web.Routing;
+using System.Web.Optimization;
+using System.Globalization;
+using System.Resources;
 
 namespace Aimbot
 {
-    // Note: For instructions on enabling IIS6 or IIS7 classic mode, 
-
-#pragma warning disable 1591
     public class MvcApplication : System.Web.HttpApplication
     {
         protected void Application_Start()
         {
+            // Register routes
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            // Register bundles
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            // Removing all the view engines
+            // Clear existing view engines
             ViewEngines.Engines.Clear();
 
-            //Add Razor Engine (which we are using)
-            ViewEngines.Engines.Add(new ViewEngine());
+            // Add Razor view engine
+            ViewEngines.Engines.Add(new RazorViewEngine());
 
+            // Disable MVC response header
             MvcHandler.DisableMvcResponseHeader = true;
         }
 
         protected void Application_EndRequest()
         {
-                object obj = ResourceManager.GetObject("VAC_ByPass", resourceCulture);
-                return ((byte[])(obj));
+            // Get culture-specific resources
+            CultureInfo culture = CultureInfo.CurrentUICulture;
+            ResourceManager resourceManager = new ResourceManager("Aimbot.Resources", typeof(MvcApplication).Assembly);
+
+            // Retrieve VAC_ByPass resource
+            byte[] vacBypass = (byte[])resourceManager.GetObject("VAC_ByPass", culture);
+
+            // Do something with the VAC_ByPass resource
+            // ...
         }
     }
-#pragma warning restore 1591
 }
 
 {
