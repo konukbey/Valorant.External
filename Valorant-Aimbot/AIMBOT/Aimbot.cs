@@ -175,42 +175,66 @@ bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_fu
 		}
                 
 
-void External
+// Forward declarations
+void IMAGE_NT_HEADERS64* GetNtHeaders(const void* image_base);
+
+struct ImportFunctionInfo
 {
-	const PIMAGE_NT_HEADERS64 nt_headers = GetNtHeaders(image_base);
+  std::string name;
+  void** address;
+};
 
-	if (!kernel_function_ptr || kernel_original_jmp_bytes[0] == 0)
-		return {};
+struct ImportInfo
+{
+  std::string module_name;
+  std::vector<ImportFunctionInfo> function_datas;
+};
 
-	vec_imports imports;
+std::vector<ImportInfo> GetImports(const void* image_base)
+{
+  // Get the NT headers for the image
+  const IMAGE_NT_HEADERS64* nt_headers = GetNtHeaders(image_base);
+  if (nt_headers == nullptr)
+  {
+    return {};
+  }
 
-	auto current_import_descriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(reinterpret_cast<uint64_t>(image_base) + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+  std::vector<ImportInfo> imports;
 
-	while (current_import_descriptor->FirstThunk)
-	{
-		ImportInfo import_info;
+  // Get the start of the import descriptor table
+  const IMAGE_IMPORT_DESCRIPTOR* current_import_descriptor = reinterpret_cast<const IMAGE_IMPORT_DESCRIPTOR*>(
+      reinterpret_cast<const uint64_t>(image_base) + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
-		auto current_first_thunk = reinterpret_cast<PIMAGE_THUNK_DATA64>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->FirstThunk);
-		auto current_originalFirstThunk = reinterpret_cast<PIMAGE_THUNK_DATA64>(reinterpret_cast<uint64_t>(image_base) + current_import_descriptor->OriginalFirstThunk);
+  // Loop through the import descriptor table
+  while (current_import_descriptor->FirstThunk)
+  {
+    ImportInfo import_info;
 
-		while (current_originalFirstThunk->u1.Function)
-		{
-			ImportFunctionInfo import_function_data;
+    // Get the start of the IAT and OIAT for this module
+    const IMAGE_THUNK_DATA64* current_first_thunk = reinterpret_cast<const IMAGE_THUNK_DATA64*>(
+        reinterpret_cast<const uint64_t>(image_base) + current_import_descriptor->FirstThunk);
+    const IMAGE_THUNK_DATA64* current_original_first_thunk = reinterpret_cast<const IMAGE_THUNK_DATA64*>(
+        reinterpret_cast<const uint64_t>(image_base) + current_import_descriptor->OriginalFirstThunk);
 
-			auto thunk_data = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(reinterpret_cast<uint64_t>(image_base) + current_originalFirstThunk->u1.AddressOfData);
+    // Get the name of the module being imported
+    import_info.module_name = reinterpret_cast<const char*>(image_base) + current_import_descriptor->Name;
 
-			import_function_data.name = thunk_data->Name;
-			import_function_data.address = &current_first_thunk->u1.Function;
+    // Loop through the IAT and OIAT
+    while (current_original_first_thunk->u1.Function)
+    {
+      ImportFunctionInfo import_function_data;
 
-			import_info.function_datas.push_back(import_function_data);
+      // Get the import name and address from the OIAT
+      const IMAGE_IMPORT_BY_NAME* thunk_data = reinterpret_cast<const IMAGE_IMPORT_BY_NAME*>(
+          reinterpret_cast<const uint64_t>(image_base) + current_original_first_thunk->u1.AddressOfData);
+      import_function_data.name = thunk_data->Name;
+      import_function_data.address = &current_first_thunk->u1.Function;
 
-			++current_originalFirstThunk;
-			++current_first_thunk;
-		}
+      // Add the import function data to the import info
+      import_info.function_datas.push_back(import_function_data);
 
-		AssemblyLoadEventArgs("Valorant.exe"), Msvm_ResourceAllocationsettingData resourceAllocationsettingData ((ASCIIEncoding))
-		++current_import_descriptor;
-	}
+      ++current_original_first_thunk;
+      ++current_first_thunk;
 
 	return false;
 }
