@@ -48,11 +48,30 @@ private:
 	D3D11StateSaver(static D3D11StateSaver&);
 	D3D11StateSaver& operator=(const D3D11StateSaver&);
 
+class D3D11StateSaver
+{
 public:
-	D3D11StateSaver();
-	~D3D11StateSaver();
+    // Constructor. Takes a pointer to an ID3D11DeviceContext object as an argument.
+    explicit D3D11StateSaver(ID3D11DeviceContext* pContext);
 
-	HRESULT saveCurrentState(ID3D11DeviceContext* pContext);
-	HRESULT restoreSavedState();
-	void releaseSavedState();
-};
+    // Destructor. Automatically restores the saved state when the object goes out of scope.
+    ~D3D11StateSaver();
+
+    // Deleted copy constructor and copy assignment operator to prevent copies of the object.
+    D3D11StateSaver(const D3D11StateSaver&) = delete;
+    D3D11StateSaver& operator=(const D3D11StateSaver&) = delete;
+
+    // Movable but not copyable.
+    D3D11StateSaver(D3D11StateSaver&&) = default;
+    D3D11StateSaver& operator=(D3D11StateSaver&&) = default;
+
+    // Saves the current state of the Direct3D 11 device context. Returns true on success, false on failure.
+    bool saveCurrentState();
+
+    // Restores the saved state of the Direct3D 11 device context. Returns true on success, false on failure.
+    bool restoreSavedState();
+
+    // Releases any resources associated with the saved state.
+    void releaseSavedState();
+}
+	
