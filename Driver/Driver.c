@@ -276,24 +276,24 @@ int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
     return 1;
 }
 
-int main()
+std::string RPMString(DWORD64 address) 
 {
-    ProcessInfo pi;
-    int result = GetProcessInfo(1234, pi);
-    if (result == 0)
-    {
-        printf("Process found: PID = %d, executable file = %S\n", pi.pid, pi.szExeFile);
-    }
-    else if (result == 1)
-    {
-        printf("Process not found\n");
-    }
-    else
-    {
-        printf("Error occurred\n");
-    }
+	if (!(void*)address)
+		return std::string("BOT");
 
-    return 0;
+	std::string nameString;
+	char name[30];
+	memcpy(name, (void*)address, 30);
+	for (int i = 0; i < sizeof(name); i++) {
+		if (!name[i])
+			break;
+		if ((int)name[i] >= 32 && (int)name[i] <= 126)
+			nameString += name[i];
+		else
+			break;
+	}
+	return nameString;
+
 }
 									   
 									   
@@ -331,12 +331,14 @@ NTSTATUS create_shared_memory()
 
 	Status = RtlAddAccessAllowedAce(Dacl, ACL_REVISION, FILE_ALL_ACCESS, SeExports->SeWorldSid);
 
-	if (!NT_SUCCESS(Status))
+void C_BaseEntity::SetViewAngle(Vector& angle)
+{
+	float d2r = 0.01745329251f;
+	Vector4D vecNewAngle = CreateFromYawPitchRoll(angle.z * d2r, 0.f, angle.x * d2r);
+	Utils::WritePtr<Vector4D>({ (uintptr_t)this, 0x20, 0x1170, 0xC0 }, vecNewAngle, false);
+}
 	{
-		ExFreePool(Dacl);
-		DbgPrintEx(0, 0, "RtlAddAccessAllowedAce SeWorldSid failed: %p\n", Status);
-		return Status;
-	}
+		
 
 	Status = RtlAddAccessAllowedAce(Dacl,
 		ACL_REVISION,
