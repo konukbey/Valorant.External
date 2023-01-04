@@ -1,55 +1,87 @@
-## Valorant External
-![CSS](https://img.shields.io/badge/-CSS-05122A?style=for-the-badge&logo=CSS3&logoColor=1572B6)&nbsp;
-![VSCode](https://img.shields.io/badge/-Visual_Studio_Code-05122A?style=for-the-badge&logo=VisualStudioCode)&nbsp;
-![GitHub](https://img.shields.io/badge/-GitHub-05122A?style=for-the-badge&logo=github)&nbsp;
-![Git](https://img.shields.io/badge/-Git-05122A?style=for-the-badge&logo=git)&nbsp;
-![Go](https://img.shields.io/badge/-Go-05122A?style=for-the-badge&logo=Go)&nbsp; 
-      
-      
-## ⚙ Setup
+<h1 align="center">
+  Valorant External 🛑
+</h1>
 
-- Build a kernel driver to make it work because
-- When it's done, combine it with the file.
-- and run it as admin
-- Finish & `START GAME`
+<p align="center">
+  External latest version / UD
+</p>
 
 
-###### ❌ Use it at your own risk.
-     
-     
-## Important
 
-- I'm not responsible if you get banned. because this is public version
+<p align="center">
+  <img src="https://img.shields.io/github/languages/top/Slackes/Valorant.External?style=flat-square"/>
+  <img src="https://img.shields.io/github/last-commit/Slackes/Valorant.External?style=flat-square"/>
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=Slackes_Valorant.External&metric=ncloc"/>
+  <img src="https://img.shields.io/github/stars/Slackes/Valorant.External?color=5ac18e&label=Stars&style=flat-square"/>
 
+</p>
 
 ---
 
-## FEATURE     
+## <a id="content"></a>🌐 〢 Content
 
-#### Aimbot 
+- External latest version that has been designed to be different from the old version
+- Read all the steps carefully.
+
+## <a id="features"></a>🔰 〢 Features
+
+```
+## Feature 
+ 
+AIMBOT
 - Set the button value to enable it (default is : right click).
-- Silent Aim  (It is not recommended to enable it as it may be banned.)
+- Silent Aim (It is not recommended to enable it as it may be banned.)
 - Selectable locking modes such as head, body, arm
 - Fov 1-120
 
-#### ESP
+ESP
 - Skeleton , 2D & 3D , Box , Line
-#### Save & Load Config
+
+SAVE & LOAD CONFIG
 - Can save the original value and can be downloaded back to use as well
-#### Skin Changer
+
+SKIN CHANGERS
 - Added skins from SS.3 - present.
-#### Scanner
-- When enabled There will be a skin notification when the aim lock skill hits the player.
-##### - ❌ Not very safe I probably wouldn't recommend you to use it.
-- Open - Close Menu
-###### - The default is [Insert] , but you can manually switch to the button you want.
+```
+
+
 
 ---
+
+## <a id="setup"></a> 📁 〢 Create:
+
+Before starting to use You will want to read the manual carefully to avoid confusion.
+
+1. Build driver & Compile. `Kernel Cheat`
+- - Video Create Drivers [Make Kernel Driver](https://www.youtube.com/playlistlist=PLQURoBilKBnwa3gPTTl1hlNCHYU8CI0HR)
+2. Drag the Valorant External folder onto the .exe.
+3. Wait for the status "Please enter the game"
+4. Enter the game and press the `Home button` to activate the menu.
+
+<br>
+
+  
+   You will need Visual Studio to compile it.:
+
+- [Visual Studio](https://visualstudio.microsoft.com/):
+
+
+
+
+
+## <a id="warn"></a> ❕ 〢 Warning 
+ This is the free version. So use it at your own risk. Use for case studies only. It will be your responsibility.
+
+## <a id="setup2"></a> 📞 〢 Support
+- If you have any questions or don't understand the instructions, join Discord for help.
+- [Discord](https://discord.gg/MBTkVcJefp)
+
+---
+
 
 https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-a31b-f35f746189a9.mp4
 
----
-
+--- 
 
   <p align="center">
     <a href="https://discord.gg/MBTkVcJefp">
@@ -86,14 +118,8 @@ A website that I created to introduce myself from start to finish. hope you like
 
 ---
 
+  <br>
 
-
-##   <p align="center">  Copyright © 2022 
-
-
-
-
-
-
-
-
+<p align="center">
+  Copyright © 2021 - 2022
+<br>
