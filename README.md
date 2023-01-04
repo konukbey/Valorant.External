@@ -53,7 +53,7 @@ SKIN CHANGERS
 Before starting to use You will want to read the manual carefully to avoid confusion.
 
 1. Build driver & Compile. `Kernel Cheat`
-- - Video Create Drivers [Make Kernel Driver](https://www.youtube.com/playlistlist=PLQURoBilKBnwa3gPTTl1hlNCHYU8CI0HR)
+- - Video Create Drivers [Make Kernel Driver](https://youtube.com/playlist?list=PLQURoBilKBnwa3gPTTl1hlNCHYU8CI0HR)
 2. Drag the Valorant External folder onto the .exe.
 3. Wait for the status "Please enter the game"
 4. Enter the game and press the `Home button` to activate the menu.
