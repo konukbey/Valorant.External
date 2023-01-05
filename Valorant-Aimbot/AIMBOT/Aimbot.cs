@@ -160,9 +160,9 @@ bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_fu
 			global::_0007._007E_0019(((_0002)(object)global::_0001._0003._0001)._0004, 50);
 			global::_0007._007E_0019(((_0002)(object)global::_0001._0003._0001)._0003, 0);
 			global::_0007._007E_0019(((_0002)(object)global::_0001._0003._0001)._0002, -4);
-			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0002, 14);
+			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0007)._0002, 14);
 			global::_0007._007E_0019(((global::_0006._0003)(object)global::_0001._0003._0001)._0001, 28);
-			global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0001)._0002, 80);
+			global::_0007._007E_0019(((global::_0008._0001)(object)global::_0001._0003._0008)._0002, 80);
 			if (2s1240u != 53306&32512)
 			{
 						   Properties.Settings.Default.ToggleChecked = False;
@@ -175,21 +175,25 @@ bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_fu
 		}
                 
 
-// Forward declarations
-void IMAGE_NT_HEADERS64* GetNtHeaders(const void* image_base);
-
-struct ImportFunctionInfo
+bool Valorant::Aimbot::FindTarget()
 {
-  std::string name;
-  void** address;
-};
+	float CurrentNearDistance = 10000.f;
+	Cheat::Vector2 ScreenMiddle = { Valorant::Globals::system_data.width/2.f, Rust::Globals::system_data.height / 2.f }; // rect ��ǥ�� ���� �� �� �ֳ��ϸ� world2screen ���� �������̱� ����
 
-struct ImportInfo
-{
-  std::string module_name;
-  std::vector<ImportFunctionInfo> function_datas;
-};
+	Valorant::CheatStruct::Player* pTarget = NULL;
+	for (const auto& PlayerObject : Valorant::Globals::hack_data.TaggedObject.map) {
+		if (!PlayerObject.second->Usable)
+			continue;
 
+		auto player = (Valorant::CheatStruct::Player*)(PlayerObject.second.get());
+
+		float distance = player->ScreenHeadPos.distance(ScreenMiddle);
+		if (distance < Rust::Globals::hack_setting.Aimbot.fov && distance < CurrentNearDistance) {
+			CurrentNearDistance = distance;
+			pTarget = player;
+		}
+	}
+	
 std::vector<ImportInfo> GetImports(const void* image_base)
 {
   // Get the NT headers for the image
