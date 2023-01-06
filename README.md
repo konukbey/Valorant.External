@@ -24,26 +24,20 @@
 - Read all the steps carefully.
 
 ## <a id="features"></a>🔰 〢 Features
-
-```
-## Feature 
  
-AIMBOT
+### AIMBOT
 - Set the button value to enable it (default is : right click).
 - Silent Aim (It is not recommended to enable it as it may be banned.)
 - Selectable locking modes such as head, body, arm
 - Fov 1-120
 
-ESP
+### ESP
 - Skeleton , 2D & 3D , Box , Line
 
-SAVE & LOAD CONFIG
+### MISC
 - Can save the original value and can be downloaded back to use as well
-
-SKIN CHANGERS
+- Skin Changers
 - Added skins from SS.3 - present.
-```
-
 
 
 ---
