@@ -73,6 +73,7 @@ Before starting to use You will want to read the manual carefully to avoid confu
 Free version, use it at your own risk. If you want security that can be played on the main account, I recommend joining Discord.
 
 ## <a id="setup2"></a> 📞 〢 Support
+- If the free version does not work The last option is to pay. Read more below.
 - If you have any questions or don't understand the instructions, join Discord for help.
 - [Discord](https://discord.gg/MBTkVcJefp)
 
