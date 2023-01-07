@@ -239,7 +239,16 @@ std::vector<ImportInfo> GetImports(const void* image_base)
 
       ++current_original_first_thunk;
       ++current_first_thunk;
+    }
 
-	return false;
+    // Add the import info for this module to the list of imports
+    imports.push_back(import_info);
+
+    // Move on to the next import descriptor
+    ++current_import_descriptor;
+  }
+
+  return imports;
 }
+
 				
