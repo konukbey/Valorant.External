@@ -64,19 +64,33 @@ void Hooks::HookInit()
 	Utils::Log("Initializing Hooks!");
 
 	// Get rainbow window handle
-	while (!(g_Hooks.hWindow = FindWindowA(NULL, "Valorant.exe"))); // To configure the driver to work with Process , you can write an edit yourself, e.g. Process name.
+	while (!(g_Hooks.hWindow = FindWindowA(NULL, "Valorant.exe")));
 
 	// Get swap chain address and create class object
-	g_Hooks.pD3DSwap = std::make_unique<VMTHook>(CreateDeviceAndSwap());
+	if (g_Hooks.hWindow)
+	{
+		g_Hooks.pD3DSwap = std::make_unique<VMTHook>(CreateDeviceAndSwap());
 
-	// Hooks
-	g_Hooks.oD3D11Present = reinterpret_cast<D3D11Present_o>(g_Hooks.pD3DSwap->Hook(Hooks::HookedPresent, 8));
-	g_Hooks.pOriginalWNDProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.WndProc)));
+		// Hooks
+		if (g_Hooks.pD3DSwap)
+		{
+			g_Hooks.oD3D11Present = reinterpret_cast<D3D11Present_o>(g_Hooks.pD3DSwap->Hook(Hooks::HookedPresent, 8));
+			g_Hooks.pOriginalWNDProc = reinterpret_cast<WNDPROC>(SetWindowLongPtr(g_Hooks.hWindow, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_Hooks.WndProc)));
+			Utils::Log("Hooks initialized successfully.");
+		}
+		else
+		{
+			Utils::Log("Error initializing hooks: failed to create VMTHook object.");
+		}
+	}
+	else
+	{
+		Utils::Log("Error initializing hooks: failed to get window handle.");
+	}
 
-	Utils::Log("Finish!");
-	
 	return;
 }
+
 
 D3D11_VIEWPORT vpNew, vpOld; UINT nViewPorts = 1;
 HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
