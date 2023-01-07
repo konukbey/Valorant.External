@@ -81,7 +81,7 @@ https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-
  
 ## 💬 ・[Discord](https://discord.gg/MBTkVcJefp) 
 
- ### 🛒〢 `PRODUCT`
+ ### 🛒〢 `SHOP`
  
 <table>
 <tr>
