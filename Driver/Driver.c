@@ -148,22 +148,44 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 
 bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t size)
 {
-	MemoryCommand* cmd = new MemoryCommand();
-	cmd->operation = 0;
-	cmd->magic = COMMAND_MAGIC;
-	
-	PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
-	data[0] = destination;
-	data[1] = source_cpp;
+    // Check for invalid input
+    if (destination == 0 || source == 0 || size == 0) {
+        return false;
+    }
 
-	memcpy(&cmd->data, &data[0], sizeof(data));
+    MemoryCommand* cmd = new MemoryCommand();
+    cmd->operation = 0;
+    cmd->magic = COMMAND_MAGIC;
 
-	cmd->size = (int)size;
+    // Check that mouclass_obj and mouclass_obj->DeviceObject are not null
+    if (mouclass_obj == nullptr || mouclass_obj->DeviceObject == nullptr) {
+        delete cmd;
+        return false;
+    }
 
-	SendCommand(cmd);
+    PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
+    data[0] = destination;
+    data[1] = source;
 
-	return true; 
+    // Use memcpy_s to ensure that the memory copy is secure
+    errno_t result = memcpy_s(&cmd->data, sizeof(data), &data[0], sizeof(data));
+    if (result != 0) {
+        delete cmd;
+        return false;
+    }
+
+    cmd->size = (int)size;
+
+    // Check the return value of SendCommand
+    bool success = SendCommand(cmd);
+    if (!success) {
+        delete cmd;
+        return false;
+    }
+
+    return true; 
 }
+
 
 /// <summary>
 NTSTATUS DriverInitialize(PDRIVER_OBJECT DriverObject, PUNICODE_STRING RegistryPath)
