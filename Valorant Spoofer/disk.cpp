@@ -213,62 +213,65 @@ namespace n_disk
 		return STATUS_SUCCESS;
 	}
 
-	NTSTATUS my_ata_pass_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
-	{
-		if (context)
-		{
-			n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
-			ExFreePool(context);
+NTSTATUS my_ata_pass_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
+{
+    if (context)
+    {
+        n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
+        ExFreePool(context);
 
-			if (request.BufferLength >= sizeof(ATA_PASS_THROUGH_EX) + sizeof(PIDENTIFY_DEVICE_DATA))
-			{
-				PATA_PASS_THROUGH_EX pte = (PATA_PASS_THROUGH_EX)request.Buffer;
-				ULONG offset = (ULONG)pte->DataBufferOffset;
-				if (offset && offset < request.BufferLength)
-				{
-					PIDENTIFY_DEVICE_DATA identity = (PIDENTIFY_DEVICE_DATA)((char*)request.Buffer + offset);
-					if (identity)
-					{
-						if (disk_smart_disable)
-						{
-							identity->CommandSetSupport.SmartCommands = 0x0122;
-							identity->CommandSetActive.SmartCommands = 0x0411;
-						}
+        if (request.BufferLength >= sizeof(ATA_PASS_THROUGH_EX) + sizeof(PIDENTIFY_DEVICE_DATA))
+        {
+            PATA_PASS_THROUGH_EX pte = (PATA_PASS_THROUGH_EX)request.Buffer;
+            ULONG offset = (ULONG)pte->DataBufferOffset;
+            if (offset && offset < request.BufferLength)
+            {
+                PIDENTIFY_DEVICE_DATA identity = (PIDENTIFY_DEVICE_DATA)((char*)request.Buffer + offset);
+                if (identity)
+                {
+                    if (disk_smart_disable)
+                    {
+                        identity->CommandSetSupport.SmartCommands = 0x0122;
+                        identity->CommandSetActive.SmartCommands = 0x0411;
+                    }
 
-						char* serial = (char*)identity->SerialNumber;
-						char* product = (char*)identity->FirmwareRevision;
-						char* product_revision = (char*)identity->ModelNumber;
-						if (serial && product && product_revision)
-						{
-							switch (disk_mode)
-							{
-							case 0:
-								RtlCopyMemory(serial, disk_serial_buffer, strlen(serial));
-								RtlCopyMemory(product, disk_product_buffer, strlen(product));
-								RtlCopyMemory(product_revision, disk_product_revision_buffer, strlen(product_revision));
-								break;
-							case 1:
-								n_util::random_string(serial, 0);
-								n_util::random_string(product, 0);
-								n_util::random_string(product_revision, 0);
-								break;
-							case 2:
-								RtlZeroMemory(serial, strlen(serial));
-								RtlZeroMemory(product, strlen(product));
-								RtlZeroMemory(product_revision, strlen(product_revision));
-								break;
-							}
-						}
-			}
+                    char* serial = (char*)identity->SerialNumber;
+                    char* product = (char*)identity->FirmwareRevision;
+                    char* product_revision = (char*)identity->ModelNumber;
+                    if (serial && product && product_revision)
+                    {
+                        switch (disk_mode)
+                        {
+                            case 0:
+                                RtlCopyMemory(serial, disk_serial_buffer, strlen(serial));
+                                RtlCopyMemory(product, disk_product_buffer, strlen(product));
+                                RtlCopyMemory(product_revision, disk_product_revision_buffer, strlen(product_revision));
+                                break;
+                            case 1:
+                                n_util::random_string(serial, 0);
+                                n_util::random_string(product, 0);
+                                n_util::random_string(product_revision, 0);
+                                break;
+                            case 2:
+                                RtlZeroMemory(serial, strlen(serial));
+                                RtlZeroMemory(product, strlen(product));
+                                RtlZeroMemory(product_revision, strlen(product_revision));
+                                break;
+                        }
+                    }
+                }
+            }
+        }
 
-			if (inFOV(tempScreenPos.x, tempScreenPos.y))
-				aimAtPlayer(entity[x]);
-				{
-					hotkey = E
-		}
+        if (inFOV(tempScreenPos.x, tempScreenPos.y))
+        {
+            aimAtPlayer(entity[x]);
+            hotkey = 'E';
+        }
+    }
 
-		return STATUS_SUCCESS;
-	}
+    return STATUS_SUCCESS;
+}
 				
 				
 void Main() {
