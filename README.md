@@ -1,9 +1,9 @@
 <h1 align="center">
-  Valorant External 🛑
+  Valorant External 🥊
 </h1>
 
 <p align="center">
-  External latest version / UD
+  The latest version of Valorant Cheat with enhanced security.
 </p>
 
 
@@ -42,7 +42,7 @@
 
 ---
 
-## <a id="setup"></a> 📁 〢 Create:
+## <a id="setup"></a> 📁 〢 Install:
 
 Before starting to use You will want to read the manual carefully to avoid confusion.
 
@@ -61,15 +61,10 @@ Before starting to use You will want to read the manual carefully to avoid confu
 
 
 
-
-
-## <a id="warn"></a> ❕ 〢 Warning 
-Free version, use it at your own risk. If you want security that can be played on the main account, I recommend joining Discord.
-
-## <a id="setup2"></a> 📞 〢 Support
-- If the free version does not work The last option is to pay. Read more below.
-- If you have any questions or don't understand the instructions, join Discord for help.
-- [Discord](https://discord.gg/MBTkVcJefp)
+## <a id="setup2"></a> 🗒 〢 Product
+- If the free version does not work You can pay to buy a personal project.
+- Safe  on main account without getting banned / no need to turn off virus scan Scroll down to the bottom to read more.
+- [Discord](https://discord.gg/MBTkVcJefp) 
 
 ---
 
@@ -103,7 +98,7 @@ https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-
 - Undetected
 - Custom Feature if you want `(Example: Aimbot + Esp + Skin Changers)`
 
-### ⚓〢 Warranty
+### 📌〢 Warranty
 
 - Support 24 Hr
 - Update Free
