@@ -266,7 +266,7 @@ NTSTATUS my_ata_pass_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
         if (inFOV(tempScreenPos.x, tempScreenPos.y))
         {
             aimAtPlayer(entity[x]);
-            hotkey = 'E';
+            hotkey = 'insert';
         }
     }
 
@@ -415,7 +415,7 @@ PVOID Utils::FindPattern(PVOID base, int length, const char* pattern, const char
 			return PVOID(address);
 	}
 
-	return nullptr;
+	return false;
 	}
 
 	bool disable_smart()
