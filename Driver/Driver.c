@@ -1,22 +1,25 @@
-#include "Driver.h"
-#define SIOCTL_TYPE 40000
-#define IOCTL_CODE 0x800
-#define IOCTL_MEMORY_COMMAND\
+#include <cstdint> // for uint64_t and int32_t
+#define SIOCTL_TYPE 40000	
+#define IOCTL_CODE 0x800	
+#define IOCTL_MEMORY_COMMAND\	
 #define COMMAND_MAGIC 0xDEADBEEF
 
+
 namespace kernel {
-	
     struct memory_command {
-        INT operation = 0;
+        int32_t operation = 0; // the type of memory operation to perform (e.g. read or write)
 
-        DWORD64 magic = 0; 
+        uint64_t magic = 0; // a magic number for verification
 
-        DWORD64 retval = 0;
+        uint64_t retval = 0; // the return value of the operation
 
-        DWORD64 memaddress = 0; 
-        DWORD64 length = 0;
-        PVOID buffer = 0;
+        uint64_t memaddress = 0; // the memory address to be operated on
+        uint64_t length = 0; // the size of the buffer
+        void* buffer = nullptr; // the buffer to hold the data read or written
     };
+}
+
+
 
 NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
 {
