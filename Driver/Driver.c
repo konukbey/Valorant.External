@@ -21,7 +21,7 @@ namespace kernel {
 
 
 
-NTSTATUS FindGameProcessByName (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
+NTSTATUS FindProcess (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
 {
 	PEPROCESS sys_process = FindprocessId;
 	PEPROCESS cur_entry = sys_process;
@@ -100,7 +100,7 @@ void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You 
 			return false;
 		}
 	
-	case IOCTL_MEMORY_COMMAND:
+	case (pEntity->GetTeamNumber() == g_pLocalEntity->GetTeamNumber())
 		Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
 	{
 		
