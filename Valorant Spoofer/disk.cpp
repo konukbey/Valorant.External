@@ -583,57 +583,39 @@ namespace Disks
 }
 
 
-NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , HWID::CompletionRoutineInfo* context ) {
-	const auto ioStack = IoGetCurrentIrpStackLocation ( irp );
-
-	if ( ioStack->Parameters.DeviceIoControl.OutputBufferLength >= sizeof ( SENDCMDOUTPARAMS ) ) {
-		const auto serial = reinterpret_cast< PIDINFO >( reinterpret_cast< PSENDCMDOUTPARAMS >(
-			irp->AssociatedIrp.SystemBuffer )->bBuffer )->sSerialNumber;
-
-		memset ( serial , 0 , sizeof ( CHAR ) );
-	}
-
-	if ( context->oldRoutine && irp->StackCount > 1 ) {
-		const auto oldRoutine = context->oldRoutine;
-		const auto oldContext = context->oldContext;
-		return oldRoutine ( deviceObject , irp , oldContext );
-	}
-
-	return STATUS_SUCCESS;
-}
-
-	
-std::string GetHWID()
+//
+// Takes a target call stack and configures it ready for use
+// via loading any required dlls, resolving module addresses
+// and calculating spoofed return addresses.
+//
+NTSTATUS InitialiseSpoofedCallstack(std::vector<StackFrame> &targetCallStack)
 {
-    //get a handle to the first physical drive
-    HANDLE h = CreateFileW(L"\\\\.\\PhysicalDrive0", 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
-    if (h == INVALID_HANDLE_VALUE) return {};
+    NTSTATUS status = STATUS_SUCCESS;
 
-    //an std::unique_ptr is used to perform cleanup automatically when returning (i.e. to avoid code duplication)
-    std::unique_ptr<std::remove_pointer<HANDLE>::type, void(*)(HANDLE)> hDevice{ h, [](HANDLE handle) {CloseHandle(handle); } };
+    for (auto stackFrame = targetCallStack.begin(); stackFrame != targetCallStack.end(); stackFrame++)
+    {
+        // [1] Get image base for current stack frame.
+        status = GetImageBase(*stackFrame);
+        if (!NT_SUCCESS(status))
+        {
+            std::cout << "[-] Error: Failed to get image base\n";
+            goto Cleanup;
+        }
 
-    //initialize a STORAGE_PROPERTY_QUERY data structure (to be used as input to DeviceIoControl)
-    STORAGE_PROPERTY_QUERY storagePropertyQuery{};
-    storagePropertyQuery.PropertyId = StorageDeviceProperty;
-    storagePropertyQuery.QueryType = PropertyStandardQuery;
+        // [2] Calculate ret address for current stack frame.
+        status = CalculateReturnAddress(*stackFrame);
+        if (!NT_SUCCESS(status))
+        {
+            std::cout << "[-] Error: Failed to caluclate ret address\n";
+            goto Cleanup;
+        }
 
-    //initialize a STORAGE_DESCRIPTOR_HEADER data structure (to be used as output from DeviceIoControl)
-    STORAGE_DESCRIPTOR_HEADER storageDescriptorHeader{};
-
-    //the next call to DeviceIoControl retrieves necessary size (in order to allocate a suitable buffer)
-    //call DeviceIoControl and return an empty std::string on failure
-    DWORD dwBytesReturned = 0;
-    if (!DeviceIoControl(hDevice.get(), IOCTL_STORAGE_QUERY_PROPERTY, &storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY),
-        &storageDescriptorHeader, sizeof(STORAGE_DESCRIPTOR_HEADER), &dwBytesReturned, NULL))
-        return {};
-
-    const DWORD dwOutBufferSize = storageDescriptorHeader.Size;
-    std::unique_ptr<BYTE[]> pOutBuffer{ new BYTE[dwOutBufferSize]{} };
-    //call DeviceIoControl with the allocated buffer
-    if (!DeviceIoControl(hDevice.get(), IOCTL_STORAGE_QUERY_PROPERTY, &storagePropertyQuery, sizeof(STORAGE_PROPERTY_QUERY),
-        pOutBuffer.get(), dwOutBufferSize, &dwBytesReturned, NULL))
-        return {};
-
-}
-
-		
+        // [3] Calculate the total stack size for ret function.
+        status = CalculateFunctionStackSizeWrapper(*stackFrame);
+        if (!NT_SUCCESS(status))
+        {
+            std::cout << "[-] Error: Failed to caluclate total stack size\n";
+            goto Cleanup;
+        }
+    }
+	
