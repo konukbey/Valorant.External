@@ -40,27 +40,23 @@ struct ents
 } mainInfo;
 
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR nCmdLine, int nCmdShow)
+struct MyPlayer_t
 {
-    AllocConsole();
-    FILE* f;
-    freopen_s(&f, "conout$", "w", stdout);
-    std::cout << "[*] Loading..." << std::endl;
-    std::cout << "[*] Launch Game..." << std::endl;
-
-    while (!targetHwnd)
-    {
-        targetHwnd = FindWindowA(NULL, "Driver.sys");
-    }
-
-    ImpDef(PsLookupProcessByProcessId);
-    ImpDef(KeStackAttachProcess);
-    ImpDef(KeUnstackDetachProcess);
-    ImpDef(ZwProtectVirtualMemory);
-    ImpDef(ObfDereferenceObject);
-    ImpSet(PsLookupProcessByProcessId);
-    ImpSet(KeStackAttachProcess);
-
+	DWORD CLocalPlayer; //Address of our ent
+	int Team;
+	int Health;
+	float Position[3];
+	void ReadInformation()
+	{
+		//Get address of entity
+		ReadProcessMemory(fProcess.__HandleProcess, (BYTE*)(fProcess.__dwordClient + Player_Base), &CLocalPlayer, sizeof(CLocalPlayer), 0);
+		ReadProcessMemory(fProcess.__HandleProcess, (BYTE*)(CLocalPlayer + dw_mTeamOffset), &Team, sizeof(Team), 0);
+		ReadProcessMemory(fProcess.__HandleProcess, (BYTE*)(CLocalPlayer + dw_Health), &Health, sizeof(Health), 0);
+		ReadProcessMemory(fProcess.__HandleProcess, (BYTE*)(CLocalPlayer + dw_Pos), &Position, sizeof(float[3]), 0);
+		//Get Number of players
+		ReadProcessMemory(fProcess.__HandleProcess, (BYTE*)(fProcess.__dwordEngine + dw_PlayerCountOffs), &NumOfPlayers, sizeof(int), 0);
+	}
+}MyPlayer;
 
     void cache()
     {
