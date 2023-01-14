@@ -275,26 +275,40 @@ void global {
 	}
 
 bool core_ud_memcpy(uint64_t pstruct) {
-	
-		NTSTATUS status;
-		SIZE_T   return_size = 0;
-		PEPROCESS process_src = nullptr;
-		PEPROCESS process_dst = nullptr;
+    NTSTATUS status;
+    SIZE_T   return_size = 0;
+    PEPROCESS process_src = nullptr;
+    PEPROCESS process_dst = nullptr;
 
-		_k_rw_request* in = (_k_rw_request*)pstruct;
-		if (DeviceIoControl(DriverHandle, IOCTL_DISK_GET_DRIVE_GEOMETRY, &DriverCall, sizeof(DriverCall), &DriverCall, sizeof(DriverCall), &BytesOut, 0)) {
-	
+    _k_rw_request* in = (_k_rw_request*)pstruct;
+    if (!DeviceIoControl(DriverHandle, IOCTL_DISK_GET_DRIVE_GEOMETRY, &DriverCall, sizeof(DriverCall), &DriverCall, sizeof(DriverCall), &BytesOut, 0)) {
+        return 0;
+    }
 
-		size_t memsize = 0;
-		void* buffer = ExAllocatePoolWithTag(NonPagedPool, in->size, POOLTAG);
-		if (!NtGdiDdDDIReclaimAllocations2)
+    size_t memsize = 0;
+    void* buffer = ExAllocatePoolWithTag(NonPagedPool, in->size, POOLTAG);
+    if (!buffer) {
+        return 0;
+    }
 
-		// mmcvm equivalent
-		{
-			// read from source
-			if (ptraddr & 0x80
-			// write to dest
-			    {
-				    return 0;
-			    }
- 
+    // mmcvm equivalent
+    if (!NtGdiDdDDIReclaimAllocations2) {
+        // read from source
+        status = ReadProcessMemory(process_src, in->src, buffer, in->size, &return_size);
+        if (status != STATUS_SUCCESS) {
+            ExFreePoolWithTag(buffer, POOLTAG);
+            return 0;
+        }
+
+        // write to dest
+        status = WriteProcessMemory(process_dst, in->dst, buffer, in->size, &return_size);
+        if (status != STATUS_SUCCESS) {
+            ExFreePoolWithTag(buffer, POOLTAG);
+            return 0;
+        }
+    }
+
+    ExFreePoolWithTag(buffer, POOLTAG);
+    return 1;
+}
+
