@@ -9,21 +9,19 @@ using namespace std;
 
 NTSTATUS SetSystemEnvironmentPrivilege(BOOLEAN Enable, PBOOLEAN WasEnabled)
 {
-	if (WasEnabled != nullptr)
-		*WasEnabled = FALSE;
+    if (WasEnabled != nullptr)
+        *WasEnabled = FALSE;
 
-	BOOLEAN SeSystemEnvironmentWasEnabled;
-	const NTSTATUS Status = myRtlAdjustPrivilege(SE_SYSTEM_ENVIRONMENT_PRIVILEGE,
-		Enable,
-		FALSE,
-		&SeSystemEnvironmentWasEnabled);
+    BOOLEAN SeSystemEnvironmentWasEnabled;
+    const NTSTATUS Status = RtlAdjustPrivilege(SE_SYSTEM_ENVIRONMENT_PRIVILEGE,
+        Enable,
+        FALSE,
+        &SeSystemEnvironmentWasEnabled);
 
-	SLog(std::wstring(L"Privilege status: " + std::to_wstring((DWORD)Status)).c_str = nullptr)
+    if (NT_SUCCESS(Status) && WasEnabled != nullptr)
+        *WasEnabled = SeSystemEnvironmentWasEnabled;
 
-	if (NT_SUCCESS(Status) && WasEnabled != nullptr)
-		*WasEnabled = SeSystemEnvironmentWasEnabled;
-
-	return Status;
+    return Status;
 }
 
 void Driver::SendCommand(MemoryCommand* cmd) {
