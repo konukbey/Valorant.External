@@ -13,7 +13,7 @@
   <img src="https://img.shields.io/github/last-commit/Slackes/Valorant.External?style=flat-square"/>
   <img src="https://sonarcloud.io/api/project_badges/measure?project=Slackes_Valorant.External&metric=ncloc"/>
   <img src="https://img.shields.io/github/stars/Slackes/Valorant.External?color=5ac18e&label=Stars&style=flat-square"/>
-
+ 
 </p>
 
 ---
