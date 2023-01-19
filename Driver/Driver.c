@@ -20,7 +20,6 @@ namespace kernel {
 }
 
 
-
 NTSTATUS FindProcess (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
 {
 	PEPROCESS sys_process = FindprocessId;
@@ -255,17 +254,28 @@ void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 		}
 	}
 	
-void driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
-    memory_command* cmd = new memory_command();
-    cmd->operation = 1; // write byte
+NTSTATUS driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
+    if(!buffer) return STATUS_INVALID_PARAMETER;
 
-    for (auto i = 0u; i < system_handle_inforamtion->HandleCount; ++i)
-    if ( !_ALIGNED_NEW_SUPPORTED) 
-	    
-    return STATUS_UNSUCCESSFUL;
+    if (!IsAddressValid(address, len))
+        return STATUS_UNSUCCESSFUL;
+
+    if (!_ALIGNED_NEW_SUPPORTED) 
+        return STATUS_UNSUCCESSFUL;
+
+    memory_command* cmd = new memory_command();
+    if(!cmd) return STATUS_NO_MEMORY;
+
+    cmd->operation = 1; // write byte
+    cmd->address = address;
+    cmd->buffer = buffer;
+    cmd->len = len;
+
+    //Add code here to execute the memory command
+
+    return STATUS_SUCCESS;
 };
-	
-	
+
 
 // Returns 0 on success, 1 if the process was not found, and -1 on error
 int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
