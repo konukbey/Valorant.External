@@ -40,7 +40,7 @@ struct ents
 } mainInfo;
 
 
-struct MyPlayer_t
+namespace MyPlayer_t
 {
 	DWORD CLocalPlayer; //Address of our ent
 	int Team;
@@ -56,9 +56,13 @@ struct MyPlayer_t
 		//Get Number of players
 		ReadProcessMemory(fProcess.__HandleProcess, (BYTE*)(fProcess.__dwordEngine + dw_PlayerCountOffs), &NumOfPlayers, sizeof(int), 0);
 	}
-}MyPlayer;
+	
+	return;
+	}
+}
 
-    void cache()
+
+void cache()
     {
         while (true)
         {
