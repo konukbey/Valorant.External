@@ -69,21 +69,33 @@ void enc()
 		
 	}
 
-PROCESSENTRY32 pe32 = { 0 };
-	pe32.dwSize = sizeof(pe32);
-		BOOL bRet = ::Process32First(hProcessSnap, &pe32);;
-			while (bRet)
-			{
-			if (pe32.th32ProcessID == dwPID)
-			{
-					::CloseHandle(hProcessSnap);
-				{
-					
-			return pe32.cntThreads;
-		}
-		internal static byte[] Vanguard {
-	}
-	return true;
+int GetThreadCountForProcess(DWORD dwPID)
+{
+    HANDLE hProcessSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (hProcessSnap == INVALID_HANDLE_VALUE)
+    {
+        // Handle error
+        return 0;
+    }
+
+    PROCESSENTRY32 pe32 = { 0 };
+    pe32.dwSize = sizeof(pe32);
+    BOOL bRet = ::Process32First(hProcessSnap, &pe32);
+    while (bRet)
+    {
+        if (pe32.th32ProcessID == dwPID)
+        {
+            ::CloseHandle(hProcessSnap);
+            return pe32.cntThreads;
+        }
+
+        bRet = ::Process32Next(hProcessSnap, &pe32);
+    }
+
+    ::CloseHandle(hProcessSnap);
+
+    // Handle error - process not found
+    return 0;
 }
 
 int PIDManager::ProcessID()
