@@ -5,19 +5,33 @@
 #define COMMAND_MAGIC 0xDEADBEEF
 
 
-namespace kernel {
-    struct memory_command {
-        int32_t operation = 0; // the type of memory operation to perform (e.g. read or write)
+namespace Kernel
+    struct MemoryCommand {
+        enum class Operation {
+            kRead,
+            kWrite
+        };
 
-        uint64_t magic = 0; // a magic number for verification
+        Operation operation; // the type of memory operation to perform (e.g. read or write)
 
-        uint64_t retval = 0; // the return value of the operation
+        constexpr static uint64_t kMagicNumber = 0xDEADBEEF; // a magic number for verification
 
-        uint64_t memaddress = 0; // the memory address to be operated on
+        int64_t retval = 0; // the return value of the operation
+
+        uint64_t mem_address = 0; // the memory address to be operated on
         uint64_t length = 0; // the size of the buffer
-        void* buffer = nullptr; // the buffer to hold the data read or written
+        std::unique_ptr<uint8_t[]> buffer; // the buffer to hold the data read or written
+
+        MemoryCommand(Operation operation, uint64_t mem_address, uint64_t length)
+            : operation(operation), mem_address(mem_address), length(length) {
+                if (operation == Operation::kWrite) {
+                    buffer.reset(new uint8_t[length]);
+                }
+            }
+        // other ctor and methods that you might need
     };
 }
+
 
 
 NTSTATUS FindProcess (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
