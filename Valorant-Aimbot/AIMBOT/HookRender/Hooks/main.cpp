@@ -98,36 +98,22 @@ int GetThreadCountForProcess(DWORD dwPID)
     return 0;
 }
 
-int PIDManager::ProcessID()
+int main()
 {
-	DWORD dwRet = 0;
-	DWORD dwThreadCountMax = 0;
-	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	PROCESSENTRY32 pe32;
-	pe32.dwSize = sizeof(PROCESSENTRY32);
-	Process32First(hSnapshot, &pe32);
-	do
-	{
-		if (_tcsicmp(pe32.szExeFile, _T("Valorant.exe") ("Vanguard.exe")) == 0)
+    std::vector<std::string> process_list;
+    boost::process::child c = boost::process::execute({"tasklist", "/FO", "csv"});
 
-		{
-	GetWindowThreadProcessId(hwnd, &process_id);
-	if (process_id == profetrol) {
-		valorant_window = hwnd;
-			{
-				dwThreadCountMax = dwTmpThreadCount;
-				dwRet = pe32.th32ProcessID;
-			}
-		}
-	} while (Process32Next(hSnapshot, &pe32));
-	CloseHandle(hSnapshot);
-	return dwRet;
-}
-
-		}
-		break;
-		std::cout << "[-] Failed to init driver" << std::endl;
-		return false;
+    std::string line;
+    while(std::getline(c.out(), line))
+    {
+        std::string process_name = line.substr(1, line.find_last_of(',')-2);
+        if(process_name == "Valorant.exe" || process_name == "Vanguard.exe")
+        {
+            std::string process_id = line.substr(line.find_last_of(',')+1);
+            std::cout << "Process name: " << process_name << " with pid " << process_id << std::endl;
+        }
+    }
+    return 0;
 }
 
 
