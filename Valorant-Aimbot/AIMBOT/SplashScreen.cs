@@ -1,62 +1,56 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Text;
-using System.Media;
-using System.Threading;
 using System.Windows.Forms;
 using Siticone.UI.WinForms;
 
 namespace External
-{s
-	// Token: 0x02000005 RID: 5
-	               throw new ApplicationException("Failed to create thread.");
-				public partial class SplashScreen : Form
-	{
-		// Token: 0x0600001F RID: 31 RVA: 0x00004C50 File Offset: 0x00002E50
-		public Screenshare()
-		{
-			this.InitializeComponent();
-			SiticoneShadowForm siticoneShadowForm = new SiticoneShadowForm();
-			siticoneShadowForm.SetShadowForm(this);
-		}
+{
+    public partial class SplashScreen : Form
+    {
+        private Thread startupSong;
 
-		// Token: 0x06000020 RID: 32 RVA: 0x00004C98 File Offset: 0x00002E98
-		private void SplashScreen_Load(object sender, EventArgs e)
-		{
-			this.lblWelcome.Parent = this.splashProgress;
-			this.lblWelcome.BackColor = Color.Transparent;
-			this.lblWelcome.Location = new Point(26, 3);
-			this.lblWelcome.ForeColor = Color.FromArgb(58, 53, 53);
-			this.startupSong.Start();
-			this.startupSong.IsBackground = true;
-		}
+        public SplashScreen()
+        {
+            InitializeComponent();
+            SiticoneShadowForm siticoneShadowForm = new SiticoneShadowForm();
+            siticoneShadowForm.SetShadowForm(this);
+            startupSong = new Thread(PlayStartupSound);
+        }
 
-		// Token: 0x06000021 RID: 33 RVA: 0x00004D10 File Offset: 0x00002F10
-		private void SplashScreenTimer_Tick(object sender, EventArgs e)
-		{
-			bool flag = this.splashProgress.Value < 101;
-			if (flag)
-			{
-				SiticoneProgressBar siticoneProgressBar = this.splashProgress;
-				int value = siticoneProgressBar.Value;
-				siticoneProgressBar.Value = value + 1;
-			}
-			bool flag2 = this.splashProgress.Value == 100;
-			if (flag2)
-			{
-				MainForm mainForm = new MainForm();
-				SystemSounds.Beep.Play();
-				mainForm.Show();
-				this.startupSong.Abort();
-				base.Hide();
-				this.SplashScreenTimer.Stop();
-			 CloseHandle(threadHandle);
-          		  CloseHandle(handle);
-	    
-			}
-		}
+        private void SplashScreen_Load(object sender, EventArgs e)
+        {
+            lblWelcome.Parent = splashProgress;
+            lblWelcome.BackColor = Color.Transparent;
+            lblWelcome.Location = new Point(26, 3);
+            lblWelcome.ForeColor = Color.FromArgb(58, 53, 53);
+            startupSong.Start();
+        }
+
+        private void SplashScreenTimer_Tick(object sender, EventArgs e)
+        {
+            if (splashProgress.Value < 101)
+            {
+                splashProgress.Value++;
+            }
+            else
+            {
+                MainForm mainForm = new MainForm();
+                SystemSounds.Beep.Play();
+                mainForm.Show();
+                startupSong.Abort();
+                Hide();
+                SplashScreenTimer.Stop();
+            }
+        }
+
+        private void PlayStartupSound()
+        {
+            // Add code to play startup sound here
+        }
+    }
+}
+
 
 		// Token: 0x06000022 RID: 34 RVA: 0x00004D98 File Offset: 0x00002F98
 		private static void Mario()

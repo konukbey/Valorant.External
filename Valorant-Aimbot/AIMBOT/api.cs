@@ -1,44 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Management;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows;
 
 namespace AuthGG
 {
     internal class App
     {
-        public static string GrabVariable(string name)
+        private static readonly IDictionary<string, string> Variables = new Dictionary<string, string>();
+        private static User _user;
+
+        public static void SetUser(User user)
         {
-            try
-            {
-                if (User.ID != null || User.HWID != null || User.IP != null || !Constants.Breached)
-                {
-                    return Variables[name];
-                }
-                else
-                {
-                    Constants.Breached = true;
-                    return "User is not logged in, possible breach detected!";
-                }
-            }
-            catch
-            {
-                return "N/A";
-            }
+            _user = user;
         }
+
+        public static string GetVariable(string name)
+        {
+            if (_user == null || string.IsNullOrEmpty(_user.Id) || string.IsNullOrEmpty(_user.Hwid) || string.IsNullOrEmpty(_user.Ip))
+            {
+                throw new InvalidOperationException("User is not logged in, possible breach detected!");
+            }
+
+            if (!Variables.TryGetValue(name, out string value))
+            {
+                throw new ArgumentException($"Variable with name {name} does not exist.");
+            }
+
+            return value;
+        }
+    }
+
+    internal class User
+    {
+        public string Id { get; set; }
+        public string Hwid { get; set; }
+        public string Ip { get; set; }
+    }
+}
+
         public static string Error = null;
         public static Dictionary<string, string> Variables = new Dictionary<string, string>();
     }
