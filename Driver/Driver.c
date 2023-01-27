@@ -104,29 +104,28 @@ struct memomry {
 	}
 		
 
-void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp) // You can set it to void or static, it's up to you, it's just some setup. But I recommend it to be Void.
+void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 {
-	const uint64_t kernel_NtGdiGetCOPPCompatibleOPMInformation = GetKernelModuleExport(utils::GetKernelModuleAddress("win32kfull.sys"), "NtGdiGetCOPPCompatibleOPMInformation");
-	for (auto current = start; current < end; ++current)
-		{
-			std::cout << "[-] Failed to get export win32kfull.NtGdiGetCOPPCompatibleOPMInformation" << std::endl;
-			return false;
-		}
-	
-	case (pEntity->GetTeamNumber() == g_pLocalEntity->GetTeamNumber())
-		Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
-	{
-		
-                if (*current == '?')
-                    ++current;
-                bytes.push_back(-1);
-	}
-	
+    const uint64_t kernel_NtGdiGetCOPPCompatibleOPMInformation = GetKernelModuleExport(utils::GetKernelModuleAddress("win32kfull.sys"), "NtGdiGetCOPPCompatibleOPMInformation");
+    if(kernel_NtGdiGetCOPPCompatibleOPMInformation == 0)
+    {
+        std::cout << "[-] Failed to get export win32kfull.NtGdiGetCOPPCompatibleOPMInformation" << std::endl;
+        return;
+    }
+
+    if (pEntity->GetTeamNumber() == g_pLocalEntity->GetTeamNumber())
+    {
+        Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
+
+        std::vector<int> bytes;
+        for (auto current = start; current < end; ++current)
+        {
+            if (*current == '?')
+                ++current;
+            bytes.push_back(-1);
+        }
+    }
 }
-			 break;
-   			 return EXIT_SUCCESS;
-	
-		}
 
 		switch (cmd->operation) {
 		case 1: // 
