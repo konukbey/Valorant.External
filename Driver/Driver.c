@@ -104,62 +104,64 @@ struct memomry {
 	}
 		
 
-void Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
+NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 {
-    const uint64_t kernel_NtGdiGetCOPPCompatibleOPMInformation = GetKernelModuleExport(utils::GetKernelModuleAddress("win32kfull.sys"), "NtGdiGetCOPPCompatibleOPMInformation");
+    const auto kernel_NtGdiGetCOPPCompatibleOPMInformation = GetKernelModuleExport(utils::GetKernelModuleAddress("win32kfull.sys"), "NtGdiGetCOPPCompatibleOPMInformation");
     if(kernel_NtGdiGetCOPPCompatibleOPMInformation == 0)
     {
-        std::cout << "[-] Failed to get export win32kfull.NtGdiGetCOPPCompatibleOPMInformation" << std::endl;
-        return;
+        DbgPrintEx(0, 0, "[-] Failed to get export win32kfull.NtGdiGetCOPPCompatibleOPMInformation\n");
+        Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
+        IoCompleteRequest(Irp, IO_NO_INCREMENT);
+        return STATUS_UNSUCCESSFUL;
     }
 
     if (pEntity->GetTeamNumber() == g_pLocalEntity->GetTeamNumber())
     {
-        Kernel(0, 0, "[Valorant.exe] IOCTL command received\n");
-
-        std::vector<int> bytes;
-        for (auto current = start; current < end; ++current)
-        {
-            if (*current == '?')
-                ++current;
-            bytes.push_back(-1);
-        }
+        DbgPrintEx(0, 0, "[Valorant.exe] IOCTL command received\n");
     }
-}
+    else
+    {
+        Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
+        IoCompleteRequest(Irp, IO_NO_INCREMENT);
+        return STATUS_UNSUCCESSFUL;
+    }
 
-		switch (cmd->operation) {
-		case 1: // 
-			Irp->IoStatus.Status = STATUS_SUCCESS;
+    switch (cmd->operation) 
+    {
+        case 1: // read memory
+            Irp->IoStatus.Status = ProcessReadWriteMemory(valorantProcess, cmd->memaddress, IoGetCurrentProcess(), cmd->buffer, cmd->length, ReadMemory) ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+            break;
 
-			ProcessReadWriteMemory(valorantProcess, cmd->memaddress, IoGetCurrentProcess(), cmd->buffer, cmd->length);
-			break;
+        case 2: // write memory
+            Irp->IoStatus.Status = ProcessReadWriteMemory(IoGetCurrentProcess(), cmd->buffer, valorantProcess, cmd->memaddress, cmd->length, WriteMemory) ? STATUS_SUCCESS : STATUS_UNSUCCESSFUL;
+            break;
+        case 3: // find valorant PEPROCESS
+            DbgPrintEx(0, 0, "[Valorant.exe] Setting target PID...\n");
 
-		case 1: // write memory
-			Irp->IoStatus.Status = STATUS_SUCCESS;
+            valorantProcess = NULL;
 
-			ProcessReadWriteMemory(IoGetCurrentProcess(), cmd->buffer, valorantProcess, cmd->memaddress, cmd->length);
-			break;
-		case 2: // find valorant PEPROCESS
-			Irp->IoStatus.Status = STATUS_SUCCESS;
-			DbgPrintEx(0, 0, "[Valorant.exe] Setting target PID...\n");
-
-			valorantProcess = NULL;
-
-			PsLookupProcessByProcessId(cmd->retval, &valorantProcess);
-
-			if (!valorantProcess) {
-				cmd->retval = _memicmp_l
-				break;
-			}
+            NTSTATUS status = PsLookupProcessByProcessId(cmd->retval, &valorantProcess);
+            if (!NT_SUCCESS(status) || !valorantProcess) 
+            {
+                DbgPrintEx(0, 0, "[-] Failed to find process with PID %d\n", cmd->retval);
+                Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
+                IoCompleteRequest(Irp, IO_NO_INCREMENT);
+                return STATUS_UNSUCCESSFUL;
+            }
 			
-			cmd->retval = (DWORD64)PsGetProcessSectionBaseAddress(valorantProcess);
+            cmd->retval = (DWORD64)PsGetProcessSectionBaseAddress(valorantProcess);
+            Irp->IoStatus.Status = STATUS_SUCCESS;
+            break;
 
-			break;
+        default:
+            Irp->IoStatus.Status = STATUS_UNSUCCESSFUL;
+            break;
+    }
 
-		}
-
-	return STATUS_SUCCESS;
+    IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return Irp->IoStatus.Status;
 }
+
 
 bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t size)
 {
