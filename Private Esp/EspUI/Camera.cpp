@@ -6,25 +6,14 @@
 
 LPDIRECT3D9 d3d;
 LPDIRECT3DDEVICE9 d3ddev;
+HWND targetHwnd, overlayHwnd;
+bool bEsp = false;
 
-HANDLE pHandle;
-HWND targetHwnd, overlayHwnd;  
-Vec2 vecScreen;
-int windowWidth, windowHeight, windowX, windowY;
-bool bMenuShow = false, bEsp = false, bSnapLines = false, bEspBox = true, bHeadBoxes = true, bShadedBoxes = false;
-
-D3DCOLOR espColor = D3DCOLOR_ARGB(255, 0, 255, 255);
-
-DWORD modBase;
-DWORD localPlayer;
-DWORD entityList;
-DWORD* dwViewMatrix;
+DWORD localPlayer, entityList, *dwViewMatrix;
 
 void initD3D(HWND hwnd);
 void renderFrame(void);
 void cleanD3D(void);
-void espThread();
-
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
 struct ents
