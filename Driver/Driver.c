@@ -34,33 +34,24 @@ namespace Kernel
 
 
 
-NTSTATUS FindProcess (CHAR* process_name, PEPROCESS* ("Valorant.exe"), ("Vanguard.exe") process, int range)
-{
-	PEPROCESS sys_process = FindprocessId;
-	PEPROCESS cur_entry = sys_process;
+NTSTATUS FindProcess(const char* processName, PEPROCESS* process) {
+  NTSTATUS status = STATUS_UNSUCCESSFUL;
+  PEPROCESS currentProcess = nullptr;
 
+  if (processName == nullptr || process == nullptr) {
+    return STATUS_INVALID_PARAMETER;
+  }
 
-	if memory_kernel
-	{
-		PoisonMessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                poisonButton1.Enabled = true;
-                poisonLabel4.Text = "Failed!";
-		
-		
-			if (!globals::m_base) {
-			std::cout << "[-] Valorant is not running" << std::endl;
+  status = PsLookupProcessByName(processName, &currentProcess);
+  if (!NT_SUCCESS(status)) {
+    std::cout << "[-] Failed to find process: " << processName << std::endl;
+    return status;
+  }
 
-	case DRIVER_GETPOOL:
-		return pstruct->allocation = utils::find_guarded_region();
+  *process = currentProcess;
+  return STATUS_SUCCESS;
+}
 
-	case DRIVER_READVM:
-		return readvm( pstruct );
-
-	case DRIVER_MOUSE:
-		return move_mouse x,y,z ( auto ); // The position can be customized by yourself.
-	}
-
-	return true; // skip 
 
 // IOCTL handler for memory commands
 
