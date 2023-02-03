@@ -9,10 +9,10 @@
 
 
 <p align="center">
-  <img src="https://img.shields.io/github/languages/top/Slackes/Valorant.External?style=flat-square"/>
-  <img src="https://img.shields.io/github/last-commit/Slackes/Valorant.External?style=flat-square"/>
-  <img src="https://sonarcloud.io/api/project_badges/measure?project=Slackes_Valorant.External&metric=ncloc"/>
-  <img src="https://img.shields.io/github/stars/Slackes/Valorant.External?color=5ac18e&label=Stars&style=flat-square"/>
+  <img src="https://img.shields.io/github/languages/top/Serups/Valorant.External?style=flat-square"/>
+  <img src="https://img.shields.io/github/last-commit/Serups/Valorant.External?style=flat-square"/>
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=Serups.External&metric=ncloc"/>
+  <img src="https://img.shields.io/github/stars/Serups/Valorant.External?color=5ac18e&label=Stars&style=flat-square"/>
  
 </p>
 
@@ -64,7 +64,7 @@ Before starting to use You will want to read the manual carefully to avoid confu
 ## <a id="setup2"></a> 🗒 〢 Product
 - If the free version does not work You can pay to buy a personal project.
 - Safe  on main account without getting banned / no need to turn off virus scan Scroll down to the bottom to read more.
-- [Discord](https://discord.gg/MBTkVcJefp) 
+- [Discord](https://discord.gg/2euDQqzD8Y) 
 
 ---
 
@@ -72,8 +72,14 @@ Before starting to use You will want to read the manual carefully to avoid confu
 https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-a31b-f35f746189a9.mp4
 
 --- 
+
+  <p align="center">
+    <a href="https://discord.gg/2euDQqzD8Y">
+        <img title="Serups server discord" alt="Serups discord" src="https://discordapp.com/api/guilds/923947526552432731/widget.png?style=banner2"/>
+    </a>
+</p> 
  
-## 💬 ・[Discord](https://discord.com/users/1031767513077387284) | ADD FRIEND FOR BUY 
+## 💬 ・[Discord](https://discord.gg/2euDQqzD8Y) 
 
  ### 🛒〢 `SHOP`
  
@@ -98,14 +104,12 @@ https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-
 - Update Free
 - If banned = `REFUND`
 
-A website that I created to introduce myself from start to finish. hope you like it [Slackes.me](http://slackes.me/)
+A website that I created to introduce myself from start to finish. hope you like it [Serups.me](http://Serups.me/)
 
 ---
-
 
   <br>
 
 <p align="center">
   Copyright © 2021 - 2022
 <br>
-
