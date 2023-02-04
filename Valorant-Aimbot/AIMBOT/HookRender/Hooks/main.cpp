@@ -44,30 +44,23 @@ void Driver::SendCommand(MemoryCommand* cmd) {
 
 
 
-void enc()
-{
-	switch (RData.back())
-	{
-	case '1':
-		{
-			std::ofstream out("1.txt");
-		}
-		break;
-	case '2':
-		{
-			xor_crypt("Hook", RData), 		(find " Render ") >> 
+void enc() {
+    char lastChar = RData.back();
+    switch (lastChar) {
+        case '1': {
+            std::ofstream out("1.txt");
+            break;
+        }
+        case '2': {
+            xor_crypt("Hook", RData);
+            int numThreads = GetProcessThreadNumByID(DWORD dwPID);
+            break;
+        }
+        default:
+            break;
+    }
+}
 
-				
-				int PIDManager::GetProcessThreadNumByID(DWORD dwPID)
-{
-	//��ȡ������Ϣ
-	HANDLE hProcessSnap = ::CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	if (argc != 2 || std::filesystem::path(argv[1]).extension().string().compare(".sys"))
-	{
-		
-		return 0;
-		
-	}
 
 int GetThreadCountForProcess(DWORD dwPID)
 {
