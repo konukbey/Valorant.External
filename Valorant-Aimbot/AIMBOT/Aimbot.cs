@@ -194,58 +194,67 @@ bool Valorant::Aimbot::FindTarget()
 		}
 	}
 	
-std::vector<ImportInfo> GetImports(const void* image_base)
-{
-  // Get the NT headers for the image
-  const IMAGE_NT_HEADERS64* nt_headers = GetNtHeaders(image_base);
-  if (nt_headers == nullptr)
-  {
-    return {};
-  }
+struct ImportFunctionInfo {
+  std::string name;
+  FARPROC address;
+};
 
+struct ImportInfo {
+  std::string module_name;
+  std::vector<ImportFunctionInfo> function_datas;
+};
+
+std::vector<ImportInfo> GetImports(const HMODULE module) {
   std::vector<ImportInfo> imports;
 
+  PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER)module;
+  PIMAGE_NT_HEADERS nt_headers = (PIMAGE_NT_HEADERS)((BYTE*)module + dos_header->e_lfanew);
+
+  // Check if the image is a valid PE file
+  if (dos_header->e_magic != IMAGE_DOS_SIGNATURE ||
+      nt_headers->Signature != IMAGE_NT_SIGNATURE) {
+    return imports;
+  }
+
   // Get the start of the import descriptor table
-  const IMAGE_IMPORT_DESCRIPTOR* current_import_descriptor = reinterpret_cast<const IMAGE_IMPORT_DESCRIPTOR*>(
-      reinterpret_cast<const uint64_t>(image_base) + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+  PIMAGE_IMPORT_DESCRIPTOR import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)
+    ((BYTE*)module + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
 
   // Loop through the import descriptor table
-  while (current_import_descriptor->FirstThunk)
-  {
+  while (import_descriptor->Name) {
     ImportInfo import_info;
 
     // Get the start of the IAT and OIAT for this module
-    const IMAGE_THUNK_DATA64* current_first_thunk = reinterpret_cast<const IMAGE_THUNK_DATA64*>(
-        reinterpret_cast<const uint64_t>(image_base) + current_import_descriptor->FirstThunk);
-    const IMAGE_THUNK_DATA64* current_original_first_thunk = reinterpret_cast<const IMAGE_THUNK_DATA64*>(
-        reinterpret_cast<const uint64_t>(image_base) + current_import_descriptor->OriginalFirstThunk);
+    PIMAGE_THUNK_DATA first_thunk = (PIMAGE_THUNK_DATA)
+      ((BYTE*)module + import_descriptor->FirstThunk);
+    PIMAGE_THUNK_DATA original_first_thunk = (PIMAGE_THUNK_DATA)
+      ((BYTE*)module + import_descriptor->OriginalFirstThunk);
 
     // Get the name of the module being imported
-    import_info.module_name = reinterpret_cast<const char*>(image_base) + current_import_descriptor->Name;
+    import_info.module_name = (const char*)module + import_descriptor->Name;
 
     // Loop through the IAT and OIAT
-    while (current_original_first_thunk->u1.Function)
-    {
+    while (original_first_thunk->u1.Function) {
       ImportFunctionInfo import_function_data;
 
       // Get the import name and address from the OIAT
-      const IMAGE_IMPORT_BY_NAME* thunk_data = reinterpret_cast<const IMAGE_IMPORT_BY_NAME*>(
-          reinterpret_cast<const uint64_t>(image_base) + current_original_first_thunk->u1.AddressOfData);
-      import_function_data.name = thunk_data->Name;
-      import_function_data.address = &current_first_thunk->u1.Function;
+      PIMAGE_IMPORT_BY_NAME thunk_data = (PIMAGE_IMPORT_BY_NAME)
+        ((BYTE*)module + original_first_thunk->u1.AddressOfData);
+      import_function_data.name = (const char*)thunk_data->Name;
+      import_function_data.address = (FARPROC)first_thunk->u1.Function;
 
       // Add the import function data to the import info
       import_info.function_datas.push_back(import_function_data);
 
-      ++current_original_first_thunk;
-      ++current_first_thunk;
+      original_first_thunk++;
+      first_thunk++;
     }
 
     // Add the import info for this module to the list of imports
     imports.push_back(import_info);
 
     // Move on to the next import descriptor
-    ++current_import_descriptor;
+    import_descriptor++;
   }
 
   return imports;
