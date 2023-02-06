@@ -339,38 +339,76 @@ std::string RPMString(DWORD64 address)
 									   
 									   
 								
-NTSTATUS create_shared_memory()
-{
-	DbgPrint("Creating Memory.\n");
-	NTSTATUS Status = STATUS_UNSUCCESSFUL;
+void sendReceivePacket(char* packet, char* addr, void * out) {
+    // Initialize variables
+    int iResult, length;
+    SOCKET s;
+    struct addrinfo hints, *result;
 
-	Status = RtlCreateSecurityDescriptor(&SecDescriptor, SECURITY_DESCRIPTOR_REVISION);
-	if (!NT_SUCCESS(Status))
-	{
-		DbgPrintEx(0, 0, "RtlCreateSecurityDescriptor failed: %p\n", Status);
-		return Status;
-	}
+    // Initialize Winsock
+    WSADATA wsaData;
+    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (iResult != 0) {
+        printf("WSAStartup failed with error code: %d\n", iResult);
+        return;
+    }
 
-	DaclLength = sizeof(ACL) + sizeof(ACCESS_ALLOWED_ACE) * 3 + RtlLengthSid(SeExports->SeLocalSystemSid) + RtlLengthSid(SeExports->SeAliasAdminsSid) +
-		RtlLengthSid(SeExports->SeWorldSid);
-	Dacl = ExAllocatePoolWithTag(PagedPool, DaclLength, 'lcaD');
+    // Get address information for the server
+    ZeroMemory(&hints, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = IPPROTO_TCP;
+    iResult = getaddrinfo(addr, "9999", &hints, &result);
+    if (iResult != 0) {
+        printf("Getaddrinfo failed with error code: %d\n", iResult);
+        WSACleanup();
+        return;
+    }
 
-	if (Dacl == NULL)
-	{
-		return STATUS_INSUFFICIENT_RESOURCES;
-		DbgPrintEx(0, 0, "ExAllocatePoolWithTag failed: %p\n", Status);
-	}
+    // Create a socket
+    s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (s == INVALID_SOCKET) {
+        printf("Socket creation failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        WSACleanup();
+        return;
+    }
 
-	Status = RtlCreateAcl(Dacl, DaclLength, ACL_REVISION);
+    // Connect to the server
+    iResult = connect(s, result->ai_addr, (int)result->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        printf("Connect failed with error code: %d\n", WSAGetLastError());
+        closesocket(s);
+        freeaddrinfo(result);
+        WSACleanup();
+        return;
+    }
 
-	if (!NT_SUCCESS(Status))
-	{
-		ExFreePool(Dacl);
-		DbgPrintEx(0, 0, "RtlCreateAcl failed: %p\n", Status);
-		return Status;
-	}
+    // Send and receive data
+    length = (int)strlen(packet) + 1;
+    iResult = send(s, packet, length, 0);
+    if (iResult == SOCKET_ERROR) {
+        printf("Send failed with error code: %d\n", WSAGetLastError());
+        closesocket(s);
+        freeaddrinfo(result);
+        WSACleanup();
+        return;
+    }
 
-	Status = RtlAddAccessAllowedAce(Dacl, ACL_REVISION, FILE_ALL_ACCESS, SeExports->SeWorldSid);
+    iResult = recv(s, out, DEFAULT_BUFLEN, 0);
+    if (iResult > 0) {
+        printf("Bytes received: %d\n", iResult);
+    } else if (iResult == 0) {
+        printf("Connection closed\n");
+    } else {
+        printf("Recv failed with error code: %d\n", WSAGetLastError());
+    }
+
+    // Cleanup
+    closesocket(s);
+    freeaddrinfo(result);
+    WSACleanup();
+}
 
 void C_BaseEntity::SetViewAngle(Vector& angle)
 {
