@@ -17,6 +17,7 @@ namespace ValorantAuth
 {
     class Program
     {
+        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
         public static string AccessToken { get; set; }
         public static string EntitlementToken { get; set; }
@@ -28,7 +29,15 @@ namespace ValorantAuth
             Console.WriteLine("Enter password: ");
             var password = Console.ReadLine();
             
-            Login(username, password);
+            try
+            {
+                Login(username, password);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "An error occurred during login");
+                Console.WriteLine("An error occurred during login. Please check the logs for more information.");
+            }
         }
 
         static void Login(string username, string password)
@@ -36,31 +45,39 @@ namespace ValorantAuth
             CookieContainer cookie = new CookieContainer();
             Authentication.GetAuthorization(cookie);
 
-            var authJson = JsonConvert.DeserializeObject(Authentication.Authenticate(cookie, username, password));
-            JToken authObj = JObject.FromObject(authJson);
+            var authResponse = Authentication.Authenticate(cookie, username, password);
+            var authJson = JsonConvert.DeserializeObject(authResponse);
+            var authObj = JObject.FromObject(authJson);
 
             string authURL = authObj["response"]["parameters"]["uri"].Value<string>();
-            var access_tokenVar = Regex.Match(authURL, @"access_token=(.+?)&scope=").Groups[1].Value;
-            AccessToken = $"{access_tokenVar}";
+            var accessTokenMatch = Regex.Match(authURL, @"access_token=(.+?)&scope=");
 
-            RestClient client = new RestClient(new Uri("https://entitlements.auth.riotgames.com/api/token/v1"));
-            RestRequest request = new RestRequest(Method.POST);
+            if (!accessTokenMatch.Success)
+            {
+                throw new Exception("Access token not found in the authentication URL.");
+            }
+
+            AccessToken = accessTokenMatch.Groups[1].Value;
+
+            var client = new RestClient(new Uri("https://entitlements.auth.riotgames.com/api/token/v1"));
+            var request = new RestRequest(Method.POST);
 
             request.AddHeader("Authorization", $"Bearer {AccessToken}");
             request.AddJsonBody("{}");
 
-            string response = client.Execute(request).Content;
-            var entitlement_token = JsonConvert.DeserializeObject(response);
-            JToken entitlement_tokenObj = JObject.FromObject(entitlement_token);
+            var response = client.Execute(request).Content;
+            var entitlementToken = JsonConvert.DeserializeObject(response);
+            var entitlementTokenObj = JObject.FromObject(entitlementToken);
 
-            EntitlementToken = entitlement_tokenObj["entitlements_token"].Value<string>();
+            EntitlementToken = entitlementTokenObj["entitlements_token"].Value<string>();
 
-
-            connect.WriteLine($"Entitlement Token: {EntitlementToken}");
-            connect.WriteLine($"---------------------------------");
-            connect.WriteLine($"Bearer Authentication Token: {AccessToken}");
+            Console.WriteLine($"Entitlement Token: {EntitlementToken}");
+            Console.WriteLine($"---------------------------------");
+            Console.WriteLine($"Bearer Authentication Token: {AccessToken}");
         }
     }
+}
+
 
     class Authentication
     {
