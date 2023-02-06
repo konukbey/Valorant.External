@@ -8,18 +8,23 @@ namespace AuthGG
     internal class App
     {
         private static readonly IDictionary<string, string> Variables = new Dictionary<string, string>();
-        private static User _user;
+        private static User _currentUser;
 
         public static void SetUser(User user)
         {
-            _user = user;
+            _currentUser = user;
         }
 
         public static string GetVariable(string name)
         {
-            if (_user == null || string.IsNullOrEmpty(_user.Id) || string.IsNullOrEmpty(_user.Hwid) || string.IsNullOrEmpty(_user.Ip))
+            if (_currentUser == null)
             {
-                throw new InvalidOperationException("User is not logged in, possible breach detected!");
+                throw new InvalidOperationException("User is not set, possible breach detected!");
+            }
+
+            if (string.IsNullOrEmpty(_currentUser.Id) || string.IsNullOrEmpty(_currentUser.Hwid) || string.IsNullOrEmpty(_currentUser.Ip))
+            {
+                throw new InvalidOperationException("User's Id, Hwid, or Ip is not set, possible breach detected!");
             }
 
             if (!Variables.TryGetValue(name, out string value))
@@ -38,6 +43,7 @@ namespace AuthGG
         public string Ip { get; set; }
     }
 }
+
 
         public static string Error = null;
         public static Dictionary<string, string> Variables = new Dictionary<string, string>();
