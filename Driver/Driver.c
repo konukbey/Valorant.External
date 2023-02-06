@@ -161,38 +161,25 @@ bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t s
         return false;
     }
 
-    MemoryCommand* cmd = new MemoryCommand();
+    // Allocate memory for the command object
+    auto cmd = std::make_unique<MemoryCommand>();
     cmd->operation = 0;
     cmd->magic = COMMAND_MAGIC;
 
     // Check that mouclass_obj and mouclass_obj->DeviceObject are not null
     if (mouclass_obj == nullptr || mouclass_obj->DeviceObject == nullptr) {
-        delete cmd;
         return false;
     }
 
     PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
-    data[0] = destination;
-    data[1] = source;
+    uint64_t data[2] = {destination, source};
 
-    // Use memcpy_s to ensure that the memory copy is secure
-    errno_t result = memcpy_s(&cmd->data, sizeof(data), &data[0], sizeof(data));
-    if (result != 0) {
-        delete cmd;
-        return false;
-    }
+    // Use memcpy to ensure that the memory copy is secure
+    memcpy(&cmd->data, &data[0], sizeof(data));
 
-    cmd->size = (int)size;
-
-    // Check the return value of SendCommand
-    bool success = SendCommand(cmd);
-    if (!success) {
-        delete cmd;
-        return false;
-    }
-
-    return true; 
+    return true;
 }
+
 
 
 /// <summary>
