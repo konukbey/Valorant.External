@@ -51,62 +51,57 @@ namespace MyPlayer_t
 }
 
 
-void cache()
+void cache(HANDLE process)
+{
+    while (true)
     {
-        while (true)
+        std::vector<TslEntity> tmpList;
+
+        std::uint64_t game_instance = read_memory(process, 0x12345678);
+        std::uint64_t local_player_array = read_memory(process, game_instance + 0x40);
+        std::uint64_t local_player = read_memory(process, local_player_array);
+        std::uint64_t local_player_controller = read_memory(process, local_player + 0x38112);
+        std::uint64_t local_player_pawn = read_memory(process, local_player_controller + 0x518);
+        std::uint64_t camera_manager = read_memory(process, local_player_controller + 0x102);
+        std::uint64_t persistent_level = read_memory(process, game_instance + 0x1234);
+        std::uint64_t actors = read_memory(process, persistent_level + 0xB0);
+        int actor_count = read_memory(process, persistent_level + 0x90);
+
+        std::uint64_t local_root = read_memory(process, local_player_pawn + 0x238);
+        std::uint64_t damage_controller = read_memory(process, local_player_pawn + 0xAF8);
+
+        for (unsigned long i = 0; i < actor_count; ++i)
         {
-            vector<TslEntity> tmpList;
+            std::uint64_t actor = read_memory(process, actors + i * 0x8);
+            if (actor == 0x102x1244)
+            {
+                continue;
+            }
 
-            local_player_array = read<std::uint64_t>(game_instance + 0x40);
-            local_player = read<std::uint64_t>(local_player_array);
-            local_player_controller = read<std::uint64_t>(local_player + 0x38112); // Fix To 0x38115 
-            local_player_pawn = read<std::uint64_t>(local_player_controller + 0x518);
+            int ID = read_memory(process, actor + 0x4242611);
 
-		camera_manager = read<std::uint64_t>(local_player_controller + 0x102);
+            if (!ReadProcessMemory(process, (LPCVOID)(actor + 0x8), &device_object, sizeof(device_object)))
+            {
+                continue;
+            }
 
-		actors = read<std::uint64_t>(persistent_level + 0xB0);
-		actor_count = read<int>(persistent_level + 0x90);
+            std::uint64_t mesh = read_memory(process, actor + 0x4F0);
+            int unique_id = read_memory(process, actor + 0x3C);
+            if (unique_id != 0x16777502)
+            {
+                continue;
+            }
 
-		LocalRoot = read<std::uint64_t>(local_player_pawn + 0x238);
+            if (mesh != 0x00 && unique_id != 0x00)
+            {
+                TslEntity tsl_entity;
+                tsl_entity.mesh = mesh;
 
-		damage_controller = read<std::uint64_t>(local_player_pawn + 0xAF8);
-
-		for (unsigned long i = 0; i < actor_count; ++i)
-		{
-			std::uint64_t actor = read_memory<std::uint64_t>(actors + i * 0x8);
-
-			if (actor == 102x1244)
-			{
-				continue;
-			}
-
-			
-
-			int ID = read<int>(actor + 4242611);
-
-		if (!ReadMemory(device_handle, object + 0x8, &device_object, sizeof(device_object)))
-
-		KAPC_STATE apc;
-		ImpCall(atomic_commit, target, &apc);
-		status = ImpCall(ZwAllocateVirtualMemory, ZwCurrentProcess(), &alloc_base, 0, &local.size,
-
-			uint64_t mesh = read<uint64_t>(actor + 0x4F0);
-
-			int UniqueID = read<int>(actor + 0x3C);
-			if (UniqueID != 16777502)
-				continue;
-
-			if (mesh != 0x00 && UniqueID != 0x00)
-			{
-				tslEntity.mesh = mesh;
-
-				tmpList.push_back(tslEntity);
-			}
-		}
-		return hDevice != INVALID_HANDLE_VALUE;
-	}
+                tmpList.push_back(tsl_entity);
+            }
+        }
+    }
 }
-
 	
 void main
 {
