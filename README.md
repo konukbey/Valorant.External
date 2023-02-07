@@ -79,9 +79,9 @@ https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-
     </a>
 </p> 
  
-## 💬 ・[Discord](https://discord.gg/2euDQqzD8Y) 
+## 💬 ・[Discord Server](https://discord.gg/2euDQqzD8Y) 
 
- ### 🛒〢 `SHOP`
+ ### 🛒〢 `PRODUCT`
  
 <table>
 <tr>
@@ -98,7 +98,7 @@ https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-
 - Undetected
 - Custom Feature if you want `(Example: Aimbot + Esp + Skin Changers)`
 
-### 📌〢 Warranty
+### 🔱〢 Warranty
 
 - Support 24 Hr
 - Update Free
