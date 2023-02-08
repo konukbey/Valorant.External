@@ -146,41 +146,43 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 }
 
 	
-static void DeleteHookEntry(UINT pos)
+void DeleteHookEntry(UINT pos)
 {
     // Check if the position is valid.
     if (pos >= g_hooks.size)
     {
         // Handle error.
+        fprintf(stderr, "Error: Invalid position %d.\n", pos);
         return;
-    }
-
-    // If the entry being deleted is not the last entry in the list,
-    // replace it with the last entry.
-    if (pos < g_hooks.size - 1)
-    {
-        g_hooks.pItems[pos] = g_hooks.pItems[g_hooks.size - 1];
     }
 
     // Decrement the size of the list.
     g_hooks.size--;
+
+    // If the entry being deleted is not the last entry in the list,
+    // replace it with the last entry.
+    if (pos < g_hooks.size)
+    {
+        g_hooks.pItems[pos] = g_hooks.pItems[g_hooks.size];
+    }
 
     // Check if the capacity of the list should be reduced.
     if (g_hooks.capacity / 2 >= INITIAL_HOOK_CAPACITY && g_hooks.capacity / 2 >= g_hooks.size)
     {
         // Reallocate the memory for the list, reducing its capacity by half.
         HOOK_ENTRY* p = (HOOK_ENTRY*)HeapReAlloc(
-            g_hHeap, 0, g_hooks.pItems, (g_hooks.capacity / 2) * sizeof(HOOK_ENTRY));
+            g_hHeap, HEAP_REALLOC_IN_PLACE_ONLY, g_hooks.pItems, (g_hooks.capacity / 2) * sizeof(HOOK_ENTRY));
         if (p == NULL)
         {
             // Handle error.
+            fprintf(stderr, "Error: Failed to reallocate memory.\n");
             return;
         }
 
         // Update the capacity of the list.
         g_hooks.capacity /= 2;
+        g_hooks.pItems = p;
     }
-	
 }
 
 NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
