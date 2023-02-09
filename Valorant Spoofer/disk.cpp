@@ -598,24 +598,28 @@ NTSTATUS InitialiseSpoofedCallstack(std::vector<StackFrame> &targetCallStack)
         status = GetImageBase(*stackFrame);
         if (!NT_SUCCESS(status))
         {
-            std::cout << "[-] Error: Failed to get image base\n";
-            goto Cleanup;
+            std::cerr << "[ERROR] Failed to get image base for stack frame: " << *stackFrame << std::endl;
+            return status;
         }
 
         // [2] Calculate ret address for current stack frame.
         status = CalculateReturnAddress(*stackFrame);
         if (!NT_SUCCESS(status))
         {
-            std::cout << "[-] Error: Failed to caluclate ret address\n";
-            goto Cleanup;
+            std::cerr << "[ERROR] Failed to calculate ret address for stack frame: " << *stackFrame << std::endl;
+            return status;
         }
 
         // [3] Calculate the total stack size for ret function.
         status = CalculateFunctionStackSizeWrapper(*stackFrame);
         if (!NT_SUCCESS(status))
         {
-            std::cout << "[-] Error: Failed to caluclate total stack size\n";
-            goto Cleanup;
+            std::cerr << "[ERROR] Failed to calculate total stack size for stack frame: " << *stackFrame << std::endl;
+            return status;
         }
     }
+
+    return status;
+}
+
 	
