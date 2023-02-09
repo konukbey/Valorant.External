@@ -112,6 +112,8 @@ HRESULT D3D11StateSaver::restoreSavedState()
 
 	m_pContext->IASetPrimitiveTopology(m_primitiveTopology);
 	m_pContext->IASetInputLayout(m_pInputLayout);
+	m_pContext->IASetVertexBuffers(0, 1, &m_pVB, &m_vertexStride, &m_vertexOffset);
+	m_pContext->IASetIndexBuffer(m_pIndexBuffer, m_indexFormat, m_indexOffset);
 
 	m_pContext->OMSetBlendState(m_pBlendState, m_blendFactor, m_sampleMask);
 	m_pContext->OMSetDepthStencilState(m_pDepthStencilState, m_stencilRef);
@@ -121,19 +123,14 @@ HRESULT D3D11StateSaver::restoreSavedState()
 	m_pContext->VSSetShader(m_pVS, m_pVSClassInstances, m_numVSClassInstances);
 	m_pContext->VSSetConstantBuffers(0, 1, &m_pVSConstantBuffer);
 
-
 	if (m_featureLevel >= D3D_FEATURE_LEVEL_10_0)
 	{
 		m_pContext->GSSetShader(m_pGS, m_pGSClassInstances, m_numGSClassInstances);
-
 	}
-
-	m_pContext->IASetVertexBuffers(0, 1, &m_pVB, &m_vertexStride, &m_vertexOffset);
-
-	m_pContext->IASetIndexBuffer(m_pIndexBuffer, m_indexFormat, m_indexOffset);
 
 	return S_OK;
 }
+
 
 void D3D11StateSaver::releaseSavedState()
 {
