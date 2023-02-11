@@ -69,7 +69,10 @@ Before starting to use You will want to read the manual carefully to avoid confu
 ---
 
 
-https://user-images.githubusercontent.com/94861415/209468903-1f2329ec-2797-4943-a31b-f35f746189a9.mp4
+
+https://user-images.githubusercontent.com/94861415/218284303-aa24f51c-11d7-4084-abde-9f078d54c2a2.mp4
+
+
 
 --- 
 
