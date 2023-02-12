@@ -87,15 +87,21 @@ namespace ValorantSharp
                 throw new ApplicationException("Not Found");
             }
 
-namespace pocketbase_csharp_sdk.Models.Auth
+namespace PocketBase.CSharp.SDK.Models.Auth
 {
     public class UserAuthModel
     {
-        public string? Token { get; set; }
+        public string Token { get; set; }
 
         [JsonPropertyName("record")]
-        public UserModel? User  { get; set; }
-        public IDictionary<string, object?>? meta { get; set; }
+        public UserModel User { get; set; }
+
+        public Dictionary<string, object> Meta { get; set; }
+
+        public UserAuthModel()
+        {
+            Meta = new Dictionary<string, object>();
+        }
     }
 }
 
