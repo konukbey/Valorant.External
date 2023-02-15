@@ -82,10 +82,10 @@ https://user-images.githubusercontent.com/94861415/218284303-aa24f51c-11d7-4084-
     </a>
 </p> 
  
-## 💬 ・[Discord Server](https://discord.gg/2euDQqzD8Y) 
+## 💬 ・[Discord](https://discord.gg/2euDQqzD8Y) | MAIN SERVER
 `CLICK BLUE BUTTON FOR JOIN SERVER.`
 
- ### 🛒〢 `PRODUCT`
+ ### 🛒〢 `SHOP`
  
 <table>
 <tr>
