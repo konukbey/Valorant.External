@@ -154,11 +154,23 @@ NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 }
 
 
-bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t size)
+enum MemoryCopyResult {
+    SUCCESS = 0,
+    INVALID_INPUT,
+    NULL_POINTER,
+    SAME_ADDRESS,
+    MEMORY_COPY_ERROR
+};
+
+MemoryCopyResult kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t size)
 {
     // Check for invalid input
     if (destination == 0 || source == 0 || size == 0) {
-        return false;
+        return INVALID_INPUT;
+    }
+
+    if (destination == source) {
+        return SAME_ADDRESS;
     }
 
     // Allocate memory for the command object
@@ -168,17 +180,22 @@ bool kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t s
 
     // Check that mouclass_obj and mouclass_obj->DeviceObject are not null
     if (mouclass_obj == nullptr || mouclass_obj->DeviceObject == nullptr) {
-        return false;
+        return NULL_POINTER;
     }
 
     PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
     uint64_t data[2] = {destination, source};
 
-    // Use memcpy to ensure that the memory copy is secure
-    memcpy(&cmd->data, &data[0], sizeof(data));
+    // Use memcpy_s to ensure that the memory copy is secure
+    try {
+        memcpy_s(&cmd->data, sizeof(cmd->data), &data[0], sizeof(data));
+    } catch (...) {
+        return MEMORY_COPY_ERROR;
+    }
 
-    return true;
+    return SUCCESS;
 }
+
 
 
 
