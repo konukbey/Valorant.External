@@ -103,23 +103,53 @@ void cache(HANDLE process)
     }
 }
 	
-void main
-{
-	auto process = utils::getprocessid( L"valorant.exe" );
-	    cmd->operation = 2; // find game process
- 	    cmd->retval = PID;
+#include <iostream>
+#include <string>
+#include <Windows.h>
 
-	printf( "processid: %i\n", process );
+void main() {
+    DWORD processId = 0;
+    const wchar_t* processName = L"valorant.exe";
+    HANDLE processHandle = nullptr;
 
-	if (!kernel_image_base)
-		{
-			std::cout << "[-] Failed to allocate remote image in kernel" << std::endl;
-			break;
-		}
+    processId = GetProcessIdByName(processName);
+    if (processId == 0) {
+        std::cerr << "Failed to find process: " << processName << std::endl;
+        return 1;
+    }
 
-	getchar();
-	return 0;
+    processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, processId);
+    if (processHandle == nullptr) {
+        std::cerr << "Failed to open process with ID " << processId << std::endl;
+        return 1;
+    }
+
+    // Do something with the process handle...
+
+    CloseHandle(processHandle);
+    std::cout << "Program completed successfully." << std::endl;
+    return 0;
 }
+
+DWORD GetProcessIdByName(const wchar_t* processName) {
+    DWORD processId = 0;
+    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snapshot != INVALID_HANDLE_VALUE) {
+        PROCESSENTRY32 processEntry = {};
+        processEntry.dwSize = sizeof(processEntry);
+        if (Process32First(snapshot, &processEntry)) {
+            do {
+                if (_wcsicmp(processEntry.szExeFile, processName) == 0) {
+                    processId = processEntry.th32ProcessID;
+                    break;
+                }
+            } while (Process32Next(snapshot, &processEntry));
+        }
+        CloseHandle(snapshot);
+    }
+    return processId;
+}
+
 
 auto local_section = reinterpret_cast<void*>(reinterpret_cast<uint64_t>(local_image_base) + current_image_section[i].VirtualAddress);
 concept crash() -> void
