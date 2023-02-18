@@ -323,26 +323,31 @@ int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
 
 std::string RPMString(DWORD64 address) 
 {
-	if (!(void*)address)
+	// Check if address is NULL or invalid
+	if (!address || address > 0x7FFFFFFF'FFFF'FFFF)
 		return std::string("BOT");
 
-	std::string nameString;
-	char name[30];
-	memcpy(name, (void*)address, 30);
-	for (int i = 0; i < sizeof(name); i++) {
-		if (!name[i])
-			break;
-		if ((int)name[i] >= 32 && (int)name[i] <= 126)
-			nameString += name[i];
-		else
-			break;
-	}
-	return nameString;
+	// Create a temporary buffer to hold the string
+	char buffer[256] = { 0 };
+	
+	// Use a safe version of memcpy to copy the string from memory
+	if (memcpy_s(buffer, sizeof(buffer), (void*)address, sizeof(buffer) - 1) != 0)
+		return std::string("BOT");
 
+	// Trim any trailing null characters from the string
+	char* endpos = buffer + strlen(buffer);
+	while (endpos > buffer && *(endpos - 1) == '\0')
+		--endpos;
+	*endpos = '\0';
+
+	// Validate the string and convert it to a std::string
+	for (char* p = buffer; *p != '\0'; ++p) {
+		if (*p < 32 || *p > 126)
+			return std::string("BOT");
+	}
+	return std::string(buffer);
 }
-									   
-									   
-								
+				
 void sendReceivePacket(char* packet, char* addr, void * out) {
     // Initialize variables
     int iResult, length;
