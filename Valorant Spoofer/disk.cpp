@@ -588,38 +588,48 @@ namespace Disks
 // via loading any required dlls, resolving module addresses
 // and calculating spoofed return addresses.
 //
-NTSTATUS InitialiseSpoofedCallstack(std::vector<StackFrame> &targetCallStack)
+// Initialize a spoofed call stack by populating information for each stack frame.
+// targetCallStack: a vector of StackFrame objects representing the call stack frames to initialize.
+// Returns: STATUS_SUCCESS if all operations succeed for all stack frames, or the corresponding error code if any operation fails.
+
+NTSTATUS InitializeSpoofedCallStack(const std::vector<StackFrame>& targetCallStack)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
+    // Iterate through each stack frame in targetCallStack.
     for (auto stackFrame = targetCallStack.begin(); stackFrame != targetCallStack.end(); stackFrame++)
     {
-        // [1] Get image base for current stack frame.
-        status = GetImageBase(*stackFrame);
+        // Get the image base address for the current stack frame.
+        status = GetImageBaseAddress(*stackFrame);
         if (!NT_SUCCESS(status))
         {
-            std::cerr << "[ERROR] Failed to get image base for stack frame: " << *stackFrame << std::endl;
+            // If the operation fails, print an error message and return the error code.
+            std::cerr << "[ERROR] Failed to get image base address for stack frame: " << *stackFrame << std::endl;
             return status;
         }
 
-        // [2] Calculate ret address for current stack frame.
+        // Calculate the return address for the current stack frame.
         status = CalculateReturnAddress(*stackFrame);
         if (!NT_SUCCESS(status))
         {
-            std::cerr << "[ERROR] Failed to calculate ret address for stack frame: " << *stackFrame << std::endl;
+            // If the operation fails, print an error message and return the error code.
+            std::cerr << "[ERROR] Failed to calculate return address for stack frame: " << *stackFrame << std::endl;
             return status;
         }
 
-        // [3] Calculate the total stack size for ret function.
-        status = CalculateFunctionStackSizeWrapper(*stackFrame);
+        // Calculate the total stack size for the function that will be returned to from the current stack frame.
+        status = CalculateFunctionStackSize(*stackFrame);
         if (!NT_SUCCESS(status))
         {
-            std::cerr << "[ERROR] Failed to calculate total stack size for stack frame: " << *stackFrame << std::endl;
+            // If the operation fails, print an error message and return the error code.
+            std::cerr << "[ERROR] Failed to calculate function stack size for stack frame: " << *stackFrame << std::endl;
             return status;
         }
     }
 
+    // If all operations succeed for all stack frames, return STATUS_SUCCESS.
     return status;
 }
+
 
 	
