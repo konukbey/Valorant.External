@@ -146,12 +146,14 @@ HRESULT __stdcall Hooks::HookedPresent(IDXGISwapChain* pSwapChain, UINT SyncInte
 }
 
 	
+// Define a macro for the minimum capacity of the list.
+#define MINIMUM_CAPACITY 16
+
 void DeleteHookEntry(UINT pos)
 {
     // Check if the position is valid.
     if (pos >= g_hooks.size)
     {
-        // Handle error.
         fprintf(stderr, "Error: Invalid position %d.\n", pos);
         return;
     }
@@ -167,23 +169,30 @@ void DeleteHookEntry(UINT pos)
     }
 
     // Check if the capacity of the list should be reduced.
-    if (g_hooks.capacity / 2 >= INITIAL_HOOK_CAPACITY && g_hooks.capacity / 2 >= g_hooks.size)
+    if (g_hooks.capacity > MINIMUM_CAPACITY && g_hooks.size <= g_hooks.capacity / 2)
     {
-        // Reallocate the memory for the list, reducing its capacity by half.
+        // Calculate the new capacity.
+        size_t newCapacity = g_hooks.capacity / 2;
+        if (newCapacity < MINIMUM_CAPACITY)
+        {
+            newCapacity = MINIMUM_CAPACITY;
+        }
+
+        // Reallocate the memory for the list with the new capacity.
         HOOK_ENTRY* p = (HOOK_ENTRY*)HeapReAlloc(
-            g_hHeap, HEAP_REALLOC_IN_PLACE_ONLY, g_hooks.pItems, (g_hooks.capacity / 2) * sizeof(HOOK_ENTRY));
+            g_hHeap, HEAP_REALLOC_IN_PLACE_ONLY, g_hooks.pItems, newCapacity * sizeof(HOOK_ENTRY));
         if (p == NULL)
         {
-            // Handle error.
             fprintf(stderr, "Error: Failed to reallocate memory.\n");
             return;
         }
 
         // Update the capacity of the list.
-        g_hooks.capacity /= 2;
+        g_hooks.capacity = newCapacity;
         g_hooks.pItems = p;
     }
 }
+
 
 NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
 	const auto stack = IoGetCurrentIrpStackLocation(irp);

@@ -10,25 +10,38 @@ uint64_t uEntityBone[] = { /*head*/ 0x670, /*neck*/ 0xF40, /*hand*/ 0x6A0, /*che
 
 std::string RPMString(uint64_t address) 
 {
-    // Initialize start time
+    // Initialize timer
     auto start = std::chrono::high_resolution_clock::now();
 
-    // Initialize state
+    // Call ntusrinit() to initialize state
     int64_t state = ntusrinit(0x193411 + DRIVER_INIT, 0x193411);
+
+    // Check for errors
     if (state == -1) {
-        return "ntusrinit failed";
+        return "Error: ntusrinit failed";
     }
 
-    // Check elapsed time
+    // Check elapsed time and return error if it took too long
     auto end = std::chrono::high_resolution_clock::now();
-    auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-    if (elapsed > 100) {
-        return "Initialization took too long";
+    auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+    if (elapsed_ms > 100) {
+        return "Error: Initialization took too long";
     }
 
-    // Return value
-    return "Success";
+    // Read memory address using system call
+    std::string value;
+    int result = read_memory(address, value);
+
+    // Check for errors
+    if (result != 0) {
+        return "Error: Failed to read memory";
+    }
+
+    // Return the value read from memory
+    return value;
 }
+
 
 std::string C_BaseEntity::GetPlayerName()
 {
