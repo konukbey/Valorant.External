@@ -123,32 +123,14 @@ void Draw::Rectangle(float x, float y, float w, float h, D3DCOLOR startColor, D3
     return Camera_rotation + diff / SmoothFactor;
 }
 
-void RCS(Vector3 Target, Vector3 Camera_rotation, float SmoothFactor) {
-
-    // Camera 2 Control space
-    Vector3 ConvertRotation = Camera_rotation;
-    normalize(ConvertRotation);
-
-    // Calculate recoil/aimpunch
-    auto ControlRotation = read<Vector3>(PlayerController + Offsets::ControlRotation);
-    Vector3 DeltaRotation = ConvertRotation - ControlRotation;
-    normalize(DeltaRotation);
-
-    // Remove aimpunch from CameraRotation
-    ConvertRotation = Target - (DeltaRotation * SmoothFactor);
-    normalize(ConvertRotation);
-
-    //Smooth the whole thing
-    Vector3 Smoothed = SmoothAim(Camera_rotation, ConvertRotation, SmoothFactor);
-    Smoothed -= (DeltaRotation / SmoothFactor);
-    Clamp(Smoothed);
-    // normalize(Smoothed);
-    // *(float*)(PlayerController + Offsets::ControlRotation) = Smoothed.X;
-    //*(float*)(PlayerController + 0x3F4) = Smoothed.Y;
-    *(D3DXVECTOR3*)(PlayerController + Offsets::ControlRotation) = D3DXVECTOR3(Smoothed.x, Smoothed.y, 0);
-	{
-		 return false;
+void RCS(Vector3 target, Vector3& cameraRotation, float smoothFactor) {
+    const Vector3 controlRotation = read<Vector3>(PlayerController + Offsets::ControlRotation);
+    const Vector3 deltaRotation = (cameraRotation - controlRotation).normalize();
+    cameraRotation = target - (deltaRotation * smoothFactor);
+    cameraRotation.smooth(controlRotation, smoothFactor).clamp();
+    *(D3DXVECTOR3*)(PlayerController + Offsets::ControlRotation) = cameraRotation.toD3DXVECTOR3();
 }
+
 
 void activateValorantWindow() {
 	SetForegroundWindow(valorant_window);
