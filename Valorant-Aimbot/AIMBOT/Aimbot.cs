@@ -177,26 +177,23 @@ bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_fu
 				
 bool Valorant::Aimbot::FindTarget()
 {
-    float CurrentNearDistance = std::numeric_limits<float>::max();
-    Cheat::Vector2 ScreenMiddle = { static_cast<float>(Valorant::Globals::system_data.width) / 2.f, static_cast<float>(Valorant::Globals::system_data.height) / 2.f };
+    float min_distance = std::numeric_limits<float>::max();
+    auto middle = Valorant::CheatStruct::Vector2{Valorant::Globals::system_data.width/2.f, Valorant::Globals::system_data.height/2.f};
+    auto target = static_cast<Valorant::CheatStruct::Player*>(nullptr);
 
-    Valorant::CheatStruct::Player* pTarget = nullptr;
-    for (const auto& PlayerObject : Valorant::Globals::hack_data.TaggedObject.map) {
-        if (!PlayerObject.second->Usable)
-            continue;
-
-        auto player = static_cast<Valorant::CheatStruct::Player*>(PlayerObject.second.get());
-
-        float distance = player->ScreenHeadPos.distance(ScreenMiddle);
-        if (distance < Valorant::Globals::hack_setting.Aimbot.fov && distance < CurrentNearDistance) {
-            CurrentNearDistance = distance;
-            pTarget = player;
+    for (auto& obj : Valorant::Globals::hack_data.TaggedObject.map) {
+        auto player = static_cast<Valorant::CheatStruct::Player*>(obj.second.get());
+        if (obj.second->Usable && player) {
+            auto distance = player->ScreenHeadPos.distance(middle);
+            if (distance < Valorant::Globals::hack_setting.Aimbot.fov && distance < min_distance) {
+                min_distance = distance;
+                target = player;
+            }
         }
     }
 
-    return pTarget != nullptr;
+    return target != nullptr;
 }
-
 	
 struct ImportFunctionInfo {
   std::string name;
