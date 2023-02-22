@@ -133,23 +133,25 @@ void RCS(Vector3 target, Vector3& cameraRotation, float smoothFactor) {
 
 
 void activateValorantWindow() {
-	SetForegroundWindow(valorant_window);
-	mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-	mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+    HWND valorantWindow = FindWindow(NULL, "Valorant");
+    if (valorantWindow != NULL) {
+        ShowWindow(valorantWindow, SW_SHOW);
+    }
 }
-	
-	
+
 void handleKeyPresses() {
-	// Toggle overlay
-	if (GetAsyncKeyState(VK_INSERT) & 1) {
-		g_overlay_visible = !g_overlay_visible;
-		glfwSetWindowAttrib(g_window, GLFW_MOUSE_PASSTHROUGH, !g_overlay_visible);
-		if (g_overlay_visible) {
-			HWND overlay_window = glfwGetWin32Window(g_window);
-			SetForegroundWindow(overlay_window);
-		}
-		else {
-			activateValorantWindow();
-		}
-	}
+    const int TOGGLE_OVERLAY_KEY = VK_INSERT;
+    static bool overlayVisible = false;
+
+    if (GetAsyncKeyState(TOGGLE_OVERLAY_KEY) & 1) {
+        overlayVisible = !overlayVisible;
+        glfwSetWindowAttrib(g_window, GLFW_MOUSE_PASSTHROUGH, !overlayVisible);
+        if (overlayVisible) {
+            HWND overlayWindow = glfwGetWin32Window(g_window);
+            ShowWindow(overlayWindow, SW_SHOW);
+        }
+        else {
+            activateValorantWindow();
+        }
+    }
 }
