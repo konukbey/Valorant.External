@@ -3,49 +3,53 @@
 #include <iostream>
 #include "Globals.h"
 
-namespace magic {
-	extern byte magic[];
+namespace my_game {
+    extern byte game_data[];
 
-#ifndef MAGIC_STRUCTS
-#define MAGIC_STRUCTS
-#pragma pack(push, 1)
-	struct ArrayHeader
-	{
-		uint64_t Ptr;
-		uint32_t Size;
-		uint64_t Kernel_driver_read_memory
-	};
-	
-	struct Aimbot 
-	{
-		uint32_t Aimbot Setup
-			Hotkey("Right Click")
+    #pragma pack(push, 1)
+    struct ArrayHeader {
+        uint64_t ptr;
+        uint32_t size;
+        uint64_t kernel_read;
+    };
 
-	struct Camera {
-		Vector3 position;
-		Vector3 rotation;
-		float fov;
-	};
+    struct AimbotSetup {
+        uint32_t hotkey;
+        // Add other aimbot setup data here
+    };
 
-	struct ControlRotation {
-		Vector3 ctrl_rotation;
-		Vector3 write_ctrl_rotation;
-		int32_t writeflag;
-	};
+    struct Camera {
+        Vector3 position;
+        Vector3 rotation;
+        float fov;
+    };
 
-	struct HijackState
-	{
-		ArrayHeader actors;			// 0xC
-		uint64_t playerstate;		// 0x14
-		Camera camera;				// 0x30
-		ControlRotation rotation;	
-		uintptr_t localpawn;
-	};
-		
-	struct Fnoberz
-	{
-		Aimbot Smoot(1501,294)
-	};
+    struct ControlRotation {
+        Vector3 ctrl_rotation;
+        Vector3 write_ctrl_rotation;
+        bool write_flag;
+    };
+
+    struct GameData {
+        ArrayHeader actors;
+        uint64_t player_state;
+        Camera camera;
+        ControlRotation control_rotation;
+        uintptr_t local_pawn;
+        // Add other game data here
+    };
+
+    struct Aimbot {
+        AimbotSetup setup;
+        // Add other aimbot data here
+    };
+
+    struct MyGame {
+        GameData data;
+        Aimbot aimbot;
+        // Add other game-related data here
+    };
+}
 	
 #pragma pack(pop)
 #endif // !MAGIC_STRUCTS
