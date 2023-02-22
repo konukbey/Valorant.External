@@ -179,11 +179,10 @@ bool Valorant::Aimbot::FindTarget()
 {
     float min_distance = std::numeric_limits<float>::max();
     auto middle = Valorant::CheatStruct::Vector2{Valorant::Globals::system_data.width/2.f, Valorant::Globals::system_data.height/2.f};
-    auto target = static_cast<Valorant::CheatStruct::Player*>(nullptr);
+    Valorant::CheatStruct::Player* target = nullptr;
 
-    for (auto& obj : Valorant::Globals::hack_data.TaggedObject.map) {
-        auto player = static_cast<Valorant::CheatStruct::Player*>(obj.second.get());
-        if (obj.second->Usable && player) {
+    for (auto obj : Valorant::Globals::hack_data.TaggedObject.map) {
+        if (obj.second->Usable && auto player = dynamic_cast<Valorant::CheatStruct::Player*>(obj.second.get())) {
             auto distance = player->ScreenHeadPos.distance(middle);
             if (distance < Valorant::Globals::hack_setting.Aimbot.fov && distance < min_distance) {
                 min_distance = distance;
@@ -194,6 +193,7 @@ bool Valorant::Aimbot::FindTarget()
 
     return target != nullptr;
 }
+
 	
 struct ImportFunctionInfo {
   std::string name;
