@@ -1,27 +1,23 @@
 #include "Utils.h"
 
 namespace Settings {
-// Menu
-bool bMenuEnabled = false;
-bool bShutDownEnabled = false;
-void* hModule = nullptr;
+// Aimbot Settings
+bool isAimbotEnabled = false;
+int aimbotMode = 0;
+int aimbotFov = 90;
+int aimbotBone = 0;
 
-// Aimbot
-bool bAimbotEnabled = false;
-int iAimbotMode = 0;
-int iFov = 90;
-int iBone = 0;
+// Visual Settings
+bool isLineEnabled = false;
+bool isBoxEnabled = false;
+int minimumRank = 300;
 
-// Visual
-bool bLineEnabled = false;
-bool bBoxEnabled = false;
-int iRank = 300;
+// Entity Settings
+bool isChamsEnabled = true;
+bool isRecoilEnabled = true;
+bool isSpreadEnabled = true;
+float entitySpeed = 175.0f;
+float entityWeaponFov = 1.4f;
+float entityCharacterFov = 1.4f;
 
-// Entity
-bool bChamsEnabled = true;
-bool bRecoilEnabled = true;
-bool bSpreadEnabled = true;
-float fSpeed = 175.0f;
-float fWepFov = 1.4f;
-float fCharFov = 1.4f;
-}
+
