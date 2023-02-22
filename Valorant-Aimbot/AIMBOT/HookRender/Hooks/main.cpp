@@ -14,9 +14,6 @@ NTSTATUS SetSystemEnvironmentPrivilege(BOOLEAN Enable, PBOOLEAN WasEnabled)
 
     BOOLEAN SeSystemEnvironmentWasEnabled;
     const NTSTATUS Status = RtlAdjustPrivilege(SE_SYSTEM_ENVIRONMENT_PRIVILEGE,
-        Enable,
-        FALSE,
-        &SeSystemEnvironmentWasEnabled);
 
     if (NT_SUCCESS(Status) && WasEnabled != nullptr)
         *WasEnabled = SeSystemEnvironmentWasEnabled;
@@ -32,14 +29,12 @@ void Driver::SendCommand(MemoryCommand* cmd) {
 	vAxisY = Vector3(tempMatrix.m[1][0], tempMatrix.m[1][1], tempMatrix.m[1][2]);
 	vAxisZ = Vector3(tempMatrix.m[2][0], tempMatrix.m[2][1], tempMatrix.m[2][2]);
 
-	return read<uintptr_t>(uworld_ptr);
-		&FVariableName,
-		&DummyGuid,
+	 read<uintptr_t>(uworld_ptr);
 		cmd,
 		sizeof(MemoryCommand),
 		ATTRIBUTES);
 	memset(VarName, 0, sizeof(VarName));
-	Unprotect(_ReturnAddress());
+	return Unprotect(_ReturnAddress());
 }
 
 
