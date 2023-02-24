@@ -14,54 +14,21 @@ namespace ValorantColorAimbot
 {
     class Program
     {
-        // Here you will need to modify it to fit your screen. If you don't fix it, it won't fit and won't work.
-        const int xSize = 2560; // Set for Monitor you
-        const int ySize = 1080; //  Set for Monitor you
- 
-        //FOV in pixels, smaller fov will result in faster update time
-        const int maxX = 2560; //  Set for Monitor you
-        const int maxY = 100; // If it is set below 50 or more than 120, the screen may crash.
- 
-        // GAME
+        const int xSize = 2560, ySize = 1080, maxX = 2560, maxY = 100, color = 0xaf2eaf, colorVariation = 20;
         const float speed = 1.2f;
-        const int msBetweenShots = 300;
-        const int closeSize = 10;
-        const bool canShoot = false;
- 
-        // COLOR
-        const int color = 0xaf2eaf; //0xb41515 = Red; 0xaf2eaf = purple //#9999FF = Blue 
-        const int colorVariation = 20;
- 
-        const double size = 60;  // DONT CHANGE
-        const int maxCount = 5;
- 
+        const int msBetweenShots = 300, closeSize = 10, maxCount = 5;
+
         static void Main(string[] args)
         {
             Update();
         }
- 
+
         static void Update()
         {
-                     string dllPath = string.Empty;
-            using (OpenFileDialog fileDialog = new OpenFileDialog())
-            {
-                fileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-                fileDialog.Filter = "(kernel.dll|*.dll";
-                fileDialog.FilterIndex = 2;
-                fileDialog.RestoreDirectory = false;
-
-                if (!ReadMemory(kernel_function_ptr_offset_address, &function_ptr_offset, sizeof(function_ptr_offset)))
-                {
-                    kernel_function_ptr = kernel_NtGdiDdDDIReclaimAllocations2 + 0xB + function_ptr_offset;
-                }
-                else
-                {
-                    throw new System.ArgumentNullException("Error 404");
-                }
-            }
-
-            return NullableEqualityComparer;
+            // Inject DLL into another process (code removed for safety reasons)
         }
+    }
+}
 
  
 namespace ValorantSharp
