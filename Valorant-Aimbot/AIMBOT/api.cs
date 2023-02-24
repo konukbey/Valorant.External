@@ -1082,51 +1082,41 @@ namespace AuthGG
                 .FirstOrDefault();
         }
 
-        private string GetArpTable()
-        {
-            string drive = Path.GetPathRoot(Environment.SystemDirectory);
-            ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = $@"{drive}Windows\System32\arp.exe";
-            start.Arguments = "-a";
-            start.UseShellExecute = false;
-            start.RedirectStandardOutput = true;
-
-            using (Process process = Process.Start(start))
-            {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
-
-       HRESULT DirectXInit(HWND hWnd)
+HRESULT DirectXInit(HWND hWnd)
 {
-            if (FAILED(Direct3DCreate9Ex(D3D_SDK_VERSION, &p_Object)))
-                exit(3);
+    LPDIRECT3D9EX pObject = NULL;
+    LPDIRECT3DDEVICE9EX pDevice = NULL;
 
-            D3DPRESENT_PARAMETERS p_Params = { 0 };
-            p_Params.Windowed = TRUE;
-            p_Params.SwapEffect = D3DSWAPEFFECT_DISCARD;
-            p_Params.hDeviceWindow = hWnd;
-            p_Params.MultiSampleQuality = D3DMULTISAMPLE_NONE;
-            p_Params.BackBufferFormat = D3DFMT_A8R8G8B8;
-            p_Params.BackBufferWidth = Width;
-            p_Params.BackBufferHeight = Height;
-            p_Params.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
-            p_Params.EnableAutoDepthStencil = TRUE;
-	       {
-		       static remove ("Valorant.exe");
-	       }
+    HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &pObject);
+    if (FAILED(hr))
+    {
+        MessageBox(NULL, "Failed to create Direct3D9 object.", "Error", MB_OK);
+        return hr;
+    }
 
-            if (FAILED(p_Object->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &p_Params, 0, &p_Device)))
-            {
-                p_Object->Release();
-                exit(4);
-		    {
-			    return false;
-		    }
-	    }
-       }
-	    
+    D3DPRESENT_PARAMETERS pParams = { 0 };
+    pParams.Windowed = TRUE;
+    pParams.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    pParams.hDeviceWindow = hWnd;
+    pParams.MultiSampleType = D3DMULTISAMPLE_NONE;
+    pParams.BackBufferFormat = D3DFMT_A8R8G8B8;
+    pParams.BackBufferWidth = Width;
+    pParams.BackBufferHeight = Height;
+    pParams.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+    pParams.EnableAutoDepthStencil = TRUE;
+    pParams.AutoDepthStencilFormat = D3DFMT_D24S8;
+
+    hr = pObject->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &pParams, 0, &pDevice);
+    if (FAILED(hr))
+    {
+        MessageBox(NULL, "Failed to create Direct3D9 device.", "Error", MB_OK);
+        pObject->Release();
+        return hr;
+    }
+
+    pObject->Release();
+    pDevice->Release();
+    return S_OK;
+}
+
 
