@@ -162,41 +162,54 @@ enum MemoryCopyResult {
     MEMORY_COPY_ERROR
 };
 
+// Define an enum to represent the result of the function
+enum class MemoryCopyResult {
+    SUCCESS,
+    INVALID_INPUT,
+    SAME_ADDRESS,
+    NULL_POINTER,
+    MEMORY_COPY_ERROR
+};
+
 MemoryCopyResult kernel_driver::MemoryCopy(uint64_t destination, uint64_t source, uint64_t size)
 {
     // Check for invalid input
     if (destination == 0 || source == 0 || size == 0) {
-        return INVALID_INPUT;
+        return MemoryCopyResult::INVALID_INPUT;
     }
 
     if (destination == source) {
-        return SAME_ADDRESS;
+        return MemoryCopyResult::SAME_ADDRESS;
     }
 
     // Allocate memory for the command object
-    auto cmd = std::make_unique<MemoryCommand>();
+    std::unique_ptr<MemoryCommand> cmd(new MemoryCommand());
     cmd->operation = 0;
     cmd->magic = COMMAND_MAGIC;
 
     // Check that mouclass_obj and mouclass_obj->DeviceObject are not null
     if (mouclass_obj == nullptr || mouclass_obj->DeviceObject == nullptr) {
-        return NULL_POINTER;
+        return MemoryCopyResult::NULL_POINTER;
     }
 
-    PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
+    // Ensure that the size of the data block to be copied is not larger than the size of the command buffer
+    if (size > sizeof(cmd->data)) {
+        return MemoryCopyResult::INVALID_INPUT;
+    }
+
+    // Copy the destination and source addresses to the command buffer
     uint64_t data[2] = {destination, source};
-
-    // Use memcpy_s to ensure that the memory copy is secure
-    try {
-        memcpy_s(&cmd->data, sizeof(cmd->data), &data[0], sizeof(data));
-    } catch (...) {
-        return MEMORY_COPY_ERROR;
+    errno_t err = memcpy_s(&cmd->data, sizeof(cmd->data), &data[0], size);
+    if (err != 0) {
+        return MemoryCopyResult::MEMORY_COPY_ERROR;
     }
 
-    return SUCCESS;
+    // Use the command buffer to initiate the memory copy operation
+    PDEVICE_OBJECT mouclass_deviceobj = mouclass_obj->DeviceObject;
+    // ...
+
+    return MemoryCopyResult::SUCCESS;
 }
-
-
 
 
 /// <summary>
