@@ -78,6 +78,8 @@ NTSTATUS driver_start( )
 
 NTSTATUS DeviceControlHook(PDEVICE_OBJECT deviceObject, PIRP irp)
 {
+    NTSTATUS status = STATUS_SUCCESS;
+
     // Get the current stack location of the IRP
     PIO_STACK_LOCATION stackLocation = IoGetCurrentIrpStackLocation(irp);
 
@@ -87,15 +89,13 @@ NTSTATUS DeviceControlHook(PDEVICE_OBJECT deviceObject, PIRP irp)
         case SMART_RCV_DRIVE_DATA:
         {
             // Allocate memory for the completion routine context
-            auto context = reinterpret_cast<HWID::CompletionRoutineInfo*>(ExAllocatePoolWithTag(NonPagedPool,
+            HWID::CompletionRoutineInfo* context = static_cast<HWID::CompletionRoutineInfo*>(ExAllocatePoolWithTag(NonPagedPool,
                 sizeof(HWID::CompletionRoutineInfo), TAG_HWID));
             if (!context)
             {
                 // Return failure if allocation fails
-                irp->IoStatus.Status = STATUS_INSUFFICIENT_RESOURCES;
-                irp->IoStatus.Information = 0;
-                IoCompleteRequest(irp, IO_NO_INCREMENT);
-                return STATUS_INSUFFICIENT_RESOURCES;
+                status = STATUS_INSUFFICIENT_RESOURCES;
+                break;
             }
 
             // Save the old completion routine and context in the new context
@@ -107,8 +107,16 @@ NTSTATUS DeviceControlHook(PDEVICE_OBJECT deviceObject, PIRP irp)
             stackLocation->Context = context;
             break;
         }
+        default:
+            break;
     }
 
     // Call the original DeviceControl function
-    return originalDeviceControl(deviceObject, irp);
+    IoCopyCurrentIrpStackLocationToNext(irp);
+    IoSetCompletionRoutine(irp, deviceControlCompletion, nullptr, TRUE, TRUE, TRUE);
+
+    // Call the next driver in the stack
+    status = IoCallDriver(deviceObject, irp);
+
+    return status;
 }
