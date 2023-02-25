@@ -42,22 +42,28 @@ namespace Aimbot
 }
 
 {
-     internal static global::System.Globalization.CultureInfo Culture
+namespace CouInjector
+{
+    class Program
     {
-        /// <summary>
-        /// Der Haupteinstiegspunkt für die Anwendung.
-        /// </summary>
-        [STAThread]
+        private static ResourceManager resourceManager;
+        private static CultureInfo resourceCulture;
+
         static void Main()
         {
-              if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CouInjector.Properties.Resources", typeof(Resources).Assembly);
-                    resourceMan = temp;
-                }
-		
-                object obj = ResourceManager.GetObject("Updater", resourceCulture);
-                return ((byte[])(obj));
+            if (resourceManager == null)
+            {
+                resourceManager = new ResourceManager("CouInjector.Properties.Resources", typeof(Resources).Assembly);
             }
+
+            // Set the culture information for the resource manager
+            resourceCulture = CultureInfo.CurrentCulture;
+
+            // Get the "Updater" resource from the resource manager
+            byte[] updaterResource = (byte[])resourceManager.GetObject("Updater", resourceCulture);
+            
+            // Do something with the updater resource, for example:
+            Console.WriteLine("Updater resource size: " + updaterResource.Length);
         }
     }
 }
