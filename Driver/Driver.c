@@ -336,46 +336,47 @@ int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
 
 std::string RPMString(DWORD64 address)
 {
-	// Check if address is NULL or invalid
-	if (!address || address > 0x7FFFFFFFFFFFFFFF)
-	{
-		return "BOT";
-	}
+    // Check if address is NULL or invalid
+    if (address == NULL || address > 0x7FFFFFFFFFFFFFFF)
+    {
+        return "BOT";
+    }
 
-	// Create a buffer to hold the string
-	char buffer[256] = { 0 };
+    // Create a buffer to hold the string
+    constexpr size_t bufferSize = 255; // Maximum buffer size
+    char buffer[bufferSize + 1] = {}; // Initialize buffer to all zeros
 
-	// Use a safe version of memcpy to copy the string from memory
-	errno_t err = memcpy_s(buffer, sizeof(buffer), reinterpret_cast<const void*>(address), sizeof(buffer) - 1);
-	if (err != 0)
-	{
-		return "BOT";
-	}
+    // Copy the string from memory into the buffer
+    errno_t err = memcpy_s(buffer, bufferSize, reinterpret_cast<const void*>(address), bufferSize);
+    if (err != 0)
+    {
+        return "BOT";
+    }
 
-	// Find the end of the string and null-terminate it
-	buffer[sizeof(buffer) - 1] = '\0';
-	char* endpos = strchr(buffer, '\0');
-	if (endpos != buffer)
-	{
-		--endpos;
-		while (endpos >= buffer && *endpos == '\0')
-		{
-			--endpos;
-		}
-		*(endpos + 1) = '\0';
-	}
+    // Find the end of the string and null-terminate it
+    buffer[bufferSize] = '\0'; // Ensure that the buffer is null-terminated
+    char* endPos = strchr(buffer, '\0');
+    if (endPos != buffer)
+    {
+        do
+        {
+            --endPos;
+        } while (endPos >= buffer && *endPos == '\0');
 
-	// Validate the string and convert it to a std::string
-	for (char* p = buffer; *p != '\0'; ++p)
-	{
-		if (*p < 32 || *p > 126)
-		{
-			return "BOT";
-		}
-	}
-	return std::string(buffer);
+        *(endPos + 1) = '\0';
+    }
+
+    // Validate the string and convert it to a std::string
+    for (char* p = buffer; *p != '\0'; ++p)
+    {
+        if (*p < 32 || *p > 126)
+        {
+            return "BOT";
+        }
+    }
+
+    return std::string(buffer);
 }
-
 				
 void sendReceivePacket(char* packet, char* addr, void * out) {
     // Initialize variables
