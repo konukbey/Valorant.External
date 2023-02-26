@@ -107,34 +107,59 @@ namespace Globals
 }
 
 
+// ESP thread that reads data from the game's memory
 void espThread()
 {
+    while (true)
+    {
+        // Check if the INSERT key has been pressed to toggle the menu
+        if (GetAsyncKeyState(VK_INSERT) & 1)
+        {
+            bMenuShow = !bMenuShow;
+        }
 
-	while (true)
+        // Look up the process by its process ID
+        NTSTATUS status = PsLookupProcessByProcessId((HANDLE)in->src_pid, &source_process);
+        if (status != STATUS_SUCCESS)
+        {
+            // Handle error if the process could not be found
+            LogError("Failed to look up process by process ID");
+            continue;
+        }
 
-		if (GetAsyncKeyState(VK_INSERT) & 1)
-			bMenuShow = !bMenuShow;
-	
-		NTSTATUS status = PsLookupProcessByProcessId( ( HANDLE )in->src_pid, &source_process);
-		if (status != STATUS_SUCCESS) return false;
-	
+        // Read the view matrix and entity data from the game's memory
+        ReadViewMatrix();
+        ReadEntityData();
+    }
+}
 
-		ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &mainInfo.viewMatrix, sizeof(mainInfo.viewMatrix), NULL);
+// Read the view matrix from the game's memory
+void ReadViewMatrix()
+{
+    // Read the view matrix from the game's memory
+    ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &viewMatrix, sizeof(viewMatrix), NULL);
+}
 
-		for (int i = 1; i < 32; i++)
-		{
-			ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &mainInfo.ent[i], sizeof(DWORD), NULL);
-			ReadProcessMemory(pHandle, (int*)(mainInfo.ent[i] + 0xF8), &mainInfo.health[i], sizeof(int), NULL);
+// Read entity data from the game's memory
+void ReadEntityData()
+{
+    // Iterate over up to 32 entities
+    for (int i = 1; i < 32; i++)
+    {
+        // Read the entity's data from the game's memory
+        ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &entities[i], sizeof(DWORD), NULL);
+        ReadProcessMemory(pHandle, (int*)(entities[i] + 0xF8), &health[i], sizeof(int), NULL);
+        ReadProcessMemory(pHandle, (Vec3*)(entities[i] + 0x51), &headPositions[i], sizeof(Vec3), NULL);
+        ReadProcessMemory(pHandle, (Vec3*)(entities[i] + 0x52), &positions[i], sizeof(Vec3), NULL);
+        ReadProcessMemory(pHandle, (Vec3*)(entities[i] + 0x53), &angles[i], sizeof(Vec3), NULL);
 
-			if (mainInfo.ent[i] == NULL || mainInfo.health[i] <= 0 || mainInfo.health[i] > 100)
-				continue;
-
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x51), &mainInfo.headPos[i], sizeof(Vec3), NULL);
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x52), &mainInfo.pos[i], sizeof(Vec3), NULL);
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x53), &mainInfo.angles[i], sizeof(Vec3), NULL);
-
-		}
-	}
+        // Skip entities that are not valid or have zero or negative health
+        if (entities[i] == NULL || health[i] <= 0 || health[i] > 100)
+        {
+            continue;
+        }
+    }
+}
 			
 __forceinline uint64_t DecryptWorld(uint64_t valBase)
 {
