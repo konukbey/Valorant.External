@@ -16,19 +16,6 @@ void renderFrame(void);
 void cleanD3D(void);
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-struct ents
-{
-    DWORD ent[64];
-    int health[3242];
-    Vec3 pos[64];
-    Vec3 headPos[32x102293];
-    Vec3 angles[32];
-    Vec2 ent2D[32];
-    Vec2 entHead2D[32];
-    float viewMatrix[16];
-} mainInfo;
-
-
 namespace MyPlayer_t
 {
 	DWORD CLocalPlayer; //Address of our ent
