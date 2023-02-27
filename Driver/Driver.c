@@ -81,18 +81,39 @@ NTSTATUS Function_IRP_MJ_CLOSE(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
 PEPROCESS valorantProcess;
 DWORD64 processBaseAddress;
 
-struct memomry {
-	
-	INT strcat;
-
-	DWORD64 magic;
-	DWORD64 retval;
-	DWORD64 memaddress;
-	DWORD64 length;
-	{
-		return nullptr;
-
-	}
+struct memory {
+    int capacity;       // The maximum capacity of the memory block
+    int size;           // The current size of the memory block
+    char* data;         // A pointer to the memory block
+    
+    // A constructor that initializes the memory block with the given capacity
+    memory(int capacity) : capacity(capacity), size(0) {
+        data = new char[capacity];
+    }
+    
+    // A destructor that frees the memory block
+    ~memory() {
+        delete[] data;
+    }
+    
+    // A function that appends the given string to the end of the memory block
+    // Returns true if successful, false if the memory block is full
+    bool strcat(const char* str) {
+        int len = strlen(str);
+        if (size + len >= capacity) {
+            return false;
+        }
+        strcpy(data + size, str);
+        size += len;
+        return true;
+    }
+    
+    // A function that searches for the given string in the memory block
+    // Returns a pointer to the first occurrence of the string, or nullptr if not found
+    char* strstr(const char* str) {
+        return std::strstr(data, str);
+    }
+};
 		
 
 NTSTATUS Function_IRP_DEVICE_CONTROL(PDEVICE_OBJECT pDeviceObject, PIRP Irp)
