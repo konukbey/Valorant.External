@@ -35,21 +35,33 @@ namespace Kernel
 
 
 NTSTATUS FindProcess(const char* processName, PEPROCESS* process) {
-  NTSTATUS status = STATUS_UNSUCCESSFUL;
-  PEPROCESS currentProcess = nullptr;
+    if (processName == nullptr || process == nullptr) {
+        return STATUS_INVALID_PARAMETER;
+    }
 
-  if (processName == nullptr || process == nullptr) {
-    return STATUS_INVALID_PARAMETER;
-  }
+    UNICODE_STRING uniProcessName;
+    RtlInitUnicodeString(&uniProcessName, L"");
+    NTSTATUS status = RtlAnsiStringToUnicodeString(&uniProcessName, 
+                                                   const_cast<PANSI_STRING>(
+                                                       &ANSI_STRING(processName)), 
+                                                   TRUE);
+    if (!NT_SUCCESS(status)) {
+        std::cout << "[-] Failed to convert process name to Unicode string: " 
+                  << processName << std::endl;
+        return status;
+    }
 
-  status = PsLookupProcessByName(processName, &currentProcess);
-  if (!NT_SUCCESS(status)) {
-    std::cout << "[-] Failed to find process: " << processName << std::endl;
-    return status;
-  }
+    PEPROCESS currentProcess = nullptr;
+    status = PsLookupProcessByProcessName(&uniProcessName, &currentProcess);
+    RtlFreeUnicodeString(&uniProcessName);
 
-  *process = currentProcess;
-  return STATUS_SUCCESS;
+    if (!NT_SUCCESS(status)) {
+        std::cout << "[-] Failed to find process: " << processName << std::endl;
+        return status;
+    }
+
+    *process = currentProcess;
+    return STATUS_SUCCESS;
 }
 
 
@@ -414,16 +426,46 @@ void sendReceivePacket(char* packet, char* addr, void * out) {
     }
 
     // Get address information for the server
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_UNSPEC;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_TCP;
-    iResult = getaddrinfo(addr, "9999", &hints, &result);
-    if (iResult != 0) {
-        printf("Getaddrinfo failed with error code: %d\n", iResult);
-        WSACleanup();
-        return;
+// Initialize the hints struct
+struct addrinfo hints = {0};
+hints.ai_family = AF_UNSPEC; // Allow IPv4 or IPv6
+hints.ai_socktype = SOCK_STREAM; // Use TCP
+hints.ai_protocol = IPPROTO_TCP; // Use TCP
+
+// Resolve the server address and port
+struct addrinfo *result = NULL;
+int error = getaddrinfo(addr, "9999", &hints, &result);
+if (error != 0) {
+    fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(error));
+    WSACleanup();
+    return;
+}
+
+// Iterate over the addrinfo structures and try to connect to the server
+for (struct addrinfo *p = result; p != NULL; p = p->ai_next) {
+    // Create a socket using the addrinfo structure
+    SOCKET sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+    if (sock == INVALID_SOCKET) {
+        fprintf(stderr, "socket failed: %d\n", WSAGetLastError());
+        continue;
     }
+
+    // Connect to the server using the socket
+    error = connect(sock, p->ai_addr, (int)p->ai_addrlen);
+    if (error == SOCKET_ERROR) {
+        fprintf(stderr, "connect failed: %d\n", WSAGetLastError());
+        closesocket(sock);
+        continue;
+    }
+
+    // We successfully connected to the server, so we can stop iterating
+    // and use the socket for sending and receiving data
+    break;
+}
+
+// Free the memory allocated by getaddrinfo
+freeaddrinfo(result);
+
 
     // Create a socket
     s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
