@@ -512,14 +512,13 @@ freeaddrinfo(result);
     WSACleanup();
 }
 
-void C_BaseEntity::SetViewAngle(Vector& angle)
+void C_BaseEntity::SetViewAngle(const Vector& angle)
 {
-	float d2r = 0.01745329251f;
-	Vector4D vecNewAngle = CreateFromYawPitchRoll(angle.z * d2r, 0.f, angle.x * d2r);
-	Utils::WritePtr<Vector4D>({ (uintptr_t)this, 0x20, 0x1170, 0xC0 }, vecNewAngle, false);
+    const float degreesToRadians = 0.01745329251f;
+    const Vector4D rotation = CreateQuaternionFromAngles(angle.z * degreesToRadians, 0.f, angle.x * degreesToRadians);
+    const uintptr_t viewAngleAddress = reinterpret_cast<uintptr_t>(this) + VIEW_ANGLE_OFFSET;
+    Utils::WritePtr<Vector4D>(viewAngleAddress, rotation, false);
 }
-	{
-		
 
 	Status = RtlAddAccessAllowedAce(Dacl,
 		ACL_REVISION,
