@@ -286,30 +286,54 @@ class __declspec(align(16)) VectorAligned : public Vector
 }
 
 
-void VectorAligned : public Vector
+class VectorAligned : public Vector
 {
 public:
-    explicit VectorAligned(const Vector& vOther) : Vector(vOther)
-    {
-        // No need to initialize x, y, and z since they are already
-        // initialized in the base class (Vector) constructor
-    }
+    float w;
 
+    // Default constructor initializes all components to zero
+    VectorAligned() : Vector(), w(0.0f) {}
+
+    // Constructor with four arguments initializes all components
+    VectorAligned(float x_, float y_, float z_, float w_)
+        : Vector(x_, y_, z_), w(w_) {}
+
+    // Copy constructor
+    VectorAligned(const VectorAligned& vOther)
+        : Vector(vOther), w(vOther.w) {}
+
+    // Copy assignment operator with Vector argument
     VectorAligned& operator=(const Vector& vOther)
     {
         x = vOther.x;
         y = vOther.y;
         z = vOther.z;
+        w = 0.0f;
         return *this;
     }
 
+    // Copy assignment operator with VectorAligned argument
     VectorAligned& operator=(const VectorAligned& vOther)
     {
         x = vOther.x;
         y = vOther.y;
         z = vOther.z;
+        w = vOther.w;
         return *this;
     }
 
-    float w;
+    // Move constructor
+    VectorAligned(VectorAligned&& vOther)
+        : Vector(std::move(vOther)), w(std::move(vOther.w)) {}
+
+    // Move assignment operator
+    VectorAligned& operator=(VectorAligned&& vOther)
+    {
+        Vector::operator=(std::move(vOther));
+        w = std::move(vOther.w);
+        return *this;
+    }
+
+    // Destructor is not necessary, because Vector's destructor is called automatically
 };
+
