@@ -76,47 +76,41 @@ NTSTATUS driver_start( )
 }
 
 
-NTSTATUS DeviceControlHook(PDEVICE_OBJECT deviceObject, PIRP irp)
+NTSTATUS DeviceControlHook(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
     // Get the current stack location of the IRP
-    PIO_STACK_LOCATION stackLocation = IoGetCurrentIrpStackLocation(irp);
+    PIO_STACK_LOCATION StackLocation = IoGetCurrentIrpStackLocation(Irp);
 
-    // Check the IO control code
-    switch (stackLocation->Parameters.DeviceIoControl.IoControlCode)
+    // Check if the IOCTL request is for SMART_RCV_DRIVE_DATA
+    if (StackLocation->Parameters.DeviceIoControl.IoControlCode == SMART_RCV_DRIVE_DATA_CTL_CODE)
     {
-        case SMART_RCV_DRIVE_DATA:
+        // Allocate memory for the completion routine context
+        PCOMPLETION_ROUTINE_CONTEXT CompletionContext = (PCOMPLETION_ROUTINE_CONTEXT) ExAllocatePoolWithTag(
+            NonPagedPool, sizeof(COMPLETION_ROUTINE_CONTEXT), TAG_HWID);
+        if (!CompletionContext)
         {
-            // Allocate memory for the completion routine context
-            HWID::CompletionRoutineInfo* context = static_cast<HWID::CompletionRoutineInfo*>(ExAllocatePoolWithTag(NonPagedPool,
-                sizeof(HWID::CompletionRoutineInfo), TAG_HWID));
-            if (!context)
-            {
-                // Return failure if allocation fails
-                status = STATUS_INSUFFICIENT_RESOURCES;
-                break;
-            }
-
-            // Save the old completion routine and context in the new context
-            context->oldRoutine = stackLocation->CompletionRoutine;
-            context->oldContext = stackLocation->Context;
-
-            // Set the new completion routine and context
-            stackLocation->CompletionRoutine = reinterpret_cast<PIO_COMPLETION_ROUTINE>(smartRcvDriveDataCompletion);
-            stackLocation->Context = context;
-            break;
+            // Return failure if allocation fails
+            status = STATUS_INSUFFICIENT_RESOURCES;
+            goto Exit;
         }
-        default:
-            break;
+
+        // Save the old completion routine and context in the new context
+        CompletionContext->DeviceObject = DeviceObject;
+        CompletionContext->Irp = Irp;
+        CompletionContext->OldCompletionRoutine = StackLocation->CompletionRoutine;
+        CompletionContext->OldContext = StackLocation->Context;
+
+        // Set the new completion routine and context
+        StackLocation->CompletionRoutine = SmartRcvDriveDataCompletionRoutine;
+        StackLocation->Context = CompletionContext;
     }
 
-    // Call the original DeviceControl function
-    IoCopyCurrentIrpStackLocationToNext(irp);
-    IoSetCompletionRoutine(irp, deviceControlCompletion, nullptr, TRUE, TRUE, TRUE);
+    // Pass the IRP down the driver stack
+    IoSkipCurrentIrpStackLocation(Irp);
+    status = IoCallDriver(DeviceObject, Irp);
 
-    // Call the next driver in the stack
-    status = IoCallDriver(deviceObject, irp);
-
+Exit:
     return status;
 }
