@@ -139,40 +139,23 @@ int main(const int argc, char** argv)
 }
 			
 
-int getValorantProcId()
+DWORD getValorantProcId()
 {
-    DWORD dwThreadCountMax = 0;
-    DWORD dwProcId = 0;
+    PROCESSENTRY32 pe32 = { sizeof(pe32) };
     HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    PROCESSENTRY32 pe32;
+    DWORD dwProcId = 0;
 
-    if (hSnapshot == INVALID_HANDLE_VALUE)
+    if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
+    
+    if (Process32First(hSnapshot, &pe32))
     {
-        // Handle error
-        return 0;
-    }
-
-    pe32.dwSize = sizeof(PROCESSENTRY32);
-
-    if (!Process32First(hSnapshot, &pe32))
-    {
-        CloseHandle(hSnapshot);
-        // Handle error
-        return 0;
-    }
-
-    do
-    {
-        if (_tcsicmp(pe32.szExeFile, _T("VALORANT-Win64-Shipping.exe")) == 0)
+        do
         {
-            DWORD dwTmpThreadCount = pe32.cntThreads;
-            if (dwTmpThreadCount > dwThreadCountMax)
-            {
-                dwThreadCountMax = dwTmpThreadCount;
+            if (_tcsicmp(pe32.szExeFile, _T("VALORANT-Win64-Shipping.exe")) == 0 && pe32.cntThreads > GetProcessThreadCount((HANDLE)pe32.th32ProcessID))
                 dwProcId = pe32.th32ProcessID;
-            }
-        }
-    } while (Process32Next(hSnapshot, &pe32));
+
+        } while (Process32Next(hSnapshot, &pe32));
+    }
 
     CloseHandle(hSnapshot);
     return dwProcId;
