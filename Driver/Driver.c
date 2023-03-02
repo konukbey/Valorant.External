@@ -411,56 +411,76 @@ std::string RPMString(DWORD64 address)
     return std::string(buffer);
 }
 				
-void sendReceivePacket(char* packet, char* addr, void * out) {
+int sendReceivePacket(const char* packet, const char* addr, void* out, size_t outSize) {
     // Initialize variables
     int iResult, length;
-    SOCKET s;
-    struct addrinfo hints, *result;
+    SOCKET s = INVALID_SOCKET;
+    struct addrinfo hints = {0}, *result = NULL;
 
     // Initialize Winsock
     WSADATA wsaData;
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed with error code: %d\n", iResult);
-        return;
+        return iResult;
     }
 
     // Get address information for the server
-// Initialize the hints struct
-struct addrinfo hints = {0};
-hints.ai_family = AF_UNSPEC; // Allow IPv4 or IPv6
-hints.ai_socktype = SOCK_STREAM; // Use TCP
-hints.ai_protocol = IPPROTO_TCP; // Use TCP
+    hints.ai_family = AF_UNSPEC; // Allow IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // Use TCP
+    hints.ai_protocol = IPPROTO_TCP; // Use TCP
 
-// Resolve the server address and port
-struct addrinfo *result = NULL;
-int error = getaddrinfo(addr, "9999", &hints, &result);
-if (error != 0) {
-    fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(error));
+    iResult = getaddrinfo(addr, "9999", &hints, &result);
+    if (iResult != 0) {
+        fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(iResult));
+        WSACleanup();
+        return iResult;
+    }
+
+    // Create socket and connect to the server
+    s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (s == INVALID_SOCKET) {
+        fprintf(stderr, "socket creation failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    iResult = connect(s, result->ai_addr, (int)result->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        fprintf(stderr, "connect failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(s);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    // Send the packet to the server
+    length = (int)strlen(packet);
+    iResult = send(s, packet, length, 0);
+    if (iResult == SOCKET_ERROR) {
+        fprintf(stderr, "send failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(s);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    // Receive response from the server
+    iResult = recv(s, (char*)out, outSize, 0);
+    if (iResult == SOCKET_ERROR) {
+        fprintf(stderr, "recv failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(s);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    // Cleanup
+    freeaddrinfo(result);
+    closesocket(s);
     WSACleanup();
-    return;
-}
-
-// Iterate over the addrinfo structures and try to connect to the server
-for (struct addrinfo *p = result; p != NULL; p = p->ai_next) {
-    // Create a socket using the addrinfo structure
-    SOCKET sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-    if (sock == INVALID_SOCKET) {
-        fprintf(stderr, "socket failed: %d\n", WSAGetLastError());
-        continue;
-    }
-
-    // Connect to the server using the socket
-    error = connect(sock, p->ai_addr, (int)p->ai_addrlen);
-    if (error == SOCKET_ERROR) {
-        fprintf(stderr, "connect failed: %d\n", WSAGetLastError());
-        closesocket(sock);
-        continue;
-    }
-
-    // We successfully connected to the server, so we can stop iterating
-    // and use the socket for sending and receiving data
-    break;
+    return iResult;
 }
 
 // Free the memory allocated by getaddrinfo
