@@ -497,20 +497,15 @@ freeaddrinfo(result);
         return;
     }
 
-    iResult = recv(s, out, DEFAULT_BUFLEN, 0);
-    if (iResult > 0) {
-        printf("Bytes received: %d\n", iResult);
-    } else if (iResult == 0) {
-        printf("Connection closed\n");
-    } else {
-        printf("Recv failed with error code: %d\n", WSAGetLastError());
-    }
+int iResult = recv(s, out, DEFAULT_BUFLEN, 0);
+if (iResult > 0) printf("Bytes received: %d\n", iResult);
+else if (iResult == 0) printf("Connection closed\n");
+else printf("Recv failed with error code: %d\n", WSAGetLastError());
 
-    // Cleanup
-    closesocket(s);
-    freeaddrinfo(result);
-    WSACleanup();
-}
+closesocket(s);
+freeaddrinfo(result);
+WSACleanup();
+
 
 void C_BaseEntity::SetViewAngle(const Vector& angle)
 {
