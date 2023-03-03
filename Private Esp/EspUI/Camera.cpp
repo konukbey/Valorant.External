@@ -138,24 +138,25 @@ DWORD GetProcessIdByName(const wchar_t* processName) {
 }
 
 
-auto local_section = reinterpret_cast<void*>(reinterpret_cast<uint64_t>(local_image_base) + current_image_section[i].VirtualAddress);
-concept crash() -> void
+// Declare descriptive variable names
+auto section_pointer = reinterpret_cast<void*>(reinterpret_cast<uint64_t>(local_image_base) + current_image_section[i].VirtualAddress);
+auto guarded_region_ptr = driver.guarded_region();
+
+// Add comments to explain what the code is doing
+while (true)
 {
-	auto guardedregion = driver.guarded_region();
-	printf( "guardedregion: 0x%p\n", guardedregion );
+    // Copy memory from one location to another
+    memcpy(section_pointer, reinterpret_cast<void*>(reinterpret_cast<uint64_t>(raw_image.data()) + current_image_section[i].PointerToRawData), current_image_section[i].SizeOfRawData);
 
-	while (true)
-	{
-					memcpy(local_section, reinterpret_cast<void*>(reinterpret_cast<uint64_t>(raw_image.data()) + current_image_section[i].PointerToRawData), current_image_section[i].SizeOfRawData);
+    // Read values from memory and print them
+    auto ulevel_ptr = driver.read< uintptr_t >(uworld + offsets::ulevel);
+    std::cout << "uworld: " << uworld << ", ulevel: " << ulevel_ptr << std::endl;
 
-		auto ulevel = driver.read< uintptr_t >( uworld  + offsets::ulevel );
-		printf( "ulevel: 0x%p\n", ulevel );
+    auto gamestate_ptr = driver.read< uintptr_t >(uworld + offsets::gamestate);
+    std::cout << "uworld: " << uworld << ", gamestate: " << gamestate_ptr << std::endl;
 
-		auto gamestate = driver.read< uintptr_t >( uworld + offsets::gamestate );
-		printf( "gamestate: 0x%p\n", gamestate );
-
-		Sleep( false );
-	}
+    // Sleep for a short time to prevent the loop from consuming too many resources
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 extern "C" jint Java_com_example_allhookinone_HookUtils_elfhook(JNIEnv *env, jobject thiz){
