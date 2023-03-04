@@ -367,49 +367,37 @@ int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
     return 1;
 }
 
-std::string RPMString(DWORD64 address)
+std::string RPMString(const void* address, size_t maxLength)
 {
-    // Check if address is NULL or invalid
-    if (address == NULL || address > 0x7FFFFFFFFFFFFFFF)
+    // Check if address is NULL
+    if (address == nullptr)
     {
-        return "BOT";
+        return "";
     }
 
     // Create a buffer to hold the string
-    constexpr size_t bufferSize = 255; // Maximum buffer size
-    char buffer[bufferSize + 1] = {}; // Initialize buffer to all zeros
+    std::vector<char> buffer(maxLength + 1, 0);
 
     // Copy the string from memory into the buffer
-    errno_t err = memcpy_s(buffer, bufferSize, reinterpret_cast<const void*>(address), bufferSize);
-    if (err != 0)
-    {
-        return "BOT";
-    }
+    memcpy(&buffer[0], address, maxLength);
 
     // Find the end of the string and null-terminate it
-    buffer[bufferSize] = '\0'; // Ensure that the buffer is null-terminated
-    char* endPos = strchr(buffer, '\0');
-    if (endPos != buffer)
-    {
-        do
-        {
-            --endPos;
-        } while (endPos >= buffer && *endPos == '\0');
-
-        *(endPos + 1) = '\0';
-    }
+    size_t length = strnlen_s(buffer.data(), maxLength);
+    buffer[length] = '\0';
 
     // Validate the string and convert it to a std::string
-    for (char* p = buffer; *p != '\0'; ++p)
+    for (size_t i = 0; i < length; ++i)
     {
-        if (*p < 32 || *p > 126)
+        char c = buffer[i];
+        if (c < 32 || c > 126)
         {
-            return "BOT";
+            return "";
         }
     }
 
-    return std::string(buffer);
+    return std::string(buffer.data());
 }
+
 				
 int sendReceivePacket(const char* packet, const char* addr, void* out, size_t outSize) {
     // Initialize variables
