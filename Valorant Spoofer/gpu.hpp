@@ -122,5 +122,6 @@ namespace utils {
                 }
             }
 
-            if (found) {
-                return reinterpret_cast
+        if (found) {
+  	return 0;
+}
