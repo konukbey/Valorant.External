@@ -144,15 +144,18 @@ bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_fu
 				
 bool Valorant::Aimbot::FindTarget()
 {
-    float min_distance = std::numeric_limits<float>::max();
+    float min_distance_sq = std::numeric_limits<float>::max(); // use squared distances instead
     auto middle = Valorant::CheatStruct::Vector2{Valorant::Globals::system_data.width/2.f, Valorant::Globals::system_data.height/2.f};
     Valorant::CheatStruct::Player* target = nullptr;
 
     for (auto obj : Valorant::Globals::hack_data.TaggedObject.map) {
         if (obj.second->Usable && auto player = dynamic_cast<Valorant::CheatStruct::Player*>(obj.second.get())) {
-            auto distance = player->ScreenHeadPos.distance(middle);
-            if (distance < Valorant::Globals::hack_setting.Aimbot.fov && distance < min_distance) {
-                min_distance = distance;
+            auto dx = player->ScreenHeadPos.x - middle.x;
+            auto dy = player->ScreenHeadPos.y - middle.y;
+            auto distance_sq = dx * dx + dy * dy; // use squared distances instead
+            if (distance_sq < Valorant::Globals::hack_setting.Aimbot.fov * Valorant::Globals::hack_setting.Aimbot.fov // compare squared distances instead
+                && distance_sq < min_distance_sq) {
+                min_distance_sq = distance_sq;
                 target = player;
             }
         }
@@ -175,53 +178,68 @@ struct ImportInfo {
 std::vector<ImportInfo> GetImports(const HMODULE module) {
   std::vector<ImportInfo> imports;
 
-  PIMAGE_DOS_HEADER dos_header = (PIMAGE_DOS_HEADER)module;
-  PIMAGE_NT_HEADERS nt_headers = (PIMAGE_NT_HEADERS)((BYTE*)module + dos_header->e_lfanew);
-
-  // Check if the image is a valid PE file
-  if (dos_header->e_magic != IMAGE_DOS_SIGNATURE ||
-      nt_headers->Signature != IMAGE_NT_SIGNATURE) {
+  if (!module) {
+    // handle invalid module handle
     return imports;
   }
 
-  // Get the start of the import descriptor table
-  PIMAGE_IMPORT_DESCRIPTOR import_descriptor = (PIMAGE_IMPORT_DESCRIPTOR)
-    ((BYTE*)module + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+  // cast module handle to pointer to DOS header
+  PIMAGE_DOS_HEADER dos_header = reinterpret_cast<PIMAGE_DOS_HEADER>(module);
+  
+  if (dos_header->e_magic != IMAGE_DOS_SIGNATURE) {
+    // handle invalid DOS signature
+    return imports;
+  }
 
-  // Loop through the import descriptor table
+  // get pointer to NT headers
+  PIMAGE_NT_HEADERS nt_headers = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<BYTE*>(module) + dos_header->e_lfanew);
+  
+  if (nt_headers->Signature != IMAGE_NT_SIGNATURE) {
+    // handle invalid NT signature
+    return imports;
+  }
+
+  // get pointer to import descriptor table
+  PIMAGE_IMPORT_DESCRIPTOR import_descriptor = reinterpret_cast<PIMAGE_IMPORT_DESCRIPTOR>(reinterpret_cast<BYTE*>(module) + nt_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress);
+  
+  // loop through import descriptor table
   while (import_descriptor->Name) {
     ImportInfo import_info;
 
-    // Get the start of the IAT and OIAT for this module
-    PIMAGE_THUNK_DATA first_thunk = (PIMAGE_THUNK_DATA)
-      ((BYTE*)module + import_descriptor->FirstThunk);
-    PIMAGE_THUNK_DATA original_first_thunk = (PIMAGE_THUNK_DATA)
-      ((BYTE*)module + import_descriptor->OriginalFirstThunk);
+    // get pointer to IAT and OIAT for this module
+    PIMAGE_THUNK_DATA first_thunk = reinterpret_cast<PIMAGE_THUNK_DATA>(reinterpret_cast<BYTE*>(module) + import_descriptor->FirstThunk);
+    PIMAGE_THUNK_DATA original_first_thunk = reinterpret_cast<PIMAGE_THUNK_DATA>(reinterpret_cast<BYTE*>(module) + import_descriptor->OriginalFirstThunk);
 
-    // Get the name of the module being imported
-    import_info.module_name = (const char*)module + import_descriptor->Name;
+    // get name of imported module
+    import_info.module_name = reinterpret_cast<const char*>(reinterpret_cast<BYTE*>(module) + import_descriptor->Name);
 
-    // Loop through the IAT and OIAT
+    // loop through IAT and OIAT
     while (original_first_thunk->u1.Function) {
       ImportFunctionInfo import_function_data;
 
-      // Get the import name and address from the OIAT
-      PIMAGE_IMPORT_BY_NAME thunk_data = (PIMAGE_IMPORT_BY_NAME)
-        ((BYTE*)module + original_first_thunk->u1.AddressOfData);
-      import_function_data.name = (const char*)thunk_data->Name;
-      import_function_data.address = (FARPROC)first_thunk->u1.Function;
+      // get import name and address from OIAT
+      if (original_first_thunk->u1.Ordinal & IMAGE_ORDINAL_FLAG) {
+        // handle imported function by ordinal
+        import_function_data.name = "#ORDINAL" + std::to_string(IMAGE_ORDINAL(original_first_thunk->u1.Ordinal));
+      } else {
+        // handle imported function by name
+        PIMAGE_IMPORT_BY_NAME thunk_data = reinterpret_cast<PIMAGE_IMPORT_BY_NAME>(reinterpret_cast<BYTE*>(module) + original_first_thunk->u1.AddressOfData);
+        import_function_data.name = reinterpret_cast<const char*>(thunk_data->Name);
+      }
+      
+      import_function_data.address = reinterpret_cast<FARPROC>(first_thunk->u1.Function);
 
-      // Add the import function data to the import info
+      // add import function data to import info
       import_info.function_datas.push_back(import_function_data);
 
       original_first_thunk++;
       first_thunk++;
     }
 
-    // Add the import info for this module to the list of imports
+    // add import info for this module to list of imports
     imports.push_back(import_info);
 
-    // Move on to the next import descriptor
+    // move on to next import descriptor
     import_descriptor++;
   }
 

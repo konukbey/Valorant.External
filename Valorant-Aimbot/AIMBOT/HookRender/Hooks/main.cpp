@@ -139,27 +139,25 @@ int main(const int argc, char** argv)
 }
 			
 
-int getValorantProcId() {
-	DWORD dwRet = 0;
-	DWORD dwThreadCountMax = 0;
-	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-	PROCESSENTRY32 pe32;
-	pe32.dwSize = sizeof(PROCESSENTRY32);
-	Process32First(hSnapshot, &pe32);
-	do
-	{
-		if (_tcsicmp(pe32.szExeFile, _T("VALORANT-Win64-Shipping.exe")) == 0)
+DWORD getValorantProcId()
+{
+    PROCESSENTRY32 pe32 = { sizeof(pe32) };
+    HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    DWORD dwProcId = 0;
 
-		{
-			DWORD dwTmpThreadCount = GetProcessThreadNumByID(pe32.th32ProcessID);
+    if (hSnapshot == INVALID_HANDLE_VALUE) return 0;
+    
+    if (Process32First(hSnapshot, &pe32))
+    {
+        do
+        {
+            if (_tcsicmp(pe32.szExeFile, _T("VALORANT-Win64-Shipping.exe")) == 0 && pe32.cntThreads > GetProcessThreadCount((HANDLE)pe32.th32ProcessID))
+                dwProcId = pe32.th32ProcessID;
 
-			if (dwTmpThreadCount > dwThreadCountMax)
-			                {
-                    PoisonMessageBox.Show(this, "Failed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    poisonButton1.Enabled = true;
-                    poisonLabel4.Text = "Failed!";
-                }
-	} while (Process32Next(hSnapshot, &pe32));
-	CloseHandle(hSnapshot);
-	return dwRet;
+        } while (Process32Next(hSnapshot, &pe32));
+    }
+
+    CloseHandle(hSnapshot);
+    return dwProcId;
 }
+

@@ -383,16 +383,33 @@ typedef struct __declspec( align( 64 ) ) _RAID_UNIT_EXTENSION
 	STOR_ASYNC_NOTIFY_CONTEXT StorAsyncNotify;
 	RAID_SHARED_WORK_ITEM_CONTEXT PowerWorkItem;
 	struct
-	{
+typedef struct _RAID_UNIT_EXTENSION {
+
+	// Power management related members
+	char FStateTransition;
+	char DStateTransition;
+	unsigned int FState;
+	struct _IRP* PowerIrp;
+
+	// Pending power-up context for the unit
+	struct {
 		char FStateTransition;
 		char DStateTransition;
 		unsigned int FState;
 		struct _IRP* PowerIrp;
 	} PendingPowerUpContext;
 	SLIST_ENTRY PendingPowerUpListEntry;
+
+	// Name of the Plug and Play (PnP) interface for the device
 	UNICODE_STRING SesPnpInterfaceName;
+
+	// IO count delayed by latency cap
 	unsigned __int64 IoCountDelayedByLatencyCap;
+
+	// GUID of the device
 	GUID DeviceGuid;
+
+	// Telemetry related members
 	TELEMETRY_UNIT_EXTENSION TelemetryExtension;
 	unsigned __int64 FirstDPNRTimeAfterCS;
 	unsigned __int64 LastF1StartTime;
@@ -427,11 +444,26 @@ typedef struct __declspec( align( 64 ) ) _RAID_UNIT_EXTENSION
 	RAID_TELEMETRY_UNIQUE_ERROR_LOG TelemetryUniqueErrorLog;
 	unsigned __int64 TelemetryBytesWritten;
 	unsigned __int64 TelemetryStreamBytesWritten;
+
+	// Power cycle count for the device
 	unsigned int PowerCycleCount;
+
+	// Time when the extension was initialized
 	LARGE_INTEGER InitialTimestamp;
+
+	// QoS information for the device
 	RAID_UNIT_QOS Qos;
+
+	// Time when the last hierarchical reset was completed
 	unsigned __int64 LastHierarchicalResetEndTime;
+
+	// Information about the disk used for crash dump
 	struct DUMP_DISK_INFO* CrashDumpInfo;
+
+	// Information about the disk used for hibernation dump
 	struct DUMP_DISK_INFO* HiberDumpInfo;
+
+	// Zone size for the device
 	unsigned __int64 ZoneSize;
+
 } RAID_UNIT_EXTENSION, * PRAID_UNIT_EXTENSION;

@@ -348,100 +348,108 @@ int GetProcessInfo(DWORD dwPID, ProcessInfo& pi)
     return 1;
 }
 
-std::string RPMString(DWORD64 address)
+std::string RPMString(const void* address, size_t maxLength)
 {
-    // Check if address is NULL or invalid
-    if (address == NULL || address > 0x7FFFFFFFFFFFFFFF)
+    // Check if address is NULL
+    if (address == nullptr)
     {
-        return "BOT";
+        return "";
     }
 
     // Create a buffer to hold the string
-    constexpr size_t bufferSize = 255; // Maximum buffer size
-    char buffer[bufferSize + 1] = {}; // Initialize buffer to all zeros
+    std::vector<char> buffer(maxLength + 1, 0);
 
     // Copy the string from memory into the buffer
-    errno_t err = memcpy_s(buffer, bufferSize, reinterpret_cast<const void*>(address), bufferSize);
-    if (err != 0)
-    {
-        return "BOT";
-    }
+    memcpy(&buffer[0], address, maxLength);
 
     // Find the end of the string and null-terminate it
-    buffer[bufferSize] = '\0'; // Ensure that the buffer is null-terminated
-    char* endPos = strchr(buffer, '\0');
-    if (endPos != buffer)
-    {
-        do
-        {
-            --endPos;
-        } while (endPos >= buffer && *endPos == '\0');
-
-        *(endPos + 1) = '\0';
-    }
+    size_t length = strnlen_s(buffer.data(), maxLength);
+    buffer[length] = '\0';
 
     // Validate the string and convert it to a std::string
-    for (char* p = buffer; *p != '\0'; ++p)
+    for (size_t i = 0; i < length; ++i)
     {
-        if (*p < 32 || *p > 126)
+        char c = buffer[i];
+        if (c < 32 || c > 126)
         {
-            return "BOT";
+            return "";
         }
     }
 
-    return std::string(buffer);
+    return std::string(buffer.data());
 }
+
 				
-void sendReceivePacket(char* packet, char* addr, void * out) {
+int sendReceivePacket(const char* packet, const char* addr, void* out, size_t outSize) {
     // Initialize variables
     int iResult, length;
-    SOCKET s;
-    struct addrinfo hints, *result;
+    SOCKET s = INVALID_SOCKET;
+    struct addrinfo hints = {0}, *result = NULL;
 
     // Initialize Winsock
     WSADATA wsaData;
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed with error code: %d\n", iResult);
-        return;
+        return iResult;
     }
 
     // Get address information for the server
-// Initialize the hints struct
-struct addrinfo hints = {0};
-hints.ai_family = AF_UNSPEC; // Allow IPv4 or IPv6
-hints.ai_socktype = SOCK_STREAM; // Use TCP
-hints.ai_protocol = IPPROTO_TCP; // Use TCP
+    hints.ai_family = AF_UNSPEC; // Allow IPv4 or IPv6
+    hints.ai_socktype = SOCK_STREAM; // Use TCP
+    hints.ai_protocol = IPPROTO_TCP; // Use TCP
 
-// Resolve the server address and port
-struct addrinfo *result = NULL;
-int error = getaddrinfo(addr, "9999", &hints, &result);
-if (error != 0) {
-    fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(error));
+    iResult = getaddrinfo(addr, "9999", &hints, &result);
+    if (iResult != 0) {
+        fprintf(stderr, "getaddrinfo failed: %s\n", gai_strerror(iResult));
+        WSACleanup();
+        return iResult;
+    }
+
+    // Create socket and connect to the server
+    s = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (s == INVALID_SOCKET) {
+        fprintf(stderr, "socket creation failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    iResult = connect(s, result->ai_addr, (int)result->ai_addrlen);
+    if (iResult == SOCKET_ERROR) {
+        fprintf(stderr, "connect failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(s);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    // Send the packet to the server
+    length = (int)strlen(packet);
+    iResult = send(s, packet, length, 0);
+    if (iResult == SOCKET_ERROR) {
+        fprintf(stderr, "send failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(s);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    // Receive response from the server
+    iResult = recv(s, (char*)out, outSize, 0);
+    if (iResult == SOCKET_ERROR) {
+        fprintf(stderr, "recv failed with error code: %d\n", WSAGetLastError());
+        freeaddrinfo(result);
+        closesocket(s);
+        WSACleanup();
+        return WSAGetLastError();
+    }
+
+    // Cleanup
+    freeaddrinfo(result);
+    closesocket(s);
     WSACleanup();
-    return;
-}
-
-// Iterate over the addrinfo structures and try to connect to the server
-for (struct addrinfo *p = result; p != NULL; p = p->ai_next) {
-    // Create a socket using the addrinfo structure
-    SOCKET sock = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-    if (sock == INVALID_SOCKET) {
-        fprintf(stderr, "socket failed: %d\n", WSAGetLastError());
-        continue;
-    }
-
-    // Connect to the server using the socket
-    error = connect(sock, p->ai_addr, (int)p->ai_addrlen);
-    if (error == SOCKET_ERROR) {
-        fprintf(stderr, "connect failed: %d\n", WSAGetLastError());
-        closesocket(sock);
-        continue;
-    }
-
-    // We successfully connected to the server, so we can stop iterating
-    // and use the socket for sending and receiving data
-    break;
+    return iResult;
 }
 
 // Free the memory allocated by getaddrinfo
@@ -478,29 +486,23 @@ freeaddrinfo(result);
         return;
     }
 
-    iResult = recv(s, out, DEFAULT_BUFLEN, 0);
-    if (iResult > 0) {
-        printf("Bytes received: %d\n", iResult);
-    } else if (iResult == 0) {
-        printf("Connection closed\n");
-    } else {
-        printf("Recv failed with error code: %d\n", WSAGetLastError());
-    }
+int iResult = recv(s, out, DEFAULT_BUFLEN, 0);
+if (iResult > 0) printf("Bytes received: %d\n", iResult);
+else if (iResult == 0) printf("Connection closed\n");
+else printf("Recv failed with error code: %d\n", WSAGetLastError());
 
-    // Cleanup
-    closesocket(s);
-    freeaddrinfo(result);
-    WSACleanup();
-}
+closesocket(s);
+freeaddrinfo(result);
+WSACleanup();
 
-void C_BaseEntity::SetViewAngle(Vector& angle)
+
+void C_BaseEntity::SetViewAngle(const Vector& angle)
 {
-	float d2r = 0.01745329251f;
-	Vector4D vecNewAngle = CreateFromYawPitchRoll(angle.z * d2r, 0.f, angle.x * d2r);
-	Utils::WritePtr<Vector4D>({ (uintptr_t)this, 0x20, 0x1170, 0xC0 }, vecNewAngle, false);
+    const float degreesToRadians = 0.01745329251f;
+    const Vector4D rotation = CreateQuaternionFromAngles(angle.z * degreesToRadians, 0.f, angle.x * degreesToRadians);
+    const uintptr_t viewAngleAddress = reinterpret_cast<uintptr_t>(this) + VIEW_ANGLE_OFFSET;
+    Utils::WritePtr<Vector4D>(viewAngleAddress, rotation, false);
 }
-	{
-		
 
 	Status = RtlAddAccessAllowedAce(Dacl,
 		ACL_REVISION,

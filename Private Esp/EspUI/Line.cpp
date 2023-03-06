@@ -140,21 +140,28 @@ void ReadViewMatrix()
     ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &viewMatrix, sizeof(viewMatrix), NULL);
 }
 
-// Read entity data from the game's memory
-void ReadEntityData()
+void ReadEntityData(HANDLE pHandle, DWORD entityList, Entity entities[])
 {
-    // Iterate over up to 32 entities
-    for (int i = 1; i < 32; i++)
+    // Iterate over up to MAX_ENTITIES entities
+    for (int i = 1; i < MAX_ENTITIES; i++)
     {
         // Read the entity's data from the game's memory
-        ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &entities[i], sizeof(DWORD), NULL);
-        ReadProcessMemory(pHandle, (int*)(entities[i] + 0xF8), &health[i], sizeof(int), NULL);
-        ReadProcessMemory(pHandle, (Vec3*)(entities[i] + 0x51), &headPositions[i], sizeof(Vec3), NULL);
-        ReadProcessMemory(pHandle, (Vec3*)(entities[i] + 0x52), &positions[i], sizeof(Vec3), NULL);
-        ReadProcessMemory(pHandle, (Vec3*)(entities[i] + 0x53), &angles[i], sizeof(Vec3), NULL);
+        DWORD entityAddress;
+        if (!ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &entityAddress, sizeof(DWORD), NULL)) {
+            // Error handling for ReadProcessMemory failure
+            fprintf(stderr, "Failed to read entity address for entity %d\n", i);
+            continue;
+        }
+
+        Entity& entity = entities[i];
+        if (!ReadProcessMemory(pHandle, (void*)(entityAddress), &entity, ENTITY_SIZE, NULL)) {
+            // Error handling for ReadProcessMemory failure
+            fprintf(stderr, "Failed to read entity data for entity %d\n", i);
+            continue;
+        }
 
         // Skip entities that are not valid or have zero or negative health
-        if (entities[i] == NULL || health[i] <= 0 || health[i] > 100)
+        if (entity.health <= 0 || entity.health > 100)
         {
             continue;
         }

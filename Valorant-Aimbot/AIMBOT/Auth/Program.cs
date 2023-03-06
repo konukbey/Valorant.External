@@ -112,19 +112,21 @@ namespace ValorantAuth
 }
 
 std::string gen_random(const int len) {
-    std::string tmp_s;
     static const char alphanum[] =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz";
+
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, sizeof(alphanum) - 2);
-    tmp_s.reserve(len);
+
+    std::string tmp_s(len, ' '); // construct string of desired length with spaces
+
     for (int i = 0; i < len; ++i)
-        tmp_s += alphanum[dis(gen)];
+        tmp_s[i] = alphanum[dis(gen)];
+
     return tmp_s;
 }
-
 
 
