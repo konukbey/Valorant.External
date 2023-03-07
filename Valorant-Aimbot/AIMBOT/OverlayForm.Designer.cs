@@ -46,20 +46,45 @@ namespace Immortal
             ResumeLayout(false);
         }
 
-        private void autoUpdate_Tick(object sender, EventArgs e)
-        {
-            // Do something on each tick of the timer
-        }
+public partial class OverlayForm : Form
+{
+    private Timer autoUpdateTimer;
 
-        private void OverlayForm_Load(object sender, EventArgs e)
-        {
-            // Perform additional initialization here
-        }
+    public OverlayForm()
+    {
+        InitializeComponent();
+        InitializeAutoUpdateTimer();
+    }
 
-        private void OverlayForm_Paint(object sender, PaintEventArgs e)
-        {
-            // Draw custom graphics or text on the form's surface here
-        }
+    private void InitializeAutoUpdateTimer()
+    {
+        autoUpdateTimer = new Timer();
+        autoUpdateTimer.Interval = 5000; // 5 seconds
+        autoUpdateTimer.Tick += AutoUpdateTimer_Tick;
+        autoUpdateTimer.Start();
+    }
+
+    private void AutoUpdateTimer_Tick(object sender, EventArgs e)
+    {
+        // Do something on each tick of the timer
+        // For example, update data from a server
+    }
+
+    private void OverlayForm_Load(object sender, EventArgs e)
+    {
+        // Perform additional initialization here
+        // For example, set the form's size and position
+        this.Size = new Size(400, 300);
+        this.Location = new Point(Screen.PrimaryScreen.WorkingArea.Width - this.Width,
+                                   Screen.PrimaryScreen.WorkingArea.Height - this.Height);
+    }
+
+    private void OverlayForm_Paint(object sender, PaintEventArgs e)
+    {
+        // Draw custom graphics or text on the form's surface here
+        // For example, draw a border and some text
+        e.Graphics.DrawRectangle(Pens.Red, 0, 0, this.Width - 1, this.Height - 1);
+        e.Graphics.DrawString("Hello, World!", new Font("Arial", 12), Brushes.Black, 10, 10);
     }
 }
 
