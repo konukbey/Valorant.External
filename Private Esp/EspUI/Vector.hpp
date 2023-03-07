@@ -286,54 +286,52 @@ class __declspec(align(16)) VectorAligned : public Vector
 }
 
 
-class VectorAligned : public Vector
-{
+class Vector {
+public:
+    virtual ~Vector() = default;
+
+    float x, y, z;
+
+    Vector() : x(0.0f), y(0.0f), z(0.0f) {}
+    Vector(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {}
+
+    Vector(const Vector& other) = default;
+    Vector& operator=(const Vector& other) = default;
+
+    Vector(Vector&& other) = default;
+    Vector& operator=(Vector&& other) = default;
+
+    virtual void someFunction() const {
+        // ...
+    }
+};
+
+class VectorAligned : public Vector {
 public:
     float w;
 
-    // Default constructor initializes all components to zero
     VectorAligned() : Vector(), w(0.0f) {}
+    VectorAligned(float x_, float y_, float z_, float w_) : Vector(x_, y_, z_), w(w_) {}
 
-    // Constructor with four arguments initializes all components
-    VectorAligned(float x_, float y_, float z_, float w_)
-        : Vector(x_, y_, z_), w(w_) {}
-
-    // Copy constructor
-    VectorAligned(const VectorAligned& vOther)
-        : Vector(vOther), w(vOther.w) {}
-
-    // Copy assignment operator with Vector argument
-    VectorAligned& operator=(const Vector& vOther)
-    {
-        x = vOther.x;
-        y = vOther.y;
-        z = vOther.z;
-        w = 0.0f;
+    VectorAligned(const VectorAligned& other) = default;
+    VectorAligned& operator=(const VectorAligned& other) {
+        if (this != &other) {
+            Vector::operator=(other);
+            w = other.w;
+        }
         return *this;
     }
 
-    // Copy assignment operator with VectorAligned argument
-    VectorAligned& operator=(const VectorAligned& vOther)
-    {
-        x = vOther.x;
-        y = vOther.y;
-        z = vOther.z;
-        w = vOther.w;
+    VectorAligned(VectorAligned&& other) = default;
+    VectorAligned& operator=(VectorAligned&& other) {
+        Vector::operator=(std::move(other));
+        w = std::move(other.w);
         return *this;
     }
 
-    // Move constructor
-    VectorAligned(VectorAligned&& vOther)
-        : Vector(std::move(vOther)), w(std::move(vOther.w)) {}
-
-    // Move assignment operator
-    VectorAligned& operator=(VectorAligned&& vOther)
-    {
-        Vector::operator=(std::move(vOther));
-        w = std::move(vOther.w);
-        return *this;
+    void someFunction() const override {
+        // ...
     }
-
-    // Destructor is not necessary, because Vector's destructor is called automatically
 };
+
 
