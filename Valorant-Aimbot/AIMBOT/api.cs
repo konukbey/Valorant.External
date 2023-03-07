@@ -3,50 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 
-namespace AuthGG
-{
-    internal class App
-    {
-        private static readonly IDictionary<string, string> Variables = new Dictionary<string, string>();
-        private static User _currentUser;
 
-        public static void SetUser(User user)
-        {
-            _currentUser = user;
-        }
-
-        public static string GetVariable(string name)
-        {
-            if (_currentUser == null)
-            {
-                throw new InvalidOperationException("User is not set, possible breach detected!");
-            }
-
-            if (string.IsNullOrEmpty(_currentUser.Id) || string.IsNullOrEmpty(_currentUser.Hwid) || string.IsNullOrEmpty(_currentUser.Ip))
-            {
-                throw new InvalidOperationException("User's Id, Hwid, or Ip is not set, possible breach detected!");
-            }
-
-            if (!Variables.TryGetValue(name, out string value))
-            {
-                throw new ArgumentException($"Variable with name {name} does not exist.");
-            }
-
-            return value;
-        }
-    }
-
-    internal class User
-    {
-        public string Id { get; set; }
-        public string Hwid { get; set; }
-        public string Ip { get; set; }
-    }
-}
-
-
-        public static string Error = null;
-        public static Dictionary<string, string> Variables = new Dictionary<string, string>();
+public static string Error = null;
+public static Dictionary<string, string> Variables = new Dictionary<string, string>();
     }
     internal class Constants
     {
