@@ -110,9 +110,21 @@ void C_BaseEntity::SetViewAngle(Vector& angle)
 }
 }
 
-Vector C_BaseEntity::GetBonePostionByID(int id)
+Vector C_BaseEntity::GetBonePositionByID(int id) const
 {
-	return Utils::ReadPtr<Vector>({ (uintptr_t)this, 0x20, (uintptr_t)uEntityBone[id] }, false);
+    // Validate the id parameter
+    if (id < 0 || id >= ARRAYSIZE(uEntityBone))
+    {
+        // Return a default vector if the id is out of bounds
+        return Vector(0, 0, 0);
+    }
+
+    // Calculate the memory address of the specified bone position
+    uintptr_t boneAddr = *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(this) + 0x20) +
+        static_cast<uintptr_t>(id) * sizeof(Vector);
+
+    // Read the bone position from memory
+    return *reinterpret_cast<Vector*>(boneAddr);
 }
 
 uintptr_t C_BaseEntity::GetWeapon()
