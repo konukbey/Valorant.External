@@ -6,15 +6,18 @@
 
 
 namespace Kernel
-    struct MemoryCommand {
-        enum class Operation {
+{
+    struct MemoryCommand
+    {
+        enum class Operation
+        {
             kRead,
             kWrite
         };
 
         Operation operation; // the type of memory operation to perform (e.g. read or write)
 
-        constexpr static uint64_t kMagicNumber = 0xDEADBEEF; // a magic number for verification
+        const uint64_t kMagicNumber = 0xDEADBEEF; // a magic number for verification (made const)
 
         int64_t retval = 0; // the return value of the operation
 
@@ -23,16 +26,82 @@ namespace Kernel
         std::unique_ptr<uint8_t[]> buffer; // the buffer to hold the data read or written
 
         MemoryCommand(Operation operation, uint64_t mem_address, uint64_t length)
-            : operation(operation), mem_address(mem_address), length(length) {
-                if (operation == Operation::kWrite) {
-                    buffer.reset(new uint8_t[length]);
+            : operation(operation), mem_address(mem_address), length(length)
+        {
+            if (operation == Operation::kWrite)
+            {
+                buffer = std::make_unique<uint8_t[]>(length); // using std::make_unique instead of new[]
+            }
+        }
+
+        // Rule of 5 - copy constructor, copy assignment operator, move constructor, move assignment operator, and destructor.
+        MemoryCommand(const MemoryCommand& other) // copy constructor
+            : operation(other.operation), kMagicNumber(other.kMagicNumber),
+              retval(other.retval), mem_address(other.mem_address), length(other.length)
+        {
+            if (operation == Operation::kWrite && other.buffer)
+            {
+                buffer = std::make_unique<uint8_t[]>(length);
+                std::copy(other.buffer.get(), other.buffer.get() + length, buffer.get()); // using std::copy to copy the buffer
+            }
+        }
+
+        MemoryCommand& operator=(const MemoryCommand& other) // copy assignment operator
+        {
+            if (this != &other)
+            {
+                operation = other.operation;
+                kMagicNumber = other.kMagicNumber;
+                retval = other.retval;
+                mem_address = other.mem_address;
+                length = other.length;
+                if (operation == Operation::kWrite && other.buffer)
+                {
+                    buffer = std::make_unique<uint8_t[]>(length);
+                    std::copy(other.buffer.get(), other.buffer.get() + length, buffer.get());
+                }
+                else
+                {
+                    buffer.reset(); // reset the buffer to nullptr
                 }
             }
-        // other ctor and methods that you might need
+            return *this;
+        }
+
+        MemoryCommand(MemoryCommand&& other) noexcept // move constructor
+            : operation(other.operation), kMagicNumber(other.kMagicNumber),
+              retval(other.retval), mem_address(other.mem_address), length(other.length),
+              buffer(std::move(other.buffer)) // using std::move for the buffer
+        {
+            other.buffer.reset(); // set the original buffer to nullptr
+        }
+
+        MemoryCommand& operator=(MemoryCommand&& other) noexcept // move assignment operator
+        {
+            if (this != &other)
+            {
+                operation = other.operation;
+                kMagicNumber = other.kMagicNumber;
+                retval = other.retval;
+                mem_address = other.mem_address;
+                length = other.length;
+                buffer = std::move(other.buffer);
+                other.buffer.reset(); // set the original buffer to nullptr
+            }
+            return *this;
+        }
+
+        ~MemoryCommand() // destructor
+        {
+            buffer.reset(); // deallocating the buffer
+        }
+
+        // accessor methods
+        uint64_t get_mem_address() const { return mem_address; }
+        uint64_t get_length() const { return length; }
+        uint8_t* get_buffer() const { return buffer.get(); } // returning a raw pointer to the buffer
     };
 }
-
-
 
 NTSTATUS FindProcess(const char* processName, PEPROCESS* process) {
     if (processName == nullptr || process == nullptr) {
