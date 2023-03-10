@@ -80,15 +80,25 @@ NTSTATUS DeviceControlHook(PDEVICE_OBJECT DeviceObject, PIRP Irp)
 {
     NTSTATUS status = STATUS_SUCCESS;
 
+    // Check for null pointers
+    if (!DeviceObject || !Irp) {
+        status = STATUS_INVALID_PARAMETER;
+        goto Exit;
+    }
+
     // Get the current stack location of the IRP
     PIO_STACK_LOCATION StackLocation = IoGetCurrentIrpStackLocation(Irp);
+    if (!StackLocation) {
+        status = STATUS_INVALID_PARAMETER;
+        goto Exit;
+    }
 
     // Check if the IOCTL request is for SMART_RCV_DRIVE_DATA
     if (StackLocation->Parameters.DeviceIoControl.IoControlCode == SMART_RCV_DRIVE_DATA_CTL_CODE)
     {
-        // Allocate memory for the completion routine context
+        // Allocate memory for the completion routine context with a specific tag
         PCOMPLETION_ROUTINE_CONTEXT CompletionContext = (PCOMPLETION_ROUTINE_CONTEXT) ExAllocatePoolWithTag(
-            NonPagedPool, sizeof(COMPLETION_ROUTINE_CONTEXT), TAG_HWID);
+            NonPagedPoolNx, sizeof(COMPLETION_ROUTINE_CONTEXT), 'MyTag');
         if (!CompletionContext)
         {
             // Return failure if allocation fails
@@ -102,15 +112,20 @@ NTSTATUS DeviceControlHook(PDEVICE_OBJECT DeviceObject, PIRP Irp)
         CompletionContext->OldCompletionRoutine = StackLocation->CompletionRoutine;
         CompletionContext->OldContext = StackLocation->Context;
 
-        // Set the new completion routine and context
-        StackLocation->CompletionRoutine = SmartRcvDriveDataCompletionRoutine;
-        StackLocation->Context = CompletionContext;
+        // Use IoSetCompletionRoutineEx instead of setting CompletionRoutine directly
+        IoSetCompletionRoutineEx(DeviceObject, Irp, SmartRcvDriveDataCompletionRoutine, CompletionContext, TRUE, TRUE, TRUE);
     }
-
-    // Pass the IRP down the driver stack
-    IoSkipCurrentIrpStackLocation(Irp);
-    status = IoCallDriver(DeviceObject, Irp);
+    else {
+        // Pass the IRP down the driver stack
+        IoSkipCurrentIrpStackLocation(Irp);
+        status = IoCallDriver(DeviceObject, Irp);
+        // Add error handling for IoCallDriver
+        if (!NT_SUCCESS(status)) {
+            // Log an error or take some other appropriate action
+        }
+    }
 
 Exit:
     return status;
 }
+
