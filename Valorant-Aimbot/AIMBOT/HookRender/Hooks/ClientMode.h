@@ -99,42 +99,52 @@ __int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
 
 					}
 
+// Define Vector2 struct with x and y components
 struct Vector2 {
 public:
-	float x;
-	float y;
+    float x;
+    float y;
 
-	inline Vector2() : x(0), y(0) {}
-	inline Vector2(float x, float y) : x(x), y(y) {}
+    Vector2() : x(0), y(0) {} // default constructor
+    Vector2(float x, float y) : x(x), y(y) {} // constructor with x and y values
+    // get the Euclidean distance between two Vector2 objects
+    static float Distance(const Vector2& v1, const Vector2& v2) {
+        float dx = v1.x - v2.x;
+        float dy = v1.y - v2.y;
+        return sqrtf(dx * dx + dy * dy);
+    }
 
-	static float Distance(Vector2 v) {
-		return sqrtf(((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y)));
-	}
-
-	static Vector2 operator+(const Vector2& v) const {
-		return Vector2(x + v.x, y + v.y);
-	}
-
-	inline Vector2 operator-(const Vector2& v) const {
-		return Vector2(x - v.x, y - v.y);
-	}
+    // overload the addition operator to add two Vector2 objects
+    Vector2 operator+(const Vector2& v) const {
+        return Vector2(x + v.x, y + v.y);
+    }
+    // overload the subtraction operator to subtract two Vector2 objects
+    Vector2 operator-(const Vector2& v) const {
+        return Vector2(x - v.x, y - v.y);
+    }
 };
 
+// Define FQuat struct with x, y, and z components
 struct FQuat {
-	float x;
-	float y;
-	float z;
+public:
+    float x;
+    float y;
+    float z;
 };
 
-class PIDManager
-{
+// Define PIDManager class with static methods for working with process identifiers (PIDs)
+class PIDManager {
 public:
-	PIDManager();
-	~PIDManager();
-	static int GetProcessIdByName(LPCTSTR szProcess);
-	static BOOL EnableDebugPriv();
-	static DWORD_PTR GetModuleBase(DWORD dwPid, LPCTSTR szModName);
-	static int GetProcessThreadNumByID(DWORD dwPID);
-	static int GetAowProcId();
-	static void killProcessByName(LPCWSTR name);
+    // Get the process ID of a process by its name
+    static DWORD GetProcessIdByName(LPCTSTR szProcessName);
+    // Enable debug privileges for the current process
+    static BOOL EnableDebugPrivilege();
+    // Get the base address of a module in a process by its name and process ID
+    static DWORD_PTR GetModuleBase(DWORD dwProcessId, LPCTSTR szModuleName);
+    // Get the number of threads in a process by its ID
+    static int GetProcessThreadCount(DWORD dwProcessId);
+    // Get the process ID of the AoW game
+    static int GetAowProcessId();
+    // Kill a process by its name
+    static BOOL KillProcessByName(LPCTSTR szProcessName);
 };
