@@ -110,28 +110,35 @@ NTSTATUS FindProcess(const char* processName, PEPROCESS* process) {
 
     UNICODE_STRING uniProcessName;
     RtlInitUnicodeString(&uniProcessName, L"");
-    NTSTATUS status = RtlAnsiStringToUnicodeString(&uniProcessName, 
-                                                   const_cast<PANSI_STRING>(
-                                                       &ANSI_STRING(processName)), 
-                                                   TRUE);
+
+    // Convert the input ANSI string to a Unicode string
+    ANSI_STRING ansiProcessName;
+    RtlInitAnsiString(&ansiProcessName, processName);
+    NTSTATUS status = RtlAnsiStringToUnicodeString(&uniProcessName, &ansiProcessName, TRUE);
+
     if (!NT_SUCCESS(status)) {
-        std::cout << "[-] Failed to convert process name to Unicode string: " 
-                  << processName << std::endl;
+        DbgPrint("[-] Failed to convert process name to Unicode string: %s\n", processName);
         return status;
     }
 
+    // Look up the process by name
     PEPROCESS currentProcess = nullptr;
     status = PsLookupProcessByProcessName(&uniProcessName, &currentProcess);
+
+    // Free the memory allocated for the Unicode string
     RtlFreeUnicodeString(&uniProcessName);
 
     if (!NT_SUCCESS(status)) {
-        std::cout << "[-] Failed to find process: " << processName << std::endl;
+        DbgPrint("[-] Failed to find process: %s\n", processName);
         return status;
     }
 
+    // Store a pointer to the PEPROCESS structure in the output parameter
     *process = currentProcess;
+
     return STATUS_SUCCESS;
 }
+
 
 
 // IOCTL handler for memory commands
