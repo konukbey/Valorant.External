@@ -368,26 +368,33 @@ void driverController::kernel(DWORD64 address, void* buffer, DWORD64 len) {
 	}
 	
 NTSTATUS driverController::writeTo(DWORD64 address, void* buffer, DWORD64 len) {
-    if(!buffer) return STATUS_INVALID_PARAMETER;
+    if (!buffer) {
+        return STATUS_INVALID_PARAMETER;
+    }
 
-    if (!IsAddressValid(address, len))
-        return STATUS_UNSUCCESSFUL;
+    if (!IsAddressValid(address, len)) {
+        return STATUS_ACCESS_VIOLATION;
+    }
 
-    if (!_ALIGNED_NEW_SUPPORTED) 
-        return STATUS_UNSUCCESSFUL;
+    if (!_ALIGNED_NEW_SUPPORTED) {
+        return STATUS_NOT_SUPPORTED;
+    }
 
-    memory_command* cmd = new memory_command();
-    if(!cmd) return STATUS_NO_MEMORY;
+    if (!IsAddressWritable(address)) {
+        return STATUS_ACCESS_DENIED;
+    }
 
-    cmd->operation = 1; // write byte
-    cmd->address = address;
-    cmd->buffer = buffer;
-    cmd->len = len;
+    PVOID mappedAddress = MapAddress(address);
+    if (!mappedAddress) {
+        return STATUS_ACCESS_VIOLATION;
+    }
 
-    //Add code here to execute the memory command
+    memcpy(mappedAddress, buffer, len);
+    UnmapAddress(mappedAddress);
 
     return STATUS_SUCCESS;
 };
+
 
 
 // Returns 0 on success, 1 if the process was not found, and -1 on error
