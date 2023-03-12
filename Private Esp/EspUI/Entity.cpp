@@ -83,9 +83,24 @@ Vector4D C_BaseEntity::GetViewAngle()
 {
 		out.window_handle = reinterpret_cast<uint64_t>(window_handle);
 }
-
-Vector4D CreateFromYawPitchRoll(float yaw, float pitch, float roll)
+	
+/**
+ * Creates a 4D vector representing a rotation in 3D space, based on the given yaw, pitch, and roll angles.
+ *
+ * @param yaw The yaw angle in radians, within the range of [-pi, pi].
+ * @param pitch The pitch angle in radians, within the range of [-pi, pi].
+ * @param roll The roll angle in radians, within the range of [-pi, pi].
+ *
+ * @return The resulting 4D vector representing the rotation.
+ */
+Vector4D createFromYawPitchRoll(float yaw, float pitch, float roll)
 {
+    // Validate inputs
+    if (yaw < -M_PI || yaw > M_PI || pitch < -M_PI || pitch > M_PI || roll < -M_PI || roll > M_PI) {
+        // Inputs are outside acceptable range
+        // Throw an exception, return an error code, or clamp the values to the acceptable range
+    }
+
     Vector4D result;
     float cy = cos(yaw);
     float sy = sin(yaw);
@@ -101,6 +116,7 @@ Vector4D CreateFromYawPitchRoll(float yaw, float pitch, float roll)
 
     return result;
 }
+
 
 void C_BaseEntity::SetViewAngle(Vector& angle)
 {
