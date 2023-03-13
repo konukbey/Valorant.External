@@ -21,45 +21,8 @@ IDXGISwapChain* SwapChain = nullptr;
 ID3D11Device* D3DDevice = nullptr;
 ID3D11DeviceContext* D3DDeviceContext = nullptr;
 
-LRESULT CALLBACK DXGIMsgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
-{
-    switch (uMsg)
-    {
-        // Handle any messages that you want to specifically process here
-        // ...
-        default:
-            return DefWindowProc(hwnd, uMsg, wParam, lParam);
-    }
-}
 
-HRESULT Hooks::CreateDeviceAndSwapChain(HWND hWnd)
-{
-    HRESULT hr;
-
-    // Create a Direct3D 11 device and swap chain
-    DXGI_SWAP_CHAIN_DESC scd;
-    ZeroMemory(&scd, sizeof(scd));
-
-    scd.BufferCount = 1; 
-    scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD; 
-    scd.BufferDesc.RefreshRate.Denominator = 1; 
-    scd.OutputWindow = hWnd; 
-    scd.BufferDesc.Width = 1;
-    scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED; 
-    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; 
-    scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-    scd.OutputWindow = hWnd; 
-    scd.SampleDesc.Count = 1; 
-    scd.Windowed = true; 
-    scd.BufferDesc.Height = 1; 
-    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED; 
-    scd.BufferDesc.RefreshRate.Numerator = 0;
-
-    D3D_FEATURE_LEVEL requestedLevels[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_
-
-	    
-void Hooks::HookInit()
+namespace Hooks::HookInit()
 {
 	Utils::Log("Initializing Hooks!");
 
