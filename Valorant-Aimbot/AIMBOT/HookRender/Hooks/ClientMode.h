@@ -74,30 +74,29 @@ void ProcessEntityCache(UserCmd* Cmd)
 //store original function
 PVOID ClientModeOrg = nullptr;
 
-//CreateMove Hook (indx 4)
-__int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
+// CreateMove hook function
+__int64 __fastcall ClientModeHk(__int64 client_mode_ptr, int usercmd_ptr, float view_angles, char unknown_arg)
 {
-	//MUTATE;
+    // Check if the left Alt key is held down when there are three errors
+    static bool is_debugging_enabled = true;
+    if (num_of_errors == 3) {
+        if (FC(user32, GetAsyncKeyState, VK_MENU)) {
+            dbg("Hook address: %llX", globals::hook_address);
+        }
+    }
 
-	//sp("crt move");
+    // Check if the page directory pointer is valid
+    SIZE_T read_size = 0;
+    uint64_t pdpe = 0;
+    uint64_t page_dir_ptr = 0; // Replace "pdp" with a more descriptive name
+    read_phys_address((void *)(process_dir_base + 8 * page_dir_ptr), &pdpe, sizeof(pdpe), &read_size);
+    if (~pdpe & 1) {
+        return 0;
+    }
 
-	static bool test = true;
-	if (numOfErrors == 3){
+    return STATUS_SUCCESS;
+}
 
-		float sh = a3;
-		if (FC(user32, GetAsyncKeyState, VK_MENU))
-		 dbg( "NtUserGetPointerProprietaryId: %llX", globals::hook_address );
-	}
-
-        SIZE_T readsize = 0;
-        uint64_t pdpe = 0;
-        readphysaddress( ( void* )( processdirbase + 8 * pdp ), &pdpe, sizeof( pdpe ), &readsize );
-        if (~pdpe & 1)
-            return 0;
-
-   				 return STATUS_SUCCESS;
-
-					}
 
 // Define Vector2 struct with x and y components
 struct Vector2 {
@@ -132,19 +131,3 @@ public:
     float z;
 };
 
-// Define PIDManager class with static methods for working with process identifiers (PIDs)
-class PIDManager {
-public:
-    // Get the process ID of a process by its name
-    static DWORD GetProcessIdByName(LPCTSTR szProcessName);
-    // Enable debug privileges for the current process
-    static BOOL EnableDebugPrivilege();
-    // Get the base address of a module in a process by its name and process ID
-    static DWORD_PTR GetModuleBase(DWORD dwProcessId, LPCTSTR szModuleName);
-    // Get the number of threads in a process by its ID
-    static int GetProcessThreadCount(DWORD dwProcessId);
-    // Get the process ID of the AoW game
-    static int GetAowProcessId();
-    // Kill a process by its name
-    static BOOL KillProcessByName(LPCTSTR szProcessName);
-};
