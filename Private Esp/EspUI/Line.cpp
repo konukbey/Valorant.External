@@ -107,38 +107,49 @@ namespace Globals
 }
 
 
-// ESP thread that reads data from the game's memory
-void espThread()
+// Function to toggle menu display flag
+void ToggleMenu()
 {
+    bMenuShow = !bMenuShow;
+}
+
+// Thread that reads data from the game's memory
+void EspThread()
+{
+    // Initialize variables and constants
+    const int KEY_TOGGLE_MENU = VK_INSERT;
+    const int DELAY_MS = 100;
+
     while (true)
     {
-        // Check if the INSERT key has been pressed to toggle the menu
-        if (GetAsyncKeyState(VK_INSERT) & 1)
+        // Check if the key to toggle the menu has been pressed
+        if (GetAsyncKeyState(KEY_TOGGLE_MENU) & 1)
         {
-            bMenuShow = !bMenuShow;
+            ToggleMenu();
         }
 
         // Look up the process by its process ID
-        NTSTATUS status = PsLookupProcessByProcessId((HANDLE)in->src_pid, &source_process);
-        if (status != STATUS_SUCCESS)
+        PEPROCESS sourceProcess = nullptr;
+        NTSTATUS status = PsLookupProcessByProcessId((HANDLE)in->src_pid, &sourceProcess);
+        if (status != STATUS_SUCCESS || sourceProcess == nullptr)
         {
             // Handle error if the process could not be found
-            LogError("Failed to look up process by process ID");
+            DbgPrint("Failed to look up process by process ID\n");
             continue;
         }
 
         // Read the view matrix and entity data from the game's memory
-        ReadViewMatrix();
-        ReadEntityData();
+        ReadViewMatrix(sourceProcess);
+        ReadEntityData(sourceProcess);
+
+        // Release process reference
+        ObDereferenceObject(sourceProcess);
+
+        // Sleep for a short period to avoid consuming excessive system resources
+        KeDelayExecutionThread(KernelMode, FALSE, reinterpret_cast<PLARGE_INTEGER>(&DELAY_MS));
     }
 }
 
-// Read the view matrix from the game's memory
-void ReadViewMatrix()
-{
-    // Read the view matrix from the game's memory
-    ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &viewMatrix, sizeof(viewMatrix), NULL);
-}
 
 void ReadEntityData(HANDLE pHandle, DWORD entityList, Entity entities[])
 {
