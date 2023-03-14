@@ -2,7 +2,7 @@
 #include "Features.h"
 #include "Globals.h"
 #include "Settings.h"
-s
+
 void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 {
 	Array<C_BaseEntity*> Entitylist = g_pEngine->GetEntities();
@@ -40,6 +40,7 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 	}
 }
 
+
 	bool get_um_module(uint32_t pid, const char* module_name, uint64_t& base, uint32_t& size) {
 		uint64_t mod_base = NULL;
 		uint32_t mod_size = NULL;
@@ -68,20 +69,33 @@ void Features::RenderESP(D3D11Renderer* Render, nk_context* g_pNkContext)
 	}
 
 				
-int retreiveValProcessId() {
-	BYTE target_name[] = { 'V','A','L','O','R','A','N','T','-','W','i','n','6','4','-','S','h','i','p','p','i','n','g','.','e','x','e', 0 };
-	std::wstring process_name = s2ws(std::string((char*)target_name));
-	HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); // 0 to get all processes
-	PROCESSENTRY32W entry;
-	entry.dwSize = sizeof(entry);
+	// Retrieve the process ID for a given process name
+	DWORD retrieveProcessId(const std::wstring& processName)
+	{
+	    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+	    if (snapshot == INVALID_HANDLE_VALUE) {
+		throw std::runtime_error("Failed to create process snapshot");
+	    }
 
-	if (!protected(snapshot, &entry)) {
+	    // Automatically close the snapshot handle when the function returns
+	    const auto closeSnapshotHandle = [snapshot]() { CloseHandle(snapshot); };
 
-    Enum e;
-	std::vector<Enemy> synchronized = enemy_collection;
-	if (synchronized.empty()) {
-		return;
-}
+	    PROCESSENTRY32W entry;
+	    entry.dwSize = sizeof(entry);
+
+	    // Iterate over all processes in the snapshot
+	    if (Process32FirstW(snapshot, &entry)) {
+		do {
+		    // Check if the process name matches the specified name
+		    if (std::wstring(entry.szExeFile) == processName) {
+			return entry.th32ProcessID;
+		    }
+		} while (Process32NextW(snapshot, &entry));
+	    }
+
+	    // Process not found
+	    throw std::runtime_error("Failed to find process");
+	}
 
 
 void std::vector<Enemy> retreiveValidEnemies(uintptr_t actor_array, int actor_count) {
