@@ -149,17 +149,13 @@ bool Valorant::Aimbot::FindTarget()
     Valorant::CheatStruct::Player* target = nullptr;
 
     for (auto& obj : Valorant::Globals::hack_data.TaggedObject.map) {
-        if (auto player = dynamic_cast<Valorant::CheatStruct::Player*>(obj.second.get())) {
-            if (player->Usable && !player->IsTeammate && player->IsAlive) {
-                auto dx = player->ScreenHeadPos.x - middle.x;
-                auto dy = player->ScreenHeadPos.y - middle.y;
-                auto distance_sq = dx * dx + dy * dy;
-                if (distance_sq < Valorant::Globals::hack_setting.Aimbot.fov * Valorant::Globals::hack_setting.Aimbot.fov) {
-                    if (distance_sq < min_distance_sq) {
-                        min_distance_sq = distance_sq;
-                        target = player;
-                    }
-                }
+        if (auto player = dynamic_cast<Valorant::CheatStruct::Player*>(obj.second.get()); player && player->Usable && !player->IsTeammate && player->IsAlive) {
+            auto dx = player->ScreenHeadPos.x - middle.x;
+            auto dy = player->ScreenHeadPos.y - middle.y;
+            auto distance_sq = dx * dx + dy * dy;
+            if (distance_sq < Valorant::Globals::hack_setting.Aimbot.fov * Valorant::Globals::hack_setting.Aimbot.fov && distance_sq < min_distance_sq) {
+                min_distance_sq = distance_sq;
+                target = player;
             }
         }
     }
@@ -172,7 +168,7 @@ bool Valorant::Aimbot::FindTarget()
     return false;
 }
 
-	
+
 struct ImportFunctionInfo {
   std::string name;
   FARPROC address;
