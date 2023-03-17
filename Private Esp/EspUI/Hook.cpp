@@ -158,30 +158,19 @@ void DeleteHookEntry(UINT pos)
 
 
 NTSTATUS HookedDeviceControlDispatch(PDEVICE_OBJECT device_object, PIRP irp) {
-	const auto stack = IoGetCurrentIrpStackLocation(irp);
-	auto* request = (CustomRequest_Struct*)irp->AssociatedIrp.SystemBuffer;
+    auto stack = IoGetCurrentIrpStackLocation(irp);
+    auto request = static_cast<CustomRequest_Struct*>(irp->AssociatedIrp.SystemBuffer);
 
-	AnsiString driverName;
-	if (device_object->DriverObject->DriverName.Buffer) {
-		LPVOID pTargetDllBuffer;
-		LPVOID addressOfHookFunction;
-	}
+    if (stack->Parameters.DeviceIoControl.IoControlCode == initiatespoof_code) {
+        spoof_initiated = true;
+    }
 
-	switch (stack->Parameters.DeviceIoControl.IoControlCode) {
-	case initiatespoof_code:
-		spoof_initiated = true;
-		break;
+    if (spoof_initiated && m_base && kernel.Matches(XorString("*partmgr*"))) {
+        return partmgr_original_device_control(device_object, irp);
+    }
 
-		if (spoof_initiated) {
-
-
-	if (!m_base) {
-		std::cout << "[-] Valorant is not running" << std::endl;
-	}
-	else if (kernel.Matches(XorString("*partmgr*"))) {
-		return partmgr_original_device_control(device_object, irp);
-	}
-
+    return STATUS_SUCCESS;
+}
 
 typedef NTSTATUS(NTAPI* pNtSetInformationThread)
         (HANDLE, UINT, PVOID, ULONG);
