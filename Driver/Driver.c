@@ -579,85 +579,13 @@ freeaddrinfo(result);
 WSACleanup();
 
 
-void C_BaseEntity::SetViewAngle(const Vector& angle)
+void C_BaseEntity::SetViewAngle(const Vector& angleInDegrees)
 {
     const float degreesToRadians = 0.01745329251f;
-    const Vector4D rotation = CreateQuaternionFromAngles(angle.z * degreesToRadians, 0.f, angle.x * degreesToRadians);
+    const Vector4D viewAngleQuaternionRotation = CreateQuaternionFromAngles(angleInDegrees.z * degreesToRadians, 0.f, angleInDegrees.x * degreesToRadians);
     const uintptr_t viewAngleAddress = reinterpret_cast<uintptr_t>(this) + VIEW_ANGLE_OFFSET;
-    Utils::WritePtr<Vector4D>(viewAngleAddress, rotation, false);
-}
-
-	Status = RtlAddAccessAllowedAce(Dacl,
-		ACL_REVISION,
-		FILE_ALL_ACCESS,
-		SeExports->SeAliasAdminsSid);
-
-	if (!NT_SUCCESS(Status))
-	{
-		ExFreePool(Dacl);
-		DbgPrintEx(0, 0, "RtlAddAccessAllowedAce SeAliasAdminsSid failed  : %p\n", Status);
-		return Status;
-	}
-
-	Status = RtlAddAccessAllowedAce(Dacl,
-		ACL_REVISION,
-		FILE_ALL_ACCESS,
-		SeExports->SeLocalSystemSid);
-
-	if (!NT_SUCCESS(Status))
-	{
-		ExFreePool(Dacl);
-		DbgPrintEx(0, 0, "RtlAddAccessAllowedAce SeLocalSystemSid failed  : %p\n", Status);
-		return Status;
-	}
-
-	Status = RtlSetDaclSecurityDescriptor(&SecDescriptor,
-		TRUE,
-		Dacl,
-		FALSE);
-
-	if (!NT_SUCCESS(Status))
-	{
-		ExFreePool(Dacl);
-		DbgPrintEx(0, 0, "RtlSetDaclSecurityDescriptor failed  : %p\n", Status);
-		return Status;
-	}
-
-	UNICODE_STRING SectionName = { 0 };
-	RtlInitUnicodeString(&SectionName, g_SharedSectionName);
-
-	OBJECT_ATTRIBUTES ObjAttributes = { 0 };
-	InitializeObjectAttributes(&ObjAttributes, &SectionName, OBJ_CASE_INSENSITIVE, NULL, &SecDescriptor);
-
-	LARGE_INTEGER lMaxSize = { 0 };
-	lMaxSize.HighPart = 0;
-	lMaxSize.LowPart = 1044 * 10;
-
-	/* Begin Mapping */
-	Status = ZwCreateSection(&g_Section, SECTION_ALL_ACCESS, &ObjAttributes, &lMaxSize, PAGE_READWRITE, SEC_COMMIT, NULL);
-	if (!NT_SUCCESS(Status))
-	{
-		DbgPrintEx(0, 0, "Create Section Failed. Status: %p\n", Status);
-		return Status;
-	}
-
-	//-----------------------------------------------------------------------------	
-	//	 ZwMapViewOfSection
-	//	-lMaxSize is the ammount of 'Room' the MapViewOfSection will look at
-	//	-ViewSize is how much of the 'Room' will be mapped (if 0 then starts at beggining)
-	//-----------------------------------------------------------------------------	
-
-	SIZE_T ulViewSize = 0;
-	Status = ZwMapViewOfSection(g_Section, NtCurrentProcess(), &shared_section, 0, lMaxSize.LowPart, NULL, &ulViewSize, ViewShare, 0, PAGE_READWRITE | PAGE_NOCACHE);
-	if (!NT_SUCCESS(Status))
-	{
-		DbgPrintEx(0, 0, "Map View Section Failed. Status: %p\n", Status);
-		ZwClose(g_Section); //Close Handle
-		return Status;
-	}
-
-	DbgPrintEx(0, 0, "Shared Memory Created.\n\n");
-	ExFreePool(Dacl);
-
-	return Status;
+    if (!Utils::WritePtr<Vector4D>(viewAngleAddress, viewAngleQuaternionRotation, false))
+    {
+        // Handle error: failed to write view angle to memory
+    }
 }
