@@ -113,10 +113,8 @@ void ToggleMenu()
     bMenuShow = !bMenuShow;
 }
 
-// Thread that reads data from the game's memory
 void EspThread()
 {
-    // Initialize variables and constants
     const int KEY_TOGGLE_MENU = VK_INSERT;
     const int DELAY_MS = 100;
 
@@ -131,22 +129,25 @@ void EspThread()
         // Look up the process by its process ID
         PEPROCESS sourceProcess = nullptr;
         NTSTATUS status = PsLookupProcessByProcessId((HANDLE)in->src_pid, &sourceProcess);
-        if (status != STATUS_SUCCESS || sourceProcess == nullptr)
+        if (NT_SUCCESS(status) && sourceProcess != nullptr)
+        {
+            // Read the view matrix and entity data from the game's memory
+            ReadViewMatrix(sourceProcess);
+            ReadEntityData(sourceProcess);
+
+            // Release process reference
+            ObDereferenceObject(sourceProcess);
+        }
+        else
         {
             // Handle error if the process could not be found
-            DbgPrint("Failed to look up process by process ID\n");
-            continue;
+            DbgPrint("Failed to look up process by process ID: %lu\n", status);
         }
 
-        // Read the view matrix and entity data from the game's memory
-        ReadViewMatrix(sourceProcess);
-        ReadEntityData(sourceProcess);
-
-        // Release process reference
-        ObDereferenceObject(sourceProcess);
-
         // Sleep for a short period to avoid consuming excessive system resources
-        KeDelayExecutionThread(KernelMode, FALSE, reinterpret_cast<PLARGE_INTEGER>(&DELAY_MS));
+        LARGE_INTEGER delayTime = {};
+        delayTime.QuadPart = -((DELAY_MS * 10) / 1000);
+        KeDelayExecutionThread(KernelMode, FALSE, &delayTime);
     }
 }
 
