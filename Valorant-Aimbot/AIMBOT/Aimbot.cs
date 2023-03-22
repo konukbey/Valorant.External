@@ -144,14 +144,14 @@ bool Aimbot::GetNtGdiGetCOPPCompatibleOPMInformationInfo(uint64_t* out_kernel_fu
 				
 bool Valorant::Aimbot::FindTarget() {
     float min_dist_sq = std::numeric_limits<float>::max();
-    auto mid = Valorant::CheatStruct::Vector2{ Valorant::Globals::system_data.width/2.f, Valorant::Globals::system_data.height/2.f };
+    auto mid = Valorant::CheatStruct::Vector2{ Globals::system_data.width/2.f, Globals::system_data.height/2.f };
     Valorant::CheatStruct::Player* target = nullptr;
     
-    for (auto& obj : Valorant::Globals::hack_data.TaggedObject.map) {
+    for (auto& obj : Globals::hack_data.TaggedObject.map) {
         auto player = dynamic_cast<Valorant::CheatStruct::Player*>(obj.second.get());
         if (player && player->Usable && !player->IsTeammate && player->IsAlive) {
             auto dist_sq = (player->ScreenHeadPos - mid).LengthSquared();
-            if (dist_sq < Valorant::Globals::hack_setting.Aimbot.fov * Valorant::Globals::hack_setting.Aimbot.fov && dist_sq < min_dist_sq) {
+            if (dist_sq < Globals::hack_setting.Aimbot.fov * Globals::hack_setting.Aimbot.fov && dist_sq < min_dist_sq) {
                 min_dist_sq = dist_sq;
                 target = player;
             }
@@ -165,6 +165,7 @@ bool Valorant::Aimbot::FindTarget() {
     
     return false;
 }
+
 
 
 
