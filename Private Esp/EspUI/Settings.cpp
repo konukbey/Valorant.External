@@ -1,24 +1,23 @@
 #include "Utils.h"
 
-namespace g_Settings
-{
-	// Menu
-	bool bMenu = false;
-	bool bShutDown = false;
-	PVOID hModule = nullptr;s
+namespace Settings {
+// Aimbot Settings
+bool isAimbotEnabled = false;
+int aimbotMode = 0;
+int aimbotFov = 90;
+int aimbotBone = 0;
+
+// Visual Settings
+bool isLineEnabled = false;
+bool isBoxEnabled = false;
+int minimumRank = 300;
+
+// Entity Settings
+bool isChamsEnabled = true;
+bool isRecoilEnabled = true;
+bool isSpreadEnabled = true;
+float entitySpeed = 175.0f;
+float entityWeaponFov = 1.4f;
+float entityCharacterFov = 1.4f;
 
 
-	// Aimbot
-	bool bAimbot = false;
-	int  iAimbot = false;
-	int  iFov = 90;
-	int  iBone = 0;
-
-	// Entity
-	bool  bChams = true;
-	bool  bRecoil = true;
-	bool  bSpread = true;
-	float  fSpeed = 175.f;
-	float  fWepFov = 1.4;
-	float  fCharFov = 1.4;
-}

@@ -5,8 +5,10 @@
 
 namespace memory
 {
-	static std::pair<std::uintptr_t, std::uint32_t> _memory_module{};
+    // This namespace contains functions related to memory manipulation
 
-	bool initialize( const wchar_t* module_name );
-	std::uintptr_t from_pattern( const char* sig, const char* mask );
+    static std::pair<std::uintptr_t, std::uint32_t> _memory_module{};
+
+    bool initialize( const wchar_t* const module_name );
+    std::uintptr_t from_pattern( const char* const sig, const char* const mask );
 }

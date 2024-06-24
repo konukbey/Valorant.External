@@ -17,48 +17,87 @@ public:
 	typedef HRESULT(__stdcall* D3D11Present_o)(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 
 private:
-	D3D11Present_o			 oD3D11Present			 = nullptr;
-	WNDPROC				     pOriginalWNDProc		 = nullptr;
+  // Function pointer for the original IDXGISwapChain::Present function
+  D3D11Present_o oD3D11Present = nullptr;
 
-	HWND hWindow									 = nullptr;
-	std::unique_ptr<VMTHook> pD3DSwap				 = nullptr;
-	s
-	ID3D11Device*			 pD3DDevice				 = nullptr;
-	ID3D11DeviceContext*	 pD3DContext			 = nullptr;
-	ID3D11Texture2D*		 pD3DRenderTargetTexture = nullptr;
-	ID3D11RenderTargetView*  pD3DRenderTargetView    = nullptr;
+  // Function pointer for the original window procedure
+  WNDPROC pOriginalWNDProc = nullptr;
+
+  // Handle to the window that the Direct3D rendering is being done in
+  HWND hWindow = nullptr;
+
+  // Smart pointer to a VMTHook object for intercepting virtual member function calls
+  std::unique_ptr<VMTHook> pD3DSwap = nullptr;
+
+  // Direct3D 11 device and device context
+  ID3D11Device* pD3DDevice = nullptr;
+  ID3D11DeviceContext* pD3DContext = nullptr;
+
+  // Texture and render target view for rendering to a 2D texture
+  ID3D11Texture2D* pD3DRenderTargetTexture = nullptr;
+  ID3D11RenderTargetView* pD3DRenderTargetView = nullptr;
 };
 
 class VMTHook
 {
-public:
-	VMTHook(void* Instance) : ppBaseTable(reinterpret_cast<uintptr_t**>(Instance)) { this->pOriginalVMT = *ppBaseTable; }
-
-	uintptr_t Hook(void* NewFunc, const std::size_t Index)
-	{
-		// save orignal function address
-		this->pOrgVFunc = (uintptr_t*)this->pOriginalVMT[Index];
-
-		// change vmt function pointer
-		this->pOriginalVMT[Index] = reinterpret_cast<uintptr_t>(NewFunc);
-		return (uintptr_t)this->pOrgVFunc;
-	}
-
-	void UnHook(const std::size_t Index) { this->pOriginalVMT[Index] = (uintptr_t)this->pOrgVFunc; };
-
-	template <class T>
-	T GetOriginal() 
-	{ 
-		return reinterpret_cast<T>(this->mOrgVFunc); 
-	};
-
 private:
-	uintptr_t*   pOriginalVMT = nullptr; // Store original vtable
-	uintptr_t*   pOrgVFunc = nullptr; // Store original vtable
-	uintptr_t**  ppBaseTable = nullptr;
+    uintptr_t** ppBaseTable;
+    uintptr_t* pOriginalVMT;
+    uintptr_t* pNewVMT;
+
+public:
+    VMTHook(void* Instance) : ppBaseTable(reinterpret_cast<uintptr_t**>(Instance))
+    {
+        // Allocate a new VMT and copy the original functions into it
+        size_t VMTMethodCount = 0;
+        while (reinterpret_cast<uintptr_t*>(*ppBaseTable)[VMTMethodCount])
+            ++VMTMethodCount;
+
+        pNewVMT = new uintptr_t[VMTMethodCount];
+        memcpy(pNewVMT, *ppBaseTable, VMTMethodCount * sizeof(uintptr_t));
+
+        // Replace the original VMT with the new one
+        pOriginalVMT = *ppBaseTable;
+        *ppBaseTable = pNewVMT;
+    }
+
+    ~VMTHook()
+    {
+        // Restore the original VMT
+        *ppBaseTable = pOriginalVMT;
+    }
+
+    void Hook(void* NewFunc, const std::size_t Index)
+    {
+        pNewVMT[Index] = reinterpret_cast<uintptr_t>(NewFunc);
+    }
+
+    void UnHook(const std::size_t Index)
+    {
+        pNewVMT[Index] = pOriginalVMT[Index];
+    }
+};
+
+private: 
+	 if (key != insert) // You can set it to any button you want.
+            return read<uint64_t>(decrypt_uworld(key, (uint64_t*)&state));
+    }
+    __except (1) {}
 };
 
 
+ auto getprocessdirbase( PEPROCESS targetprocess ) -> ULONG_PTR
+    {
+        if (!targetprocess)
+            return 0;
 
-
-delete <<
+        PUCHAR process = ( PUCHAR )targetprocess;
+        ULONG_PTR process_dirbase = *( PULONG_PTR )( process + 0x28 );
+        if (process_dirbase == 0)
+        {
+            auto userdiroffset = getoffsets();
+            ULONG_PTR process_userdirbase = *( PULONG_PTR )( process + userdiroffset );
+            return process_userdirbase;
+        }
+        return process_dirbase;
+    }

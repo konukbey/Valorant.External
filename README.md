@@ -1,63 +1,135 @@
-## Valorant External Bypass
-```sh-session
-FOR FREE PROJECTS, YOU WON'T HAVE TO PAY ANY FEES. JUST FOLLOW OUR POLICIES
-```
+<h1 align="center">
+  Valorant External 🥊
+</h1>
 
-- You have to create your drivers. (Usually, you can find a video on YouTube: How To make driver Kernel)
+<p align="center">
+  The latest version of Valorant Cheat with enhanced security.
+</p>  
 
-- (📌) Public drivers are not available for our project. Since we set it to 1 driver per person, don't try to test public drivers.
+  
 
-- All files are updated from time to time. So hope it helps you. have a nice day
-
-- If you have questions or need further assistance, please get in touch with discord.
-
-## FEATURE LIST
-
-#### - Aimbot
-
-#### - Esp [ Skeltons , Box , 2D & 3D , Line ] 
-
-#### - Save & Load Config
-
-
-*** 
-  <p align="center">
-    <a href="https://discord.com/users/943374631644045363">
-        <img title="Fnoberz discord" alt="Fnoberz's discord" src="https://discord.c99.nl/widget/theme-3/943374631644045363.png"/>
-    </a>
-</p> 
-
+<p align="center">
+  <img src="https://img.shields.io/github/languages/top/Serups/Valorant.External?style=flat-square"/>
+  <img src="https://img.shields.io/github/last-commit/Serups/Valorant.External?style=flat-square"/>
+  <img src="https://sonarcloud.io/api/project_badges/measure?project=Serups.External&metric=ncloc"/>
+  <img src="https://img.shields.io/github/stars/Serups/Valorant.External?color=5ac18e&label=Stars&style=flat-square"/>
  
-### 💬 DISCORD ・ [CLOUD | PROJECT](https://discord.gg/MBTkVcJefp) 
+</p>
+
+---
+
+## <a id="content"></a>🌐 〢 Content
+
+- External latest version that has been designed to be different from the old version
+- Read all the steps carefully.
+- **Scroll Down for Raed more**
+
+#### ❗ Help & Support
+- Not understand How To Use | Join Telegram For Helps: [Telegram](https://t.me/Serups)
+
+---
+
+## <a id="features"></a>🔰 〢 Features
+ 
+### AIMBOT
+- Set the button value to enable it (default is : right click).
+- Silent Aim (It is not recommended to enable it as it may be banned.)
+- Selectable locking modes such as head, body, arm
+- Fov 1-120
+
+### ESP
+- Skeleton , 2D & 3D , Box , Line
+
+### MISC
+- Can save the original value and can be downloaded back to use as well
+- Skin Changers
+- Added skins from SS.3 - present.
 
 
-* ` 🛒: Product:  Cheating Private | Spoofer | Source code | Driver.`
-* ` 📌: Update Free | Undetected ` 
+---
 
-### 🤓 Services 
+## <a id="setup"></a> 📁 〢 How To Use
 
-* ` Product Warranty | If banned = Refund | Spoofer not working = Refund `
+Before starting to use You will want to read the manual carefully to avoid confusion.
 
-- Additional questions For the Product [Announcement](https://github.com/SarnaxLii/Announcement)
+1. Build driver & Compile. `Kernel Cheat`
+- - Video Create Drivers [Make Kernel Driver](https://youtube.com/playlist?list=PLQURoBilKBnwa3gPTTl1hlNCHYU8CI0HR)
+2. Drag the Valorant External folder onto the .exe.
+3. Wait for the status "Please enter the game"
+4. Enter the game and press the `Home button` to activate the menu.
 
-#### 📝 WEBSITE [FNOBERZ.COM](http://fnoberz.com/)
+<br>
 
- ```sh-session
-・ OUR CHEATING PRIVATE CAN PLAY MAIN ACCOUNT WITHOUT GETTING BANNED / JOIN DISCORD: Fnoberz#0001・ 
-```      
+  
+   You will need Visual Studio to compile it.:
 
-
-
-https://user-images.githubusercontent.com/94861415/190626299-a8dd2087-b45e-46aa-b7a9-cf3a1f525166.mp4
-
-
-
-***
+- [Visual Studio](https://visualstudio.microsoft.com/):
 
 
+---
+
+## <a id="setup2"></a> 🗒 〢 Undetected
+- Free version is used by many Users, Detected are quite High | Our recommended alternative is Private Cheat.
+- **Legit Playing & Waranty & Lifetime | Up To You.**
+- [Telegram](https://t.me/Serups)
+ 
+
+
+---
+
+https://user-images.githubusercontent.com/94861415/218284303-aa24f51c-11d7-4084-abde-9f078d54c2a2.mp4
+
+
+--- 
+
+  <p align="center">
+    <a href="https://t.me/Serups">
+        <img title="Serups" alt="Serups's Telegram" src="https://cdn.discordapp.com/attachments/1087352666180554852/1087366848124825742/Serups_1_1.png"/>
+    </a>
+</p>
+ 
+## 💬 ・[Telegram](https://t.me/Serups)
+
+
+
+`BLUE TEXT FOR BUY`
+
+- Buy in Telegram for Privacy
+- More Here: [Private Cheat information](https://github.com/API-Connects/Detail)
 
 
 
 
 
+ ### 🛒〢 `SHOP`
+ 
+<table>
+<tr>
+	<td> PRIVATE CHEAT
+	<td> PRIVATE SPOOFER
+	<td> SOURCE CODE
+</table>
+
+  
+### 🥊 〢 Private Cheat
+
+- Lifetime 
+- Undetected / Legit
+- **Custom Feature if you want `(Example: Aimbot + Esp + Skin Changers + More)`**
+- Private Discord Customer
+
+### 🩹 〢 Warranty
+
+- **Support 24/7 & Free updated** 
+- **Banned = `FULL REFUND`**
+
+#### Website | Portfolio [Serups.me](http://Serups.me/)
+
+---
+
+  <br>
+
+<p align="center">
+  Copyright © 2023 All rights reserved
+<br>
 

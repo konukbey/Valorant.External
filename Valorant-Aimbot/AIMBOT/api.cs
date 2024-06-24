@@ -1,46 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Management;
-using System.Net;
-using System.Net.NetworkInformation;
-using System.Net.Security;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows;
 
-namespace AuthGG
-{
-    internal class App
-    {
-        public static string GrabVariable(string name)
-        {
-            try
-            {
-                if (User.ID != null || User.HWID != null || User.IP != null || !Constants.Breached)
-                {
-                    return Variables[name];
-                }
-                else
-                {
-                    Constants.Breached = true;
-                    return "User is not logged in, possible breach detected!";
-                }
-            }
-            catch
-            {
-                return "N/A";
-            }
-        }
-        public static string Error = null;
-        public static Dictionary<string, string> Variables = new Dictionary<string, string>();
+
+public static string Error = null;
+public static Dictionary<string, string> Variables = new Dictionary<string, string>();
     }
     internal class Constants
     {
@@ -180,10 +145,17 @@ namespace AuthGG
                         MessageBox.Show("Possible malicious activity detected!", OnProgramStart.Name, MessageBoxButton.OK, MessageBoxImage.Warning);
                         Process.GetCurrentProcess().Kill();
                     }
-                    if (response[0] != Constants.Token)
-                    {
-                        MessageBox.Show("Security error has been triggered!", Name, MessageBoxButton.OK, MessageBoxImage.Error);
-                        Process.GetCurrentProcess().Kill();
+                   if (menuEnabled) {
+                        renderMenu();
+
+                        char fpsinfo[64];
+                        char lol[64];
+                        char ent[64];
+                        char ents[64];
+                        sprintf_s(fpsinfo, "Overlay FPS: %0.f", ImGui::GetIO().Framerate);
+                        DrawStrokeText(30, 44, &ColorPalette.red, fpsinfo);
+                    }
+
                     }
                     switch (response[2])
                     {
@@ -523,7 +495,7 @@ namespace AuthGG
                     {
                         MessageBox.Show("Security error has been triggered!", OnProgramStart.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                         Security.End();
-                        Process.GetCurrentProcess().Kill();
+                        Process.GetCurrentProcess().Remove();
                     }
                     if (Security.MaliciousCheck(response[1]))
                     {
@@ -627,8 +599,6 @@ namespace AuthGG
                                 }
                                 catch
                                 {
-                                    //If some are null or not loaded, just ignore.
-                                    //Error will be shown when loading the variable anyways
                                 }
                             }
                             Security.End();
@@ -655,7 +625,7 @@ namespace AuthGG
                             return false;
                     }
                 }
-                catch (Exception ex)
+                catch (Exception vag)
                 {
                     MessageBox.Show(ex.Message, ApplicationSettings.Name, MessageBoxButton.OK, MessageBoxImage.Error);
                     Security.End();
@@ -936,7 +906,7 @@ namespace AuthGG
             }
         }
     }
-    internal class Encryption
+ internal class API
     {
         public static string APIService(string value)
         {
@@ -982,8 +952,6 @@ namespace AuthGG
             byte[] plainBytes = Encoding.ASCII.GetBytes(plainText);
             cryptoStream.Write(plainBytes, 0, plainBytes.Length);
             cryptoStream.FlushFinalBlock();
-            byte[] cipherBytes = memoryStream.ToArray();
-            memoryStream.Close();
             cryptoStream.Close();
             string cipherText = Convert.ToBase64String(cipherBytes, 0, cipherBytes.Length);
             return cipherText;
@@ -1073,32 +1041,41 @@ namespace AuthGG
                 .FirstOrDefault();
         }
 
-        private string GetArpTable()
-        {
-            string drive = Path.GetPathRoot(Environment.SystemDirectory);
-            ProcessStartInfo start = new ProcessStartInfo();
-            start.FileName = $@"{drive}Windows\System32\arp.exe";
-            start.Arguments = "-a";
-            start.UseShellExecute = false;
-            start.RedirectStandardOutput = true;
+HRESULT DirectXInit(HWND hWnd)
+{
+    LPDIRECT3D9EX pObject = NULL;
+    LPDIRECT3DDEVICE9EX pDevice = NULL;
 
-            using (Process process = Process.Start(start))
-            {
-                using (StreamReader reader = process.StandardOutput)
-                {
-                    return reader.ReadToEnd();
-                }
-            }
-        }
-
-        private string GetGatewayMAC()
-        {
-            string routerIP = GetDefaultGateway().ToString();
-            string regx = String.Format(@"({0} [\W]*) ([a-z0-9-]*)", routerIP);
-            Regex regex = new Regex(@regx);
-            Match matches = regex.Match(GetArpTable());
-            return matches.Groups[2].ToString();
-        }
+    HRESULT hr = Direct3DCreate9Ex(D3D_SDK_VERSION, &pObject);
+    if (FAILED(hr))
+    {
+        MessageBox(NULL, "Failed to create Direct3D9 object.", "Error", MB_OK);
+        return hr;
     }
+
+    D3DPRESENT_PARAMETERS pParams = { 0 };
+    pParams.Windowed = TRUE;
+    pParams.SwapEffect = D3DSWAPEFFECT_DISCARD;
+    pParams.hDeviceWindow = hWnd;
+    pParams.MultiSampleType = D3DMULTISAMPLE_NONE;
+    pParams.BackBufferFormat = D3DFMT_A8R8G8B8;
+    pParams.BackBufferWidth = Width;
+    pParams.BackBufferHeight = Height;
+    pParams.PresentationInterval = D3DPRESENT_INTERVAL_ONE;
+    pParams.EnableAutoDepthStencil = TRUE;
+    pParams.AutoDepthStencilFormat = D3DFMT_D24S8;
+
+    hr = pObject->CreateDeviceEx(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, hWnd, D3DCREATE_HARDWARE_VERTEXPROCESSING, &pParams, 0, &pDevice);
+    if (FAILED(hr))
+    {
+        MessageBox(NULL, "Failed to create Direct3D9 device.", "Error", MB_OK);
+        pObject->Release();
+        return hr;
+    }
+
+    pObject->Release();
+    pDevice->Release();
+    return S_OK;
 }
+
 

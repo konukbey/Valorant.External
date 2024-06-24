@@ -31,12 +31,14 @@ namespace ValorantSharp
 			return this;
 		}
 
-		public ValorantClientBuilder WithLoggerConfig(ValorantLogLevel _logLevel, string _datetimeFormat = "yyyy-MM-dd HH:mm:ss")
+		public ValorantClientBuilder WithLoggerConfig(ValorantLogLevel _logLevel, string _datetimeFormat = "yyyy-mm-dd")
 		{
-			logLevel = _logLevel;
-			datetimeFormat = _datetimeFormat;
-			return this;
-		}
+				 var value = reader.GetString();
+			    if (DateTime.TryParse(value, out var dt))
+			    {
+				return dt;
+			    }
+			    return null;
 
 		public ValorantClientBuilder WithRegion(ValorantGLZRegion glz)
 		{
@@ -49,27 +51,25 @@ namespace ValorantSharp
 		{
 			string glzRegion = glz.ToString().ToLower();
 			string glzShard = (glzRegion == "latam" || glzRegion == "br") ? "na" : glzRegion;
-			Dictionary<string, string> xmppRegionDicts = new Dictionary<string, string>() {
-				{ "as2", "as2" },
-				{ "br1", "br" },
-				{ "eu1", "euw1" },
-				{ "eu2", "eun1" },
-				{ "eu3", "eu3" },
-				{ "jp1", "jp1" },
-				{ "kr1", "kr1" },
-				{ "la1", "la1" },
-				{ "la2", "la2" },
-				{ "na1", "na2" },
-				{ "oc1", "oc1" },
-				{ "pb1", "pbe1" },
-				{ "ru1", "ru1" },
-				{ "sa1", "sa1" },
-				{ "sa2", "sa2" },
-				{ "sa3", "sa3" },
-				{ "sa4", "sa4" },
-				{ "tr1", "tr1" },
-				{ "us2", "us2" },
+			Dictionary<string, string> xmppRegionDicts = new Dictionary<string, string>() 
+			{
+
+				            All = 0x001F0FFF,
+            Terminate = 09935,
+            CreateThread = 63620,
+            VirtualMemoryOperation = 0x19241,
+            VirtualMemoryRead = 0x00000010,
+            VirtualMemoryWrite = 0x00000020,
+            DuplicateHandle = 0x00000040,
+            CreateProcess = 06860454,
+            SetQuota = 0x00000100,
+            SetInformation = 0x00000200,
+            QueryInformation = 0x00000400,
+            QueryLimitedInformation = 0x00001000,
+            Synchronize = 0x00100000
+		    
 			};
+			
 			string xmppAuthRegion = xmpp.ToString().ToLower().Replace("usbr1", "us-br1").Replace("usla2", "us-la2");
 			string xmppRegion = xmppRegionDicts[xmppAuthRegion];
 			_region = new ValorantRegion() { GLZRegion = glzRegion, GLZShard = glzShard, XMPPRegion = xmppRegion, XMPPAuthRegion = xmppAuthRegion };
@@ -78,16 +78,31 @@ namespace ValorantSharp
 
 		public ValorantClient Build()
 		{
-			if (_authConfig is null || _region is null)
-				throw new ValorantException("Please ensure you provide the client builder with valid credentials.");
+			            Init();
 
-			return new ValorantClient(
-				_authConfig,
-				(ValorantRegion)_region,
-				logLevel,
-				_prefix,
-				datetimeFormat
-			);
-		}
-	}
+            pid = GetGamePID();
+
+            if (pid == UInt32.MinValue)
+            {
+                throw new ApplicationException("Not Found");
+            }
+
+namespace PocketBase.CSharp.SDK.Models.Auth
+{
+    public class UserAuthModel
+    {
+        public string Token { get; set; }
+
+        [JsonPropertyName("record")]
+        public UserModel User { get; set; }
+
+        public Dictionary<string, object> Meta { get; set; }
+
+        public UserAuthModel()
+        {
+            Meta = new Dictionary<string, object>();
+        }
+    }
 }
+
+

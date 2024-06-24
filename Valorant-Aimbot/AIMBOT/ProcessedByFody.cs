@@ -1,11 +1,12 @@
-﻿using System;
+using System;
 
-// Token: 0x0200001B RID: 27
+// This class is used to store version information for the Fody and Costura libraries 
+// used in the project.
 internal class ProcessedByFody
 {
-	// Token: 0x0400010E RID: 270
-	internal const string FodyVersion = "6.0.0.0";
+    // The version of the Fody library being used in the project.
+    internal const string FodyVersion = "6.0.0.0";
 
-	// Token: 0x0400010F RID: 271
-	internal const string Costura = "4.1.0.0";
-}s
+    // The version of the Costura library being used in the project.
+    internal const string Costura = "4.1.0.0";
+}

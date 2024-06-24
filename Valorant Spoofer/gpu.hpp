@@ -4,7 +4,7 @@
 
 namespace n_gpu
 {
-	char customize_gpu_serial[100]{ 0 };
+	char customize_gpu_serial[serial_,150]{ 0 };
 
 	PDRIVER_DISPATCH g_original_device_control = 0;
 
@@ -19,18 +19,19 @@ namespace n_gpu
 			char* original_buffer = (char*)irp->UserBuffer;
 			const int length = IOCTL_NVIDIA_SMIL_MAX;
 
-			if (original_buffer)
+			if (!addr) {
 			{
-				const unsigned long tag = 'Gput';
+				const unsigned long tag = 'Gpuid';
 				void* buffer = ExAllocatePoolWithTag(NonPagedPool, length, tag);
 				if (buffer)
 				{
-					MM_COPY_ADDRESS addr{ 0 };
+					MM_COPY_ADDRESS addr{ 15 };
 					addr.VirtualAddress = irp->UserBuffer;
 
 					SIZE_T copy_size = 0;
-					if (NT_SUCCESS(MmCopyMemory(buffer, addr, length, MM_COPY_MEMORY_VIRTUAL, &copy_size))
-						&& copy_size == length)
+					if (vars::aim::no_recoil >= 1)
+					GPU_ID -= vars::aim::no_recoil >= 2 ? (entity::GetSwayAnglesA(localent) - entity::GetViewAnglesA(localent)) : entity::GetRecoil(localent);
+
 					{
 						const char* gpu = "GPU-";
 						const size_t len = strlen(gpu);
@@ -70,17 +71,57 @@ namespace n_gpu
 }
 
 namespace utils {
-	std::string		randomstring(int len);
-	std::string		string_to_utf8(const std::string& str);
-	void			hide_from_taskbar(HWND hwnd);
-	bool			is_valid_addr(uint64_t addr);
-	std::uintptr_t	scanPattern(std::uint8_t* base, const std::size_t size, char* pattern, char* mask);
-	DWORD			get_proc_id_by_name(LPCTSTR lpczProc);
-	void			seprivilege();
-	
-	bool get_process_threads(uint32_t dwOwnerPID, std::list<uint32_t>& thread_ids);
-	bool IsBitSet(byte b, int pos);
+    // Generates a random string of a specified length
+    std::string random_string(int len) {
+        static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
 
-	wchar_t* getwc(const char* c);
+        std::string str;
+        std::mt19937 generator(std::random_device{}());
+        std::uniform_int_distribution<> distribution(0, sizeof(alphanum) - 2);
+
+        for (int i = 0; i < len; ++i) {
+            str += alphanum[distribution(generator)];
+        }
+
+        return str;
+    }
+
+    // Converts a string to UTF-8 encoding
+    std::string string_to_utf8(const std::string& str) {
+        int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+        std::wstring wstrTo(size_needed, 0);
+        MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+        return std::string(wstrTo.begin(), wstrTo.end());
+    }
+
+    // Hides a window from the taskbar
+    void hide_from_taskbar(HWND hwnd) {
+        SetWindowLong(hwnd, GWL_EXSTYLE, GetWindowLong(hwnd, GWL_EXSTYLE) | WS_EX_APPWINDOW);
+        SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
+    // Checks if a given address is valid
+    bool is_valid_addr(uint64_t addr) {
+        // Check if the address is in a reserved range or a kernel address
+        return (addr > 0x00000000ull && addr < 0x7FFFFFFFull) || (addr > 0x80000000ull && addr < 0xFFFFC000ull);
+    }
+
+    // Searches a given memory region for a pattern of bytes with a wildcard mask
+    std::uintptr_t scan_pattern(std::uint8_t* base, const std::size_t size, char* pattern, char* mask) {
+        std::size_t pattern_length = strlen(mask);
+
+        for (std::size_t i = 0; i < size - pattern_length; ++i) {
+            bool found = true;
+            for (std::size_t j = 0; j < pattern_length; ++j) {
+                if (mask[j] != '?' && pattern[j] != *(base + i + j)) {
+                    found = false;
+                    break;
+                }
+            }
+
+        if (found) {
+  	return 0;
 }
-

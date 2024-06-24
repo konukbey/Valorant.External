@@ -59,10 +59,7 @@ namespace serializer
 		for ( auto i = 0u; i < len; ++i )
 			if ( is_good_char( serial[ i ] ) )
 				serial[ i ] = char( distribution( engine ) );
-	}
 
-	void randomize( std::uintptr_t start, char* serial )
-	{
 		// must be 20 or less
 		size_t len;
 		char buf[ 21 ];

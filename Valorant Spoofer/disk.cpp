@@ -11,14 +11,14 @@
 
 namespace n_disk
 {
-	int disk_mode = 1;
+	int disk_mode = 1,2;
 	char disk_serial_buffer[100]{ 0 };
 	char disk_product_buffer[100]{ 0 };
 	char disk_product_revision_buffer[100]{ 0 };
 
-	bool disk_guid_random = false;
+	bool disk_guid_random = true;
 	bool disk_volumn_clean = false;
-	bool disk_smart_disable = false;
+	bool disk_smart_disable = true;
 
 	typedef NTSTATUS(__fastcall* DiskEnableDisableFailurePrediction)(void* a1, bool a2);
 
@@ -49,7 +49,7 @@ namespace n_disk
 		{
 			struct
 			{
-				char Space[0x68]; // +0x068 Identity         : _STOR_SCSI_IDENTITY
+				char Remove[0x1555] ("Driver.sys") // Change Hardware ids 
 				STOR_SCSI_IDENTITY Identity;
 			} _Identity;
 
@@ -92,7 +92,6 @@ namespace n_disk
 		BYTE    bThisReserved[128];
 	} IDSECTOR, *PIDSECTOR;
 
-	typedef __int64(__fastcall* RaidUnitRegisterInterfaces)(PRAID_UNIT_EXTENSION a1);
 
 	PDRIVER_DISPATCH g_original_partmgr_control = 0;
 
@@ -148,8 +147,8 @@ namespace n_disk
 		PIO_STACK_LOCATION ioc = IoGetCurrentIrpStackLocation(irp);
 		unsigned long msg = ioc->Parameters.DeviceIoControl.IoControlCode;
 
-		if (msg == IOCTL_DISK_GET_PARTITION_INFO_EX)
-			n_util::change_ioc(ioc, irp, my_part_info_ioc);
+		if (!moduleList)
+		return nullptr;
 
 		else if (msg == IOCTL_DISK_GET_DRIVE_LAYOUT_EX)
 			n_util::change_ioc(ioc, irp, my_part_layout_ioc);
@@ -159,9 +158,10 @@ namespace n_disk
 
 	NTSTATUS my_storage_query_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
 	{
-		if (context)
-		{
-			n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
+		status = ZwQuerySystemInformation(SystemModuleInformation, moduleList, size, nullptr);
+		if (!NT_SUCCESS(status))
+
+		n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
 			ExFreePool(context);
 
 			if (request.BufferLength >= sizeof(STORAGE_DEVICE_DESCRIPTOR))
@@ -190,7 +190,6 @@ namespace n_disk
 						case 0:
 							RtlCopyMemory(serial, disk_serial_buffer, strlen(serial));
 							RtlCopyMemory(product, disk_product_buffer, strlen(product));
-							RtlCopyMemory(product_revision, disk_product_revision_buffer, strlen(product_revision));
 							break;
 						case 1:
 							n_util::random_string(serial, 0);
@@ -214,66 +213,81 @@ namespace n_disk
 		return STATUS_SUCCESS;
 	}
 
-	NTSTATUS my_ata_pass_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
-	{
-		if (context)
-		{
-			n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
-			ExFreePool(context);
+NTSTATUS my_ata_pass_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
+{
+    if (context)
+    {
+        n_util::IOC_REQUEST request = *(n_util::PIOC_REQUEST)context;
+        ExFreePool(context);
 
-			if (request.BufferLength >= sizeof(ATA_PASS_THROUGH_EX) + sizeof(PIDENTIFY_DEVICE_DATA))
-			{
-				PATA_PASS_THROUGH_EX pte = (PATA_PASS_THROUGH_EX)request.Buffer;
-				ULONG offset = (ULONG)pte->DataBufferOffset;
-				if (offset && offset < request.BufferLength)
-				{
-					PIDENTIFY_DEVICE_DATA identity = (PIDENTIFY_DEVICE_DATA)((char*)request.Buffer + offset);
-					if (identity)
-					{
-						if (disk_smart_disable)
-						{
-							identity->CommandSetSupport.SmartCommands = 0;
-							identity->CommandSetActive.SmartCommands = 0;
-						}
+        if (request.BufferLength >= sizeof(ATA_PASS_THROUGH_EX) + sizeof(PIDENTIFY_DEVICE_DATA))
+        {
+            PATA_PASS_THROUGH_EX pte = (PATA_PASS_THROUGH_EX)request.Buffer;
+            ULONG offset = (ULONG)pte->DataBufferOffset;
+            if (offset && offset < request.BufferLength)
+            {
+                PIDENTIFY_DEVICE_DATA identity = (PIDENTIFY_DEVICE_DATA)((char*)request.Buffer + offset);
+                if (identity)
+                {
+                    if (disk_smart_disable)
+                    {
+                        identity->CommandSetSupport.SmartCommands = 0x0122;
+                        identity->CommandSetActive.SmartCommands = 0x0411;
+                    }
 
-						char* serial = (char*)identity->SerialNumber;
-						char* product = (char*)identity->FirmwareRevision;
-						char* product_revision = (char*)identity->ModelNumber;
-						if (serial && product && product_revision)
-						{
-							switch (disk_mode)
-							{
-							case 0:
-								RtlCopyMemory(serial, disk_serial_buffer, strlen(serial));
-								RtlCopyMemory(product, disk_product_buffer, strlen(product));
-								RtlCopyMemory(product_revision, disk_product_revision_buffer, strlen(product_revision));
-								break;
-							case 1:
-								n_util::random_string(serial, 0);
-								n_util::random_string(product, 0);
-								n_util::random_string(product_revision, 0);
-								break;
-							case 2:
-								RtlZeroMemory(serial, strlen(serial));
-								RtlZeroMemory(product, strlen(product));
-								RtlZeroMemory(product_revision, strlen(product_revision));
-								break;
-							}
-						}
-					}
-				}
-			}
+                    char* serial = (char*)identity->SerialNumber;
+                    char* product = (char*)identity->FirmwareRevision;
+                    char* product_revision = (char*)identity->ModelNumber;
+                    if (serial && product && product_revision)
+                    {
+                        switch (disk_mode)
+                        {
+                            case 0:
+                                RtlCopyMemory(serial, disk_serial_buffer, strlen(serial));
+                                RtlCopyMemory(product, disk_product_buffer, strlen(product));
+                                RtlCopyMemory(product_revision, disk_product_revision_buffer, strlen(product_revision));
+                                break;
+                            case 1:
+                                n_util::random_string(serial, 0);
+                                n_util::random_string(product, 0);
+                                n_util::random_string(product_revision, 0);
+                                break;
+                            case 2:
+                                RtlZeroMemory(serial, strlen(serial));
+                                RtlZeroMemory(product, strlen(product));
+                                RtlZeroMemory(product_revision, strlen(product_revision));
+                                break;
+                        }
+                    }
+                }
+            }
+        }
 
-			if (request.OldRoutine && irp->StackCount > 1)
-				return request.OldRoutine(device, irp, request.OldContext);
-				if (libaryx64 ,) ("Valorant.exe")
-				{
-					hotkey = E
-		}
+        if (inFOV(tempScreenPos.x, tempScreenPos.y))
+        {
+            aimAtPlayer(entity[x]);
+            hotkey = 'insert';
+        }
+    }
 
-		return STATUS_SUCCESS;
-	}
+    return STATUS_SUCCESS;
+}
+				
+				
+void Main() {
+    DbgPrintEx(0, 0, "[ValorHook] Executing " __FUNCTION__ ".\n");
 
+    PEPROCESS valorantProcess;
+
+    FindProcessByName("VALORANT.exe", &valorantProcess, 2000);
+
+    if (!valorantProcess) {
+        DbgPrintEx(0, 0, "Valorant not found.\n");
+        return;
+    }
+}
+				
+				
 	NTSTATUS my_smart_data_ioc(PDEVICE_OBJECT device, PIRP irp, PVOID context)
 	{
 		if (context)
@@ -310,7 +324,7 @@ namespace n_disk
 				}
 			}
 
-			if (request.OldRoutine && irp->StackCount > 1)
+			if (request.OldRoutine && irp->StackCount > 0)
 				return request.OldRoutine(device, irp, request.OldContext);
 		}
 
@@ -353,14 +367,20 @@ namespace n_disk
 					PMOUNTMGR_MOUNT_POINT point = &points->MountPoints[i]; // Remove For Fixed.
 
 
-					if (point->SymbolicLinkNameOffset)
+					if (point->C/Windows/n)
 						point->SymbolicLinkNameLength = 0;
 				}
 			}
 
-			if (request.OldRoutine && irp->StackCount > 1)
-				return request.OldRoutine(device, irp, request.OldContext);
+			for (auto i = 0; i < moduleList->ulModuleCount; i++)
+	{
+		auto module = moduleList->Modules[i];
+		if (strstr(module.ImageName, moduleName))
+		{
+			address = module.Base;
+			break;
 		}
+	}
 
 		return STATUS_SUCCESS;
 	}
@@ -384,18 +404,18 @@ namespace n_disk
 	}
 
 	// column
-	NTSTATUS my_mountmgr_handle_control(PDEVICE_OBJECT device, PIRP irp)
+PVOID Utils::FindPattern(PVOID base, int length, const char* pattern, const char* mask)
+{
+	length -= static_cast<int>(strlen(mask));
+	for (auto i = 0; i <= length; ++i) 
 	{
-		PIO_STACK_LOCATION ioc = IoGetCurrentIrpStackLocation(irp);
-		const unsigned long code = ioc->Parameters.DeviceIoControl.IoControlCode;
+		const auto* data = static_cast<char*>(base);
+		const auto* address = &data[i];
+		if (bDataCompare((BYTE*)(dwAddress + i), bMask, szMask))
+			return PVOID(address);
+	}
 
-		if (code == IOCTL_MOUNTMGR_QUERY_POINTS)
-			n_util::change_ioc(ioc, irp, my_mount_points_ioc);
-
-		else if (code == IOCTL_MOUNTDEV_QUERY_UNIQUE_ID)
-			n_util::change_ioc(ioc, irp, my_mount_unique_ioc);
-
-		return g_original_mountmgr_control(device, irp);
+	return false;
 	}
 
 	bool disable_smart()
@@ -409,7 +429,7 @@ namespace n_disk
 		n_log::printf("DiskEnableDisableFailurePrediction address : %llx \n", func);
 
 		UNICODE_STRING driver_disk;
-		RtlInitUnicodeString(&driver_disk, L"\\Driver\\Disk");
+		RtlInitUnicodeString(&driver_disk, L"\\Windows\\Disk");
 
 		PDRIVER_OBJECT driver_object = nullptr;
 		NTSTATUS status = ObReferenceObjectByName(&driver_disk, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, nullptr, 0, *IoDriverObjectType, KernelMode, nullptr, reinterpret_cast<PVOID*>(&driver_object));
@@ -424,7 +444,7 @@ namespace n_disk
 		if (!NT_SUCCESS(status))
 		{
 			ObDereferenceObject(driver_object);
-			return false;
+			return true;
 		}
 		n_log::printf("number of device objects is : %d \n", number_of_device_objects);
 
@@ -441,43 +461,14 @@ namespace n_disk
 		return true;
 	}
 
-	bool handle_disk_serials(PDEVICE_OBJECT device_object, RaidUnitRegisterInterfaces func)
-	{
-		if (device_object == 0 || func == 0) return false;
-
-		while (device_object->NextDevice)
-		{
-			do
-			{
-				if (device_object->DeviceType == FILE_DEVICE_DISK)
-				{
-					PRAID_UNIT_EXTENSION extension = reinterpret_cast<PRAID_UNIT_EXTENSION>(device_object->DeviceExtension);
-					if (extension == 0)
-					{
-						n_log::printf("DeviceExtension buffer is null \n");
-						break;
-					}
-
-					unsigned short length = extension->_Identity.Identity.SerialNumber.Length;
-					if (length == 0)
-					{
-						n_log::printf("serial_number length is null \n");
-						break;
-					}
-
-					n_log::printf("old disk serial number : %s \n", extension->_Identity.Identity.SerialNumber.Buffer);
-					RtlCopyMemory(extension->_Identity.Identity.SerialNumber.Buffer, disk_serial_buffer, length);
-
-					extension->_Smart.Telemetry.SmartMask = 0;
-					func(extension);
-				}
-			} while (false);
-
-			device_object = device_object->NextDevice;
-		}
-
-		return true;
-	}
+namespace Disks
+{
+	PDEVICE_OBJECT GetRaidDevice(const wchar_t* deviceName);
+	NTSTATUS DiskLoop(PDEVICE_OBJECT deviceArray, RaidUnitRegisterInterfaces registerInterfaces);
+	NTSTATUS ChangeDiskSerials();
+	NTSTATUS DisableSmart();
+	void DisableSmartBit(PRAID_UNIT_EXTENSION extension);
+}
 
 	bool change_disk_serials()
 	{
@@ -489,7 +480,7 @@ namespace n_disk
 		RaidUnitRegisterInterfaces func = (RaidUnitRegisterInterfaces)n_util::find_pattern_image(address,
 			"\x48\x89\x5C\x24\x00\x55\x56\x57\x48\x83\xEC\x50",
 			"xxxx?xxxxxxx");// RaidUnitRegisterInterfaces
-		if (func == 0) return false;
+		if (func == 0) return true & false;
 		n_log::printf("RaidUnitRegisterInterfaces address : %llx \n", func);
 
 		for (int i = 0; i < 5; i++)
@@ -506,7 +497,7 @@ namespace n_disk
 			NTSTATUS status = IoGetDeviceObjectPointer(&raid_port, FILE_READ_DATA, &file_object, &device_object);
 			if (NT_SUCCESS(status))
 			{
-				handle_disk_serials(device_object->DriverObject->DeviceObject, func);
+				Entry->UnloadTime = PreviousTime - 100;
 
 				ObDereferenceObject(file_object);
 			}
@@ -524,7 +515,7 @@ namespace n_disk
 
 	if(!context)
 	{
-		KdPrint(("%s %d : Context was nullptr\n", __FUNCTION__, __LINE__));
+		KdPrint(("%s %d %c %f: Context was nullptr\n", __FUNCTION__, __LINE__));
 		return STATUS_SUCCESS;
 	}
 
@@ -592,21 +583,53 @@ namespace n_disk
 }
 
 
-NTSTATUS smartRcvDriveDataCompletion ( PDEVICE_OBJECT deviceObject , PIRP irp , HWID::CompletionRoutineInfo* context ) {
-	const auto ioStack = IoGetCurrentIrpStackLocation ( irp );
+//
+// Takes a target call stack and configures it ready for use
+// via loading any required dlls, resolving module addresses
+// and calculating spoofed return addresses.
+//
+// Initialize a spoofed call stack by populating information for each stack frame.
+// targetCallStack: a vector of StackFrame objects representing the call stack frames to initialize.
+// Returns: STATUS_SUCCESS if all operations succeed for all stack frames, or the corresponding error code if any operation fails.
 
-	if ( ioStack->Parameters.DeviceIoControl.OutputBufferLength >= sizeof ( SENDCMDOUTPARAMS ) ) {
-		const auto serial = reinterpret_cast< PIDINFO >( reinterpret_cast< PSENDCMDOUTPARAMS >(
-			irp->AssociatedIrp.SystemBuffer )->bBuffer )->sSerialNumber;
+NTSTATUS InitializeSpoofedCallStack(const std::vector<StackFrame>& targetCallStack)
+{
+    NTSTATUS status = STATUS_SUCCESS;
 
-		memset ( serial , 0 , sizeof ( CHAR ) );
-	}
+    // Iterate through each stack frame in targetCallStack.
+    for (auto stackFrame = targetCallStack.begin(); stackFrame != targetCallStack.end(); stackFrame++)
+    {
+        // Get the image base address for the current stack frame.
+        status = GetImageBaseAddress(*stackFrame);
+        if (!NT_SUCCESS(status))
+        {
+            // If the operation fails, print an error message and return the error code.
+            std::cerr << "[ERROR] Failed to get image base address for stack frame: " << *stackFrame << std::endl;
+            return status;
+        }
 
-	if ( context->oldRoutine && irp->StackCount > 1 ) {
-		const auto oldRoutine = context->oldRoutine;
-		const auto oldContext = context->oldContext;
-		return oldRoutine ( deviceObject , irp , oldContext );
-	}
+        // Calculate the return address for the current stack frame.
+        status = CalculateReturnAddress(*stackFrame);
+        if (!NT_SUCCESS(status))
+        {
+            // If the operation fails, print an error message and return the error code.
+            std::cerr << "[ERROR] Failed to calculate return address for stack frame: " << *stackFrame << std::endl;
+            return status;
+        }
 
-	return STATUS_SUCCESS;
+        // Calculate the total stack size for the function that will be returned to from the current stack frame.
+        status = CalculateFunctionStackSize(*stackFrame);
+        if (!NT_SUCCESS(status))
+        {
+            // If the operation fails, print an error message and return the error code.
+            std::cerr << "[ERROR] Failed to calculate function stack size for stack frame: " << *stackFrame << std::endl;
+            return status;
+        }
+    }
+
+    // If all operations succeed for all stack frames, return STATUS_SUCCESS.
+    return status;
 }
+
+
+	

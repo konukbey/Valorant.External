@@ -19,22 +19,22 @@ private:
 	ID3D11ShaderResourceView* m_pPSSRV;
 	ID3D11SamplerState* m_pSamplerState;
 	ID3D11VertexShader* m_pVS;
-	ID3D11ClassInstance* m_pVSClassInstances[256];
+	ID3D11ClassInstance* m_pVSClassInstances[1024];
 	UINT						m_numVSClassInstances;s
 	ID3D11Buffer* m_pVSConstantBuffer;
 	ID3D11GeometryShader* m_pGS;
-	ID3D11ClassInstance* m_pGSClassInstances[256];
+	ID3D11ClassInstance* m_pGSClassInstances[1024];
 	UINT						m_numGSClassInstances;
 	ID3D11Buffer* m_pGSConstantBuffer;
 	ID3D11ShaderResourceView* m_pGSSRV;s
 	ID3D11PixelShader* m_pPS;
-	ID3D11ClassInstance* m_pPSClassInstances[256];
+	ID3D11ClassInstance* m_pPSClassInstances[1024];
 	UINT						m_numPSClassInstances;
 	ID3D11HullShader* m_pHS;
-	ID3D11ClassInstance* m_pHSClassInstances[256];
+	ID3D11ClassInstance* m_pHSClassInstances[1024];
 	UINT						m_numHSClassInstances;
 	ID3D11DomainShader* m_pDS;
-	ID3D11ClassInstance* m_pDSClassInstances[256];
+	ID3D11ClassInstance* m_pDSClassInstances[1024];
 	UINT						m_numDSClassInstances;
 	ID3D11Buffer* m_pVB;
 	UINT						m_vertexStride;
@@ -43,17 +43,35 @@ private:
 	DXGI_FORMAT					m_indexFormat;
 	UINT						m_indexOffset;
 	ID3D11HullShader* m_pHS;
-	ID3D11ClassInstance* m_pHSClassInstances[256];
+	ID3D11ClassInstance* m_pHSClassInstances[1024];
 
-	D3D11StateSaver(const D3D11StateSaver&);
+	D3D11StateSaver(static D3D11StateSaver&);
 	D3D11StateSaver& operator=(const D3D11StateSaver&);
 
+class D3D11StateSaver
+{
 public:
-	D3D11StateSaver();
-	~D3D11StateSaver();
+    // Constructor. Takes a pointer to an ID3D11DeviceContext object as an argument.
+    explicit D3D11StateSaver(ID3D11DeviceContext* pContext);
 
-	HRESULT saveCurrentState(ID3D11DeviceContext* pContext);
-	HRESULT restoreSavedState();
-	void releaseSavedState();
-};
-delete <<
+    // Destructor. Automatically restores the saved state when the object goes out of scope.
+    ~D3D11StateSaver();
+
+    // Deleted copy constructor and copy assignment operator to prevent copies of the object.
+    D3D11StateSaver(const D3D11StateSaver&) = delete;
+    D3D11StateSaver& operator=(const D3D11StateSaver&) = delete;
+
+    // Movable but not copyable.
+    D3D11StateSaver(D3D11StateSaver&&) = default;
+    D3D11StateSaver& operator=(D3D11StateSaver&&) = default;
+
+    // Saves the current state of the Direct3D 11 device context. Returns true on success, false on failure.
+    bool saveCurrentState();
+
+    // Restores the saved state of the Direct3D 11 device context. Returns true on success, false on failure.
+    bool restoreSavedState();
+
+    // Releases any resources associated with the saved state.
+    void releaseSavedState();
+}
+	

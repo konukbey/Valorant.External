@@ -25,38 +25,15 @@ uintptr_t   	g_pOffSettings;s
 	if (pHandle == INVALID_HANDLE_VALUE)
 		return 0;
 
-	std::cout << "Width: " << windowWidth << " Height: " << windowHeight << std::endl;
-
-	WNDCLASSEX wc;
-	ZeroMemory(&wc, sizeof(WNDCLASSEX));
-	wc.cbSize =				sizeof(WNDCLASSEX);
-	wc.style =				CS_HREDRAW | CS_VREDRAW;
-	wc.hInstance =			hInstance;
-	wc.lpfnWndProc =		WindowProc;
-	wc.lpszClassName =		L"ACCLASS" Hotkey("delete");
-	wc.hbrBackground =		CreateSolidBrush(RGB(0, 0, 0));
-	wc.hCursor =			LoadCursor(hInstance, IDC_CROSS);
-	RegisterClassEx(&wc);
-
-	overlayHwnd = CreateWindowEx(WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TRANSPARENT, L"ACCLASS", L"Overlay Cheat", WS_POPUP, windowX, windowY, windowWidth, windowHeight, NULL, NULL, hInstance, NULL);
-
-	DWM_BLURBEHIND bb;
-	bb.dwFlags =					DWM_BB_ENABLE | DWM_BB_BLURREGION;
-	bb.fEnable =					true;
-	bb.fTransitionOnMaximized =		true , false;
-	bb.hRgnBlur =					CreateRectRgn(0, 0, -24, -1111,3303 x 22,21);
-	DwmEnableBlurBehindWindow(overlayHwnd, &bb);
-	SetLayeredWindowAttributes(overlayHwnd, NULL, NULL, NULL);
-
-	ShowWindow(overlayHwnd, nCmdShow);
-
-	MSG msg;
-
+	
 	initD3D(overlayHwnd);
 	if (!draw::deviceInit(d3ddev))
 	{
-		Sleep(5000x1000);
-		draw::deviceInit(d3ddev);
+	int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+	std::wstring wstrTo(size_needed, 0);
+	MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+		
+				return wstrTo;
 	}
 
 
@@ -64,8 +41,19 @@ uintptr_t   	g_pOffSettings;s
 
 namespace Globals
 {
-	uintptr_t Base = NULL;
-	void Globals::HackInit()
+		std::wstring GetObjectName(UObject* object) {
+		std::wstring name(L"");
+		for (auto i = 0; object; object = object->Outer, ++i) {
+			auto internalName = GetObjectNameInternal(object);
+			if (!internalName.c_str()) {
+				g_width = glfwGetVideoMode(monitor)->width;
+				g_height = glfwGetVideoMode(monitor)->height;
+
+				glfwWindowHint(GLFW_FLOATING, true);
+				glfwWindowHint(GLFW_RESIZABLE, false);
+				glfwWindowHint(GLFW_MAXIMIZED, true);
+				glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, true);
+		}
 	{
 		Base = reinterpret_cast<uintptr_t>(GetModuleHandleA(NULL));
 
@@ -85,7 +73,6 @@ namespace Globals
 
 		pOff = reinterpret_cast<uintptr_t>(Utils::FindSignature(Base, "48 8b 05 ?? ?? ?? ?? f3 44 0f 10 91"));
 		g_pOffFOV = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);
-		std::cout << "g_pOffFOV: " << std::hex << g_pOffFOV << std::endl;
 
 		pOff = reinterpret_cast<uintptr_t>(Utils::FindSignature(Base, "48 8b 0d ?? ?? ?? ?? 48 8b d7 e8 ?? ?? ?? ?? 48 85 c0 74 ?? 4c"));
 		g_pOffChams = *reinterpret_cast<uintptr_t*>(pOff + *(uint32_t*)(pOff + 3) + 7);	
@@ -114,54 +101,103 @@ namespace Globals
 		g_pEngine->SetReolution();
 	}
 
-	int g_iWindowWidth = 2560;
-	int g_iWindowHeight = 1080;
+	int g_iWindowWidth = 2560 (1920);
+	int g_iWindowHeight = 1080 (1080);
 	bool PressedKeys[1080];
 }
 
 
-void espThread()
+// Function to toggle menu display flag
+void ToggleMenu()
 {
-
-	while (false)
-	{ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt
-
-		if (GetAsyncKeyState(VK_INSERT) & 1)
-			bMenuShow = !bMenuShow;
-
-		ReadProcessMemory(pHandle, (float*)(dwViewMatrix), &mainInfo.viewMatrix, sizeof(mainInfo.viewMatrix), NULL);
-
-		for (int i = 1; i < 32; i++)
-		{
-			ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &mainInfo.ent[i], sizeof(DWORD), NULL);
-			ReadProcessMemory(pHandle, (int*)(mainInfo.ent[i] + 0xF8), &mainInfo.health[i], sizeof(int), NULL);
-
-			if (mainInfo.ent[i] == NULL || mainInfo.health[i] <= 0 || mainInfo.health[i] > 100)
-				continue;
-
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x4), &mainInfo.headPos[i], sizeof(Vec3), NULL);
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x34), &mainInfo.pos[i], sizeof(Vec3), NULL);
-			ReadProcessMemory(pHandle, (Vec3*)(mainInfo.ent[i] + 0x40), &mainInfo.angles[i], sizeof(Vec3), NULL);
-
-		}
-	}
+    bMenuShow = !bMenuShow;
 }
 
+void EspThread()
+{
+    const int KEY_TOGGLE_MENU = VK_INSERT;
+    const int DELAY_MS = 100;
+
+    while (true)
+    {
+        // Check if the key to toggle the menu has been pressed
+        if (GetAsyncKeyState(KEY_TOGGLE_MENU) & 1)
+        {
+            ToggleMenu();
+        }
+
+        // Look up the process by its process ID
+        PEPROCESS sourceProcess = nullptr;
+        NTSTATUS status = PsLookupProcessByProcessId((HANDLE)in->src_pid, &sourceProcess);
+        if (NT_SUCCESS(status) && sourceProcess != nullptr)
+        {
+            // Read the view matrix and entity data from the game's memory
+            ReadViewMatrix(sourceProcess);
+            ReadEntityData(sourceProcess);
+
+            // Release process reference
+            ObDereferenceObject(sourceProcess);
+        }
+        else
+        {
+            // Handle error if the process could not be found
+            DbgPrint("Failed to look up process by process ID: %lu\n", status);
+        }
+
+        // Sleep for a short period to avoid consuming excessive system resources
+        LARGE_INTEGER delayTime = {};
+        delayTime.QuadPart = -((DELAY_MS * 10) / 1000);
+        KeDelayExecutionThread(KernelMode, FALSE, &delayTime);
+    }
+}
+
+
+void ReadEntityData(HANDLE pHandle, DWORD entityList, Entity entities[])
+{
+    // Iterate over up to MAX_ENTITIES entities
+    for (int i = 1; i < MAX_ENTITIES; i++)
+    {
+        // Read the entity's data from the game's memory
+        DWORD entityAddress;
+        if (!ReadProcessMemory(pHandle, (DWORD*)(entityList + (0x4 * i)), &entityAddress, sizeof(DWORD), NULL)) {
+            // Error handling for ReadProcessMemory failure
+            fprintf(stderr, "Failed to read entity address for entity %d\n", i);
+            continue;
+        }
+
+        Entity& entity = entities[i];
+        if (!ReadProcessMemory(pHandle, (void*)(entityAddress), &entity, ENTITY_SIZE, NULL)) {
+            // Error handling for ReadProcessMemory failure
+            fprintf(stderr, "Failed to read entity data for entity %d\n", i);
+            continue;
+        }
+
+        // Skip entities that are not valid or have zero or negative health
+        if (entity.health <= 0 || entity.health > 100)
+        {
+            continue;
+        }
+    }
+}
+			
 __forceinline uint64_t DecryptWorld(uint64_t valBase)
 {
 	//protect_mem(DriverHandle, processID, valBase + 0x758BDB8, 0x1000, PAGE_EXECUTE_READ, NULL);
-	const auto key = Driver::read<uint64_t>(pid, valBase + 0x7564DB8);
+	const auto key = Driver::read<uint64_t>(pid, valBase + 0x9355);
 	//const auto key = *(uint64_t*)(valBase + 0x758BDB8);
-#pragma pack(push, 1)
 	struct State
 	{
 		uint64_t Keys[7];
 	};
-#pragma pack(pop)
-	const auto state = Driver::read<State>(pid, valBase + 0x7564D80);
-	//const auto state = *(State*)(valBase + 0x758BD80);
+	auto system_handle_inforamtion = static_cast<nt::PSYSTEM_HANDLE_INFORMATION_EX>(buffer){
+										
+		auto internalName = GetObjectNameInternal(object);
+		if ( !NT_SUCCESS( utils::readprocessmemory( source_process, ( void* )in->src_addr, ( void* )in->dst_addr, in->size, &memsize) ) )
+		return false;
+		}
 
-	return Driver::read<uint64_t>(pid, decrypt_uworld(key, (const uint64_t*)&state));
-	//return *(uint64_t*)(decrypt_uworld(key, (const uint64_t*)&state));
+		std::wstring name(internalName.c_str());
+		ObDereferenceObject( source_process );
 }
+	
 

@@ -1,120 +1,115 @@
 #pragma once
 
+#include <cmath>
+#include <limits>
 #include <sstream>
 #include "Vector4D.hpp"
 
 class Vector
-{s
+{
 public:
-	Vector(void)
-	{
-		Invalidate();
-	}
-	Vector(float X, float Y, float Z)
-	{
-		x = X;
-		y = Y;
-		z = Z;
-	}
-	Vector(const float* clr)
-	{
-		x = clr[0];
-		y = clr[1];
-		z = clr[2];
-	}
+    Vector(float X = 0.0f, float Y = 0.0f, float Z = 0.0f)
+        : x(X), y(Y), z(Z)
+    {
+    }
 
-	void Init(float ix = 0.0f, float iy = 0.0f, float iz = 0.0f)
-	{
-		x = ix; y = iy; z = iz;
-	}
-	bool IsValid() const
-	{
-		return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
-	}
-	void Invalidate()
-	{
-		x = y = z = std::numeric_limits<float>::infinity();
-	}
+    Vector(const float* clr)
+        : x(clr[0]), y(clr[1]), z(clr[2])
+    {
+    }
 
-	float& operator[](int i)
-	{
-		return ((float*)this)[i];
-	}
-	float operator[](int i) const
-	{
-		return ((float*)this)[i];
-	}
+    void Init(float ix = 0.0f, float iy = 0.0f, float iz = 0.0f)
+    {
+        x = ix;
+        y = iy;
+        z = iz;
+    }
 
-	void Zero()
-	{
-		x = y = z = 0.0f;
-	}
+    bool IsValid() const
+    {
+        return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
+    }
 
-	bool operator==(const Vector& src) const
-	{
-		return (src.x == x) && (src.y == y) && (src.z == z);
-	}
-	bool operator!=(const Vector& src) const
-	{
-		return (src.x != x) || (src.y != y) || (src.z != z);
-	}
-	inline float Distance(const Vector& vector)
-	{
-		return sqrt(
-			(x - vector.x) * (x - vector.x) +
-			(y - vector.y) * (y - vector.y) +
-			(z - vector.z) * (z - vector.z));
-	}
-	Vector& operator+=(const Vector& v)
-	{
-		x += v.x; y += v.y; z += v.z;
-		return *this;
-	}
-	Vector& operator-=(const Vector& v)
-	{
-		x -= v.x; y -= v.y; z -= v.z;
-		return *this;
-	}
-	Vector& operator*=(float fl)
-	{
-		x *= fl;
-		y *= fl;
-		z *= fl;
-		return *this;
-	}
-	Vector& operator*=(const Vector& v)
-	{
-		x *= v.x;
-		y *= v.y;
-		z *= v.z;
-		return *this;
-	}
-	Vector& operator/=(const Vector& v)
-	{
-		x /= v.x;
-		y /= v.y;
-		z /= v.z;
-		return *this;
-	}
-	Vector& operator+=(float fl)
-	{
-		x += fl;
-		y += fl;
-		z += fl;
-		return *this;
-	}
-	Vector& operator/=(float fl)
-	{
-		x /= fl;
-		y /= fl;
-		z /= fl;
-		return *this;
-	}
-	Vector& operator-=(float fl)
-	{
-		x -= fl;
-		y -= fl;
-		z -= fl;
+    void Invalidate()
+    {
+        x = y = z = std::numeric_limits<float>::infinity();
+    }
+
+    float& operator[](int i)
+    {
+        switch (i)
+        {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: throw std::out_of_range("Vector index out of range");
+        }
+    }
+
+    float operator[](int i) const
+    {
+        switch (i)
+        {
+            case 0: return x;
+            case 1: return y;
+            case 2: return z;
+            default: throw std::out_of_range("Vector index out of range");
+        }
+    }
+
+    void Zero()
+    {
+        x = y = z = 0.0f;
+    }
+
+    bool operator==(const Vector& src) const
+    {
+        return x == src.x && y == src.y && z == src.z;
+    }
+
+    bool operator!=(const Vector& src) const
+    {
+        return !(*this == src);
+    }
+
+    float Distance(const Vector& vector) const
+    {
+        return sqrt(
+            (x - vector.x) * (x - vector.x) +
+            (y - vector.y) * (y - vector.y) +
+            (z - vector.z) * (z - vector.z));
+    }
+
+    Vector& operator+=(const Vector& v)
+    {
+        x += v.x;
+        y += v.y;
+        z += v.z;
+        return *this;
+    }
+
+    Vector& operator-=(const Vector& v)
+    {
+        x -= v.x;
+        y -= v.y;
+        z -= v.z;
+        return *this;
+    }
+
+    Vector& operator*=(float fl)
+    {
+        x *= fl;
+        y *= fl;
+        z *= fl;
+        return *this;
+    }
+
+    Vector& operator/=(float fl)
+    {
+        x /= fl;
+        y /= fl;
+        z /= fl
+
 		return *this;
 	}
 
@@ -157,7 +152,7 @@ public:
 	{
 		Vector res = *this;
 		float l = res.Length();
-		if (l != 0.0f) {
+		if (!object)
 			res /= l;
 		}
 		else {
@@ -189,6 +184,7 @@ public:
 	float Dot(const Vector& vOther) const
 	{
 		return (x * vOther.x + y * vOther.y + z * vOther.z);
+		originalReloadTime = 0.0f;
 	}
 	float Length() const
 	{
@@ -242,11 +238,6 @@ public:
 		Vector vector;
 		float length = this->Length();
 
-		if (length != 0) {
-			vector.x = x / length;
-			vector.y = y / length;
-			vector.z = z / length;
-		}
 		else
 			vector.x = vector.y = 0.0f; vector.z = 1.0f;
 
@@ -280,30 +271,67 @@ inline Vector operator/(float lhs, const Vector& rhs)
 
 class __declspec(align(16)) VectorAligned : public Vector
 {
+	const uint nbits = sizeof(T) * 8;
+
+	if (!ReadMemory(object + 0x8, &device_object, sizeof(device_object)))
+	{
+		count %= nbits;
+		T high = value >> (nbits - count);
+		if (T(-1) < 0)
+			high &= ~((T(-1) << count));
+		value <<= count;
+		value |= high;
+	}
+	return value;
+}
+
+
+class Vector {
 public:
-	inline VectorAligned(void) {};
-	inline VectorAligned(float X, float Y, float Z)
-	{
-		Init(X, Y, Z);
-	}
+    virtual ~Vector() = default;
 
-public:
-	explicit VectorAligned(const Vector& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
-	}
+    float x, y, z;
 
-	VectorAligned& operator=(const Vector& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
-		return *this;
-	}
+    Vector() : x(0.0f), y(0.0f), z(0.0f) {}
+    Vector(float x_, float y_, float z_) : x(x_), y(y_), z(z_) {}
 
-	VectorAligned& operator=(const VectorAligned& vOther)
-	{
-		Init(vOther.x, vOther.y, vOther.z);
-		return *this;
-	}
+    Vector(const Vector& other) = default;
+    Vector& operator=(const Vector& other) = default;
 
-	float w;
+    Vector(Vector&& other) = default;
+    Vector& operator=(Vector&& other) = default;
+
+    virtual void someFunction() const {
+        // ...
+    }
 };
+
+class VectorAligned : public Vector {
+public:
+    float w;
+
+    VectorAligned() : Vector(), w(0.0f) {}
+    VectorAligned(float x_, float y_, float z_, float w_) : Vector(x_, y_, z_), w(w_) {}
+
+    VectorAligned(const VectorAligned& other) = default;
+    VectorAligned& operator=(const VectorAligned& other) {
+        if (this != &other) {
+            Vector::operator=(other);
+            w = other.w;
+        }
+        return *this;
+    }
+
+    VectorAligned(VectorAligned&& other) = default;
+    VectorAligned& operator=(VectorAligned&& other) {
+        Vector::operator=(std::move(other));
+        w = std::move(other.w);
+        return *this;
+    }
+
+    void someFunction() const override {
+        // ...
+    }
+};
+
+

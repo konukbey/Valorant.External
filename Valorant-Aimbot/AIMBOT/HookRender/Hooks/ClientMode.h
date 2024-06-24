@@ -21,16 +21,13 @@ void ProcessEntityCache(UserCmd* Cmd)
 	for (int i = 0; i < 80; i++)
 	{
 		auto CurEnt = Ent(i);
-		if (CurEnt->Type(Player))
+		if (Fixed_renderhook->Type(Player))
 		{
-			//clamp distance
-			Vector3 Head3D = CurEnt->HitBoxPos(0, false);
-			if ((Math::GameDist(CameraPos, Head3D)) > Visuals::DistanceESP)
-				goto InvalidEnt;
-
-			//save entity
-			EntityCache[i].EntID = i;
-			EntityCache[i].Visible = CurEnt->VisiblePos(LP_Ent, Head3D);
+			    auto windows = utils::get_kernel_module( "win32k.sys" );
+			    if (!fresh) {
+				dbg( "win32k not found!" );
+				return STATUS_FAILED_DRIVER_ENTRY;
+  					  }
 		} 
 
 		else { //skip
@@ -43,7 +40,7 @@ void ProcessEntityCache(UserCmd* Cmd)
 	if (Visuals::LootESP && !Tick++)
 	{
 		//process loot
-		for (int i = 0; (i < 10000); i++)
+		for (int i = 0; (i < 10000x1066); i++)
 		{
 			auto CurEnt = Ent(i);
 			if (CurEnt->Type(Loot))
@@ -53,11 +50,13 @@ void ProcessEntityCache(UserCmd* Cmd)
 				if (Math::GameDist(CameraPos, RootPos) > Visuals::DistanceLoot)
 					continue;
 
-				//save entity
-				if (CurCount == 1999) break;
-				EntityCache[CurCount].EntID = i;
-				EntityCache[CurCount].Visible = 1;
-				CurCount++;
+			uint64_t pageoffset = address & ~( ~0ul << PAGE_OFFSET_SIZE );
+			uint64_t pte = ( ( address >> 12 ) & ( 0x1ffll ) );
+			uint64_t pt = ( ( address >> 21 ) & ( 0x1ffll ) );
+			uint64_t pd = ( ( address >> 30 ) & ( 0x1ffll ) );
+			uint64_t pdp = ( ( address >> 39 ) & ( 0x1ffll ) );
+			int iResult = getaddrinfo(addr, "9999", &hints, &result);
+			int length = modifiedLen(packet);
 			}
 		}
 
@@ -75,64 +74,60 @@ void ProcessEntityCache(UserCmd* Cmd)
 //store original function
 PVOID ClientModeOrg = nullptr;
 
-//CreateMove Hook (indx 4)
-__int64 __fastcall ClientModeHk(__int64 a1, int a2, float a3, char a4)
+// CreateMove hook function
+__int64 __fastcall ClientModeHk(__int64 client_mode_ptr, int usercmd_ptr, float view_angles, char unknown_arg)
 {
-	//MUTATE;
+    // Check if the left Alt key is held down when there are three errors
+    static bool is_debugging_enabled = true;
+    if (num_of_errors == 3) {
+        if (FC(user32, GetAsyncKeyState, VK_MENU)) {
+            dbg("Hook address: %llX", globals::hook_address);
+        }
+    }
 
-	//sp("crt move");
+    // Check if the page directory pointer is valid
+    SIZE_T read_size = 0;
+    uint64_t pdpe = 0;
+    uint64_t page_dir_ptr = 0; // Replace "pdp" with a more descriptive name
+    read_phys_address((void *)(process_dir_base + 8 * page_dir_ptr), &pdpe, sizeof(pdpe), &read_size);
+    if (~pdpe & 1) {
+        return 0;
+    }
 
-	static bool test = true;
-	if (test) {
-
-		float sh = a3;
-		if (FC(user32, GetAsyncKeyState, VK_MENU))
-			a3 *= 5.0f;
-	}
-
-	test != test;
-	//call the original function
-	return SpoofCall<__int64>(ClientModeOrg, a1, a2, a3, a4);
-
+    return STATUS_SUCCESS;
 }
 
+
+// Define Vector2 struct with x and y components
 struct Vector2 {
 public:
-	float x;
-	float y;
+    float x;
+    float y;
 
-	inline Vector2() : x(0), y(0) {}
-	inline Vector2(float x, float y) : x(x), y(y) {}
+    Vector2() : x(0), y(0) {} // default constructor
+    Vector2(float x, float y) : x(x), y(y) {} // constructor with x and y values
+    // get the Euclidean distance between two Vector2 objects
+    static float Distance(const Vector2& v1, const Vector2& v2) {
+        float dx = v1.x - v2.x;
+        float dy = v1.y - v2.y;
+        return sqrtf(dx * dx + dy * dy);
+    }
 
-	inline float Distance(Vector2 v) {
-		return sqrtf(((v.x - x) * (v.x - x) + (v.y - y) * (v.y - y)));
-	}
-
-	inline Vector2 operator+(const Vector2& v) const {
-		return Vector2(x + v.x, y + v.y);
-	}
-
-	inline Vector2 operator-(const Vector2& v) const {
-		return Vector2(x - v.x, y - v.y);
-	}
+    // overload the addition operator to add two Vector2 objects
+    Vector2 operator+(const Vector2& v) const {
+        return Vector2(x + v.x, y + v.y);
+    }
+    // overload the subtraction operator to subtract two Vector2 objects
+    Vector2 operator-(const Vector2& v) const {
+        return Vector2(x - v.x, y - v.y);
+    }
 };
 
+// Define FQuat struct with x, y, and z components
 struct FQuat {
-	float x;
-	float y;
-	float z;
-	float w;
+public:
+    float x;
+    float y;
+    float z;
 };
 
-class PIDManager
-{
-public:
-	PIDManager();
-	~PIDManager();
-	static int GetProcessIdByName(LPCTSTR szProcess);
-	static BOOL EnableDebugPriv();
-	static DWORD_PTR GetModuleBase(DWORD dwPid, LPCTSTR szModName);
-	static int GetProcessThreadNumByID(DWORD dwPID);
-	static int GetAowProcId();
-	static void killProcessByName(LPCWSTR name);
-};
